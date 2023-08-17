@@ -7,6 +7,16 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { nanoid } from "nanoid";
 import { getFileExtension } from "~/utils/utils";
 import { toast } from "react-toastify";
+// uploader
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+
+const S3_Client = new S3Client({
+  region: "us-west-2",
+  credentials: {
+    accessKeyId: "AKIA3WFV2SULDNNESNDC",
+    secretAccessKey: "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",
+  },
+});
 
 const VideoUploader = ({
   uploading,
@@ -35,6 +45,17 @@ const VideoUploader = ({
     const video = event.target.files?.[0];
     if (video) {
       setUploading(true);
+      const command = new PutObjectCommand({
+        Bucket: "mentorey",
+        Key: `${nanoid()}.${getFileExtension(video.name)}`,
+        Body: video,
+      });
+
+      console.log(command);
+      S3_Client.send(command)
+        .then((res) => console.log(res))
+        .catch((err) => console.error("uploadError: ", err))
+        .finally(() => setUploading(false));
       // Storage.remove(videoName, { level: "public" });
       // Storage.put(nanoid() + "." + getFileExtension(video.name), video, {
       //   level: "public",
