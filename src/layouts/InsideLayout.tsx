@@ -8,7 +8,7 @@ export default function InsideLayout({
   return (
     <>
       <InsideHeader />
-      {children}
+      <div className="py-4">{children}</div>
     </>
   );
 }

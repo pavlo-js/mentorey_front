@@ -245,7 +245,7 @@ function InsideHeader() {
               </MenuItem>
               {curUser
                 ? !isTeacher && (
-                    <MenuItem onClick={() => router.push("/become_teacher")}>
+                    <MenuItem onClick={() => router.push("/pupil/be_coach")}>
                       <ListItemIcon>
                         <AssignmentIndIcon fontSize="small" />
                       </ListItemIcon>
@@ -254,7 +254,7 @@ function InsideHeader() {
                   )
                 : null}
               {curUser && isTeacher ? (
-                <MenuItem onClick={() => router.push(`/new_lesson`)}>
+                <MenuItem onClick={() => router.push(`/coach/new_lesson`)}>
                   <ListItemIcon>
                     <AddToPhotosIcon fontSize="small" />
                   </ListItemIcon>
@@ -262,7 +262,7 @@ function InsideHeader() {
                 </MenuItem>
               ) : null}
               {curUser && isTeacher ? (
-                <MenuItem onClick={() => router.push(`/teacher_dashboard`)}>
+                <MenuItem onClick={() => router.push(`/coach/dashboard`)}>
                   <ListItemIcon>
                     <DashboardIcon fontSize="small" />
                   </ListItemIcon>
