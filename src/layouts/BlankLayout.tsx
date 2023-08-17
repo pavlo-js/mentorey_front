@@ -1,5 +1,4 @@
-import BlankHeader from "~/components/widgets/BlankHeader";
-import Footer from "~/components/widgets/Footer";
+import BlankHeader from "~/components/layout/BlankHeader";
 
 export default function BlankLayout({
   children,
@@ -10,7 +9,6 @@ export default function BlankLayout({
     <>
       <BlankHeader />
       {children}
-      <Footer />
     </>
   );
 }

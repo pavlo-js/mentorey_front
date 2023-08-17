@@ -35,7 +35,7 @@ export default function LoginPage() {
   };
 
   async function LogIn() {
-    const url = "/api/auth/signin";
+    const url = "/api/auth/login";
     const request = {
       method: "POST",
       headers: {

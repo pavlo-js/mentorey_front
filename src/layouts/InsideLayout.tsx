@@ -1,5 +1,4 @@
-import InHeader from "~/components/widgets/InHeader";
-import Footer from "~/components/widgets/Footer";
+import InsideHeader from "~/components/layout/InsideHeader";
 
 export default function InsideLayout({
   children,
@@ -8,9 +7,8 @@ export default function InsideLayout({
 }) {
   return (
     <>
-      <InHeader />
+      <InsideHeader />
       {children}
-      <Footer />
     </>
   );
 }

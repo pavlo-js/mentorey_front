@@ -3,7 +3,7 @@ import createConnection from "~/database/db";
 import { RowDataPacket } from "mysql2/promise";
 import bcrypt from "bcrypt";
 
-const verifyHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+const loginHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const { email, password } = req.body;
 
@@ -33,4 +33,4 @@ const verifyHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default verifyHandler;
+export default loginHandler;

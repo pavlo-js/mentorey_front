@@ -1,6 +1,5 @@
 import type { Config } from "tailwindcss";
 
-const defaultTheme = require("tailwindcss/defaultTheme");
 const colors = require("tailwindcss/colors");
 
 const config: Config = {
@@ -27,19 +26,11 @@ const config: Config = {
         primary: colors.emerald,
         secondary: colors.blue,
       },
-      fontFamily: {
-        sans: ["var(--font-inter)", ...defaultTheme.fontFamily.sans],
-      },
       width: {
         "calc-100-minus-75": "calc(100% - 75px)",
       },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      },
     },
   },
-  plugins: [require("@tailwindcss/typography")],
+  plugins: [],
 };
 export default config;
