@@ -7,6 +7,7 @@ import VideoUploader from "./VideoUploader";
 import { useRouter } from "next/navigation";
 import { selectAuthState } from "~/slices/authSlice";
 import { useSelector } from "react-redux";
+import useSetAuthState from "~/hooks/useSetAuthState";
 
 const BeCoachPage = () => {
   const [meAsTeacher, setMeAsTeacher] = useState<string>("");
@@ -20,6 +21,7 @@ const BeCoachPage = () => {
 
   const router = useRouter();
   const curUser: any = useSelector(selectAuthState);
+  const setAuthState = useSetAuthState();
 
   function getVideoName(data: string) {
     setVideoName(data);
@@ -51,10 +53,16 @@ const BeCoachPage = () => {
         }),
       };
       fetch(url, request)
-        .then(() => router.push("/coach/new_lesson"))
+        .then((res) => res.json())
+        .then((data) => successHandler(data))
         .catch((err) => console.error(err))
         .finally(() => setSaving(false));
     }
+  }
+
+  function successHandler(data: any) {
+    setAuthState(data.user);
+    router.push("/coach/new_lesson");
   }
 
   return (

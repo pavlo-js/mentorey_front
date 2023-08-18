@@ -36,3 +36,22 @@ export interface FilterData {
   value: string;
   type: string;
 }
+
+export interface CurrencyInfo {
+  symbol: string;
+  name: string;
+  symbol_native: string;
+  decimal_digits: number;
+  rounding: number;
+  code: string;
+  name_plural: string;
+}
+
+export interface CurrencyData {
+  [key: string]: CurrencyInfo;
+}
+
+export interface Category {
+  id: number;
+  label: string;
+}

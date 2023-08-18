@@ -12,11 +12,15 @@ const beCoachHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       const query =
         "UPDATE users SET is_teacher = 1, intro_video = ?, MAT = ?, LS = ? WHERE id = ?";
       const params = [intro_video, MAT, LS, userID];
+      await dbConnect.execute(query, params);
+      const getUserQuery = "SELECT * FROM users WHERE id = ?";
+      const getUserParams = [userID];
       const [results] = (await dbConnect.execute(
-        query,
-        params
+        getUserQuery,
+        getUserParams
       )) as RowDataPacket[];
-      res.status(200);
+
+      res.status(200).json({ user: results[0] });
     } catch (error) {
       res.status(500).json(error);
     }
