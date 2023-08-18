@@ -46,7 +46,7 @@ const LinkStyle = {
 
 function InsideHeader() {
   const router = useRouter();
-  const curUser = useSelector(selectAuthState);
+  const curUser: any = useSelector(selectAuthState);
   const isTeacher = curUser.is_teacher;
 
   React.useEffect(() => {

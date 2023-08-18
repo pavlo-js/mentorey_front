@@ -1,17 +1,19 @@
-"use client";
-
-import React, { useRef, useState, useEffect } from "react";
-import { Box, Button, Divider } from "@mui/material";
+import React, { useRef, useState } from "react";
+import { Box } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { nanoid } from "nanoid";
-import { getFileExtension } from "~/utils/utils";
+import { getFileExtension, getFullS3Uri } from "~/utils/utils";
 import { toast } from "react-toastify";
 // uploader
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+  PutObjectCommand,
+  DeleteObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
 
 const S3_Client = new S3Client({
-  region: "us-west-2",
+  region: "eu-central-1",
   credentials: {
     accessKeyId: "AKIA3WFV2SULDNNESNDC",
     secretAccessKey: "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",
@@ -19,65 +21,73 @@ const S3_Client = new S3Client({
 });
 
 const VideoUploader = ({
-  uploading,
+  uploading, // State to set uploading status of parent element
   setUploading,
-  sendVideoName,
+  sendVideoName, // This state is passed to parent and sent at there.
 }: {
   uploading: boolean;
   setUploading: React.Dispatch<React.SetStateAction<boolean>>;
   sendVideoName: (data: string) => void;
 }) => {
   const videoInputRef = useRef<HTMLInputElement | null>(null);
-  // const [uploading, setUploading] = useState<boolean>(false);
   const [videoFile, setVideoFile] = useState<File | undefined>(undefined);
   const [videoKey, setVideoKey] = useState<number>(0);
   const [videoName, setVideoName] = useState<string>("");
-
-  // useEffect(() => {
-  // 	console.log(videoFile && URL.createObjectURL(videoFile));
-  // }, [videoFile]);
 
   function getVideo() {
     videoInputRef.current?.click();
   }
 
-  function uploadVideo(event: React.ChangeEvent<HTMLInputElement>) {
+  function uploadNewVideo(event: React.ChangeEvent<HTMLInputElement>) {
+    console.log("newVideo");
     const video = event.target.files?.[0];
     if (video) {
+      const fileName = `${nanoid()}.${getFileExtension(video.name)}`;
       setUploading(true);
       const command = new PutObjectCommand({
         Bucket: "mentorey",
-        Key: `${nanoid()}.${getFileExtension(video.name)}`,
+        Key: `intro_video/${fileName}`,
         Body: video,
       });
 
-      console.log(command);
       S3_Client.send(command)
-        .then((res) => console.log(res))
-        .catch((err) => console.error("uploadError: ", err))
+        .then(() => {
+          setVideoFile(video);
+          setVideoKey(videoKey + 1);
+          setVideoName(fileName);
+          sendVideoName(`intro_video/${fileName}`);
+          toast.success("Video is uploaded successfully", {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          });
+        })
+        .catch((err) => {
+          console.error("uploadError: ", err);
+          toast.error("Something went wrong. Please try again", {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          });
+        })
         .finally(() => setUploading(false));
-      // Storage.remove(videoName, { level: "public" });
-      // Storage.put(nanoid() + "." + getFileExtension(video.name), video, {
-      //   level: "public",
-      // })
-      //   .then((res) => {
-      //     setVideoFile(video);
-      //     setVideoKey(videoKey + 1);
-      //     setUploading(false);
-      //     sendVideoName(res.key);
-      //     setVideoName(res.key);
-      //     toast.success("Video is uploaded successfully", {
-      //       position: toast.POSITION.BOTTOM_RIGHT,
-      //     });
-      //   })
-      //   .catch((err) => {
-      //     toast.error("Network error! Please try again.", {
-      //       position: toast.POSITION.BOTTOM_RIGHT,
-      //     });
-      //     console.log(err);
-      //   });
     }
   }
+
+  function updateOriginalVideo(event: React.ChangeEvent<HTMLInputElement>) {
+    console.log("update");
+    const command = new DeleteObjectCommand({
+      Bucket: "mentorey",
+      Key: `intro_video/${videoName}`,
+    });
+    S3_Client.send(command)
+      .then((res) => {
+        console.log(res);
+        uploadNewVideo(event);
+      })
+      .catch((err) => console.error("Delete Error : ", err));
+  }
+
+  function changeHandler(event: React.ChangeEvent<HTMLInputElement>) {
+    videoName ? updateOriginalVideo(event) : uploadNewVideo(event);
+  }
+
   return (
     <>
       <Box className="my-4">
@@ -87,7 +97,7 @@ const VideoUploader = ({
           hidden
           ref={videoInputRef}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            uploadVideo(e);
+            changeHandler(e);
           }}
         />
         <LoadingButton

@@ -73,3 +73,7 @@ export function generateVerificationCode() {
 
   return code;
 }
+
+export function getFullS3Uri(objectKey: string) {
+  return `https://mentorey.s3.eu-central-1.amazonaws.com/${objectKey}`;
+}

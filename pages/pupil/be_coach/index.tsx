@@ -1,20 +1,12 @@
-// import InsideLayout from "~/layouts/InsideLayout";
-
-// export default function BeCoachPage() {
-//   return (
-//     <InsideLayout>
-//       <h1>This is be coach pge</h1>
-//     </InsideLayout>
-//   );
-// }
 import React, { useState, useEffect } from "react";
 import InsideLayout from "~/layouts/InsideLayout";
 import { Button, Divider, Paper, TextField, Typography } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 import VideoUploader from "./VideoUploader";
-import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
+import { selectAuthState } from "~/slices/authSlice";
+import { useSelector } from "react-redux";
 
 const BeCoachPage = () => {
   const [meAsTeacher, setMeAsTeacher] = useState<string>("");
@@ -25,9 +17,9 @@ const BeCoachPage = () => {
   const [validVideo, setValidVideo] = useState<boolean>(true);
   const [uploading, setUploading] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
-  const [curUser, setCurUser] = useState<any>();
 
   const router = useRouter();
+  const curUser: any = useSelector(selectAuthState);
 
   function getVideoName(data: string) {
     setVideoName(data);
@@ -45,13 +37,23 @@ const BeCoachPage = () => {
   function submitData() {
     if (validateData()) {
       setSaving(true);
-      const attributes = {
-        "custom:is_teacher": "1", // set is_teacher to TRUE
-        "custom:intro_video": videoName,
-        "custom:MAT": meAsTeacher,
-        "custom:LS": lessonStyle,
-        "custom:trial_price": 5,
+      const url = "/api/pupil/be_coach";
+      const request = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userID: curUser.id,
+          intro_video: videoName,
+          MAT: meAsTeacher,
+          LS: lessonStyle,
+        }),
       };
+      fetch(url, request)
+        .then(() => router.push("/coach/new_lesson"))
+        .catch((err) => console.error(err))
+        .finally(() => setSaving(false));
     }
   }
 
