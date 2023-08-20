@@ -3,34 +3,16 @@ import createConnection from "~/database/db";
 import { RowDataPacket } from "mysql2/promise";
 
 const createLesson = async (req: NextApiRequest, res: NextApiResponse) => {
-  const {
-    userID,
-    lessonType,
-    lessonPack,
-    disRate,
-    lessonTitle,
-    lessonCategory,
-    price,
-    description,
-    purpose,
-  } = req.body;
+  const { userID } = req.body;
   try {
     const dbConnect = await createConnection();
-    const query =
-      "INSERT INTO lessons (ownerID, title, type, price, pack, disRate, categoryID, description, purpose) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    const params = [
-      userID,
-      lessonTitle,
-      lessonType,
-      price,
-      lessonPack,
-      disRate,
-      lessonCategory,
-      description,
-      purpose,
-    ];
-    await dbConnect.execute(query, params);
-    res.status(200).send("success");
+    const query = "SELECT * FROM lessons WHERE ownerID = ?";
+    const params = [userID];
+    const [lessons] = (await dbConnect.execute(
+      query,
+      params
+    )) as RowDataPacket[];
+    res.status(200).json({ lessons });
   } catch (error) {
     res.status(500).json(error);
   }
@@ -49,6 +31,8 @@ export default createLesson;
 // 	`categoryID` INT(11) NULL DEFAULT NULL,
 // 	`description` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 // 	`purpose` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
+// 	`created_at` TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+// 	`updated_at` TIMESTAMP NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
 // 	PRIMARY KEY (`id`) USING BTREE,
 // 	INDEX `ownerID` (`ownerID`) USING BTREE,
 // 	INDEX `categoryID` (`categoryID`) USING BTREE

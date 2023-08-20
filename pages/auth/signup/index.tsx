@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import { countries } from "~/shared/data";
 import { useRouter } from "next/router";
 import useSetAuthState from "~/hooks/useSetAuthState";
+import Link from "next/link";
 
 // Set the datepicker's timezone as UTC
 dayjs.extend(utc);
@@ -363,8 +364,8 @@ export default function SignUpPage() {
             </button>
             <p className="text-center">
               Already a member? &nbsp;&nbsp; &nbsp;{" "}
-              <a
-                href="/signin"
+              <Link
+                href="/auth/login"
                 className="inline-flex items-center space-x-1 font-medium text-primary-600"
               >
                 <span>Sign In now </span>
@@ -384,7 +385,7 @@ export default function SignUpPage() {
                     />
                   </svg>
                 </span>
-              </a>
+              </Link>
             </p>
           </div>
         </form>

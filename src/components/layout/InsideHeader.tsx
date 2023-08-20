@@ -31,6 +31,7 @@ import CoPresentIcon from "@mui/icons-material/CoPresent";
 // Redux
 import { selectAuthState } from "~/slices/authSlice";
 import { useSelector } from "react-redux";
+import Link from "next/link";
 
 const pages = ["Products", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
@@ -130,25 +131,25 @@ function InsideHeader() {
                 <ListItemIcon>
                   <CastForEducationIcon fontSize="small" color="primary" />
                 </ListItemIcon>
-                <Typography>Learn</Typography>
+                <Link href="/general/learn">Learn</Link>
               </MenuItem>
               <MenuItem onClick={() => router.push("/findcoach")}>
                 <ListItemIcon>
                   <PageviewIcon fontSize="small" color="primary" />
                 </ListItemIcon>
-                <Typography textAlign="center">Find a Coach</Typography>
+                <Link href="/general/coach">Find a Coach</Link>
               </MenuItem>
               <MenuItem onClick={() => router.push("/seminar")}>
                 <ListItemIcon>
                   <Diversity1Icon fontSize="small" color="primary" />
                 </ListItemIcon>
-                <Typography textAlign="center">Seminar</Typography>
+                <Link href="/general/seminar">Seminar</Link>
               </MenuItem>
               <MenuItem onClick={() => router.push("/message")}>
                 <ListItemIcon>
                   <ForumIcon fontSize="small" color="primary" />
                 </ListItemIcon>
-                <Typography textAlign="center">Message</Typography>
+                <Link href="/message">Message</Link>
               </MenuItem>
             </Menu>
           </Box>
@@ -178,7 +179,7 @@ function InsideHeader() {
               justifyContent: "center",
             }}
           >
-            <Button onClick={() => router.push("/learn")} sx={LinkStyle}>
+            <Button sx={LinkStyle}>
               <CastForEducationIcon className="mx-auto block" />
               Learn
             </Button>
@@ -245,20 +246,20 @@ function InsideHeader() {
               </MenuItem>
               {curUser
                 ? !isTeacher && (
-                    <MenuItem onClick={() => router.push("/pupil/be_coach")}>
+                    <MenuItem>
                       <ListItemIcon>
                         <AssignmentIndIcon fontSize="small" />
                       </ListItemIcon>
-                      Become a Teacher
+                      <Link href="/pupil/be_coach">Become a Teacher</Link>
                     </MenuItem>
                   )
                 : null}
               {curUser && isTeacher ? (
-                <MenuItem onClick={() => router.push(`/coach/new_lesson`)}>
+                <MenuItem>
                   <ListItemIcon>
                     <AddToPhotosIcon fontSize="small" />
                   </ListItemIcon>
-                  Create a new Lesson
+                  <Link href="/coach/new_lesson">Create a new Lesson</Link>
                 </MenuItem>
               ) : null}
               {curUser && isTeacher ? (
@@ -266,7 +267,7 @@ function InsideHeader() {
                   <ListItemIcon>
                     <DashboardIcon fontSize="small" />
                   </ListItemIcon>
-                  My Teacher Dashboard
+                  <Link href="/coach/dashboard">My Teacher Dashboard</Link>
                 </MenuItem>
               ) : null}
               <MenuItem onClick={handleCloseUserMenu}>

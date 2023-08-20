@@ -11,7 +11,7 @@ import { selectAuthState } from "~/slices/authSlice";
 import { useSelector } from "react-redux";
 import { CurrencyData } from "~/shared/CurrencyData";
 import { Category } from "~/shared/types";
-import { data } from "autoprefixer";
+import { useRouter } from "next/router";
 
 export default function NewLessonPage() {
   const [categories, setCategories] = React.useState<Category[]>([]);
@@ -19,6 +19,7 @@ export default function NewLessonPage() {
   const [purpose, setPurpose] = React.useState<string>("");
   const curUser = useSelector(selectAuthState);
   const currencySymbol = CurrencyData[curUser.currency].symbol;
+  const router = useRouter();
 
   React.useEffect(() => {
     getAllCategories();
@@ -43,8 +44,8 @@ export default function NewLessonPage() {
     };
     fetch(url, request).then((res) => {
       console.log(res);
+      router.push("/coach/dashboard");
     });
-    console.log(data);
   }
 
   return (

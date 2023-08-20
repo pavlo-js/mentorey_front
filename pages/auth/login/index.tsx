@@ -4,6 +4,7 @@ import { TextField } from "@mui/material";
 import Spinner from "~/components/common/Spinner";
 import { toast } from "react-toastify";
 import useSetAuthState from "~/hooks/useSetAuthState";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = React.useState<string>("");
@@ -168,8 +169,8 @@ export default function LoginPage() {
             </button>
             <p className="text-center">
               Not registered yet? &nbsp;&nbsp; &nbsp;{" "}
-              <a
-                href="/signup"
+              <Link
+                href="/auth/signup"
                 className="inline-flex items-center space-x-1 font-medium text-primary-600"
               >
                 <span>Register now </span>
@@ -189,7 +190,7 @@ export default function LoginPage() {
                     />
                   </svg>
                 </span>
-              </a>
+              </Link>
             </p>
           </div>
         </form>
