@@ -137,7 +137,7 @@ function InsideHeader() {
                 <ListItemIcon>
                   <PageviewIcon fontSize="small" color="primary" />
                 </ListItemIcon>
-                <Link href="/general/coach">Find a Coach</Link>
+                <Link href="/general/find_coach">Find a Coach</Link>
               </MenuItem>
               <MenuItem onClick={() => router.push("/seminar")}>
                 <ListItemIcon>
@@ -179,19 +179,19 @@ function InsideHeader() {
               justifyContent: "center",
             }}
           >
-            <Button sx={LinkStyle}>
+            <Button sx={LinkStyle} href="/general/learn">
               <CastForEducationIcon className="mx-auto block" />
               Learn
             </Button>
-            <Button onClick={() => router.push("/findcoach")} sx={LinkStyle}>
+            <Button sx={LinkStyle} href="/general/find_coach">
               <PageviewIcon className="mx-auto block" />
               Find a Coach
             </Button>
-            <Button onClick={() => router.push("/seminar")} sx={LinkStyle}>
+            <Button sx={LinkStyle} href="/general/seminar">
               <Diversity1Icon className="mx-auto block" />
               Seminar
             </Button>
-            <Button onClick={() => router.push("/message")} sx={LinkStyle}>
+            <Button sx={LinkStyle} href="/message">
               <ForumIcon className="mx-auto block" />
               Message
             </Button>
