@@ -16,7 +16,7 @@ const VerifyPage: NextPageWithLayout = () => {
   const curUser = useSelector(selectAuthState);
   useEffect(() => {
     if (curUser.is_verified) {
-      const url = curUser.is_teacher ? "/coach/dashboard" : "/pupil/learn";
+      const url = curUser.is_teacher ? "/coach/dashboard" : "/general/learn";
       router.push(url);
     }
   }, []);

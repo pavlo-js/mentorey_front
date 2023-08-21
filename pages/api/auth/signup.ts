@@ -8,8 +8,16 @@ import { generateVerificationCode } from "~/utils/utils";
 
 const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
-    const { firstName, lastName, email, password, gender, country, birthday } =
-      req.body;
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      gender,
+      country,
+      birthday,
+      timezone,
+    } = req.body;
 
     try {
       const [existingUser] = (await db.execute(
@@ -32,7 +40,7 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       // // Insert user into the database
 
       await db.execute(
-        "INSERT INTO users (first_name, last_name, email, password, gender, country, birthday, verification_token, verification_token_expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO users (first_name, last_name, email, password, gender, country, birthday, timezone, verification_token, verification_token_expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
           firstName,
           lastName,
@@ -41,6 +49,7 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           gender,
           country,
           birthday,
+          timezone,
           verificationToken,
           verificationTokenExpiresAt,
         ]

@@ -3,7 +3,7 @@ import InsideLayout from "~/layouts/InsideLayout";
 import { Button, Divider, Paper, TextField, Typography } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
-import VideoUploader from "./VideoUploader";
+import VideoUploader from "~/components/common/VideoUploader";
 import { useRouter } from "next/navigation";
 import { selectAuthState } from "~/slices/authSlice";
 import { useSelector } from "react-redux";

@@ -127,25 +127,25 @@ function InsideHeader() {
                 display: { xs: "block", md: "none" },
               }}
             >
-              <MenuItem onClick={() => router.push("/learn")}>
+              <MenuItem>
                 <ListItemIcon>
                   <CastForEducationIcon fontSize="small" color="primary" />
                 </ListItemIcon>
                 <Link href="/general/learn">Learn</Link>
               </MenuItem>
-              <MenuItem onClick={() => router.push("/findcoach")}>
+              <MenuItem>
                 <ListItemIcon>
                   <PageviewIcon fontSize="small" color="primary" />
                 </ListItemIcon>
                 <Link href="/general/find_coach">Find a Coach</Link>
               </MenuItem>
-              <MenuItem onClick={() => router.push("/seminar")}>
+              <MenuItem>
                 <ListItemIcon>
                   <Diversity1Icon fontSize="small" color="primary" />
                 </ListItemIcon>
                 <Link href="/general/seminar">Seminar</Link>
               </MenuItem>
-              <MenuItem onClick={() => router.push("/message")}>
+              <MenuItem>
                 <ListItemIcon>
                   <ForumIcon fontSize="small" color="primary" />
                 </ListItemIcon>
@@ -181,19 +181,19 @@ function InsideHeader() {
           >
             <Button sx={LinkStyle} href="/general/learn">
               <CastForEducationIcon className="mx-auto block" />
-              Learn
+              <Link href="/general/learn">Learn</Link>
             </Button>
             <Button sx={LinkStyle} href="/general/find_coach">
               <PageviewIcon className="mx-auto block" />
-              Find a Coach
+              <Link href="/general/find_coach">Find a Coach</Link>
             </Button>
             <Button sx={LinkStyle} href="/general/seminar">
               <Diversity1Icon className="mx-auto block" />
-              Seminar
+              <Link href="/general/seminar">Seminar</Link>
             </Button>
             <Button sx={LinkStyle} href="/message">
               <ForumIcon className="mx-auto block" />
-              Message
+              <Link href="/message">Message</Link>
             </Button>
           </Box>
           {/* Avatar Button */}
@@ -232,17 +232,17 @@ function InsideHeader() {
                   <ListItemIcon>
                     <CoPresentIcon fontSize="small" />
                   </ListItemIcon>
-                  <Link href={`/coach/profile/${curUser.id}`}>
+                  <Link href={`/profile/coach/${curUser.id}`}>
                     My Coach Profile
                   </Link>
                 </MenuItem>
               ) : null}
               <Divider />
-              <MenuItem onClick={() => router.push(`/uprof_edit`)}>
+              <MenuItem>
                 <ListItemIcon>
                   <BorderColorIcon fontSize="small" />
                 </ListItemIcon>
-                Edit my profile
+                <Link href="/profile/edit">Edit my profile</Link>
               </MenuItem>
               {curUser
                 ? !isTeacher && (
@@ -250,7 +250,7 @@ function InsideHeader() {
                       <ListItemIcon>
                         <AssignmentIndIcon fontSize="small" />
                       </ListItemIcon>
-                      <Link href="/pupil/be_coach">Become a Teacher</Link>
+                      <Link href="/pupil/be_coach">Become a Coach</Link>
                     </MenuItem>
                   )
                 : null}
@@ -267,7 +267,7 @@ function InsideHeader() {
                   <ListItemIcon>
                     <DashboardIcon fontSize="small" />
                   </ListItemIcon>
-                  <Link href="/coach/dashboard">My Teacher Dashboard</Link>
+                  <Link href="/coach/dashboard">My Coach Dashboard</Link>
                 </MenuItem>
               ) : null}
               <MenuItem onClick={handleCloseUserMenu}>

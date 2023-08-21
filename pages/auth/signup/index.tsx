@@ -116,6 +116,7 @@ export default function SignUpPage() {
         gender,
         country: country?.code,
         birthday: formattedDate,
+        timezone: dayjs.tz.guess(),
       }),
     };
     setSpin(true);

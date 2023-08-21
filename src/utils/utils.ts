@@ -77,3 +77,11 @@ export function generateVerificationCode() {
 export function getFullS3Uri(objectKey: string) {
   return `https://mentorey.s3.eu-central-1.amazonaws.com/${objectKey}`;
 }
+
+export function validatePhoneNumber(phoneNumber: string | undefined) {
+  if (phoneNumber) {
+    const cleanedPhoneNumber = phoneNumber.replace(/[^\d+]/g, "");
+    const isValid = /^\+\d{1,}\d*$/.test(cleanedPhoneNumber);
+    return isValid;
+  }
+}
