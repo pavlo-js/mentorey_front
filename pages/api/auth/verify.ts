@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import createConnection from "~/database/db";
+import db from "~/database/db";
 import { RowDataPacket } from "mysql2/promise";
 
 const verifyHandler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -7,19 +7,15 @@ const verifyHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { userID, token } = req.body;
 
     try {
-      const dbConnect = await createConnection();
       const query =
         "SELECT * FROM users WHERE id = ? AND verification_token = ?";
       const params = [userID, token];
-      const [getUser] = (await dbConnect.execute(
-        query,
-        params
-      )) as RowDataPacket[];
+      const [getUser] = (await db.execute(query, params)) as RowDataPacket[];
 
       if (getUser.length > 0) {
         const query = "UPDATE users SET is_verified = ? WHERE id = ? ";
         const params = [1, userID];
-        const [updateResult] = (await dbConnect.execute(
+        const [updateResult] = (await db.execute(
           query,
           params
         )) as RowDataPacket[];

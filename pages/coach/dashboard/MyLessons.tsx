@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { Paper } from "@mui/material";
 // Data grid imports
@@ -29,6 +27,13 @@ import { useSelector } from "react-redux";
 import { selectAuthState } from "~/slices/authSlice";
 // Currency Imports
 import { CurrencyData } from "~/shared/CurrencyData";
+import Link from "next/link";
+
+const LessonType: any = {
+  MIN30: "30min",
+  MIN60: "60min",
+  MIXED: "Mixed",
+};
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -36,12 +41,11 @@ interface EditToolbarProps {
     newModel: (oldModel: GridRowModesModel) => GridRowModesModel
   ) => void;
 }
-function EditToolbar(props: EditToolbarProps) {
-  const { setRows, setRowModesModel } = props;
+function EditToolbar() {
   return (
     <GridToolbarContainer>
       <Button color="primary" startIcon={<AddIcon />}>
-        Add record
+        <Link href="/coach/new_lesson">Add Lesson</Link>
       </Button>
     </GridToolbarContainer>
   );
@@ -68,29 +72,33 @@ export default function MyLessons() {
     const url = "/api/common/getAllCategories";
     fetch(url)
       .then((res) => res.json())
-      .then((data) => setCategories(data.categories))
+      .then((data) => {
+        setCategories(data.categories);
+      })
       .catch((err) => console.error(err));
   }
   // Get Lessons
   useEffect(() => {
-    const request = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userID: curUser.id,
-      }),
-    };
-    const url = "/api/coach/my_lessons";
-    fetch(url, request)
-      .then((res) => res.json())
-      .then((data) => generateRows(data.lessons))
-      .finally(() => setLoading(false));
-  }, []);
+    if (categories?.length) {
+      const request = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userID: curUser.id,
+        }),
+      };
+      const url = "/api/coach/my_lessons";
+      fetch(url, request)
+        .then((res) => res.json())
+        .then((data) => generateRows(data.lessons))
+        .finally(() => setLoading(false));
+    }
+  }, [categories]);
 
   function generateRows(data: any) {
-    const rows = [];
+    const rows: any[] = [];
     data.map((item: any, key: number) => {
       const {
         id,
@@ -105,12 +113,23 @@ export default function MyLessons() {
         created_at,
         updated_at,
       } = item;
+      const category = categories.find((item) => item.id === categoryID);
       rows.push({
         id,
         index: key + 1,
         title,
+        type: LessonType[type],
+        category: category.label,
+        price,
+        pack,
+        disRate,
+        description,
+        purpose,
+        created_at: new Date(created_at),
+        updated_at: new Date(updated_at),
       });
     });
+    setRows(rows);
   }
 
   // {
@@ -168,18 +187,36 @@ export default function MyLessons() {
       width: 70,
     },
     {
+      field: "pack",
+      type: "number",
+      headerName: "Pack count",
+      width: 70,
+    },
+    {
+      field: "disRate",
+      type: "number",
+      headerName: "Discount Rate",
+      width: 70,
+    },
+    {
       field: "description",
       type: "string",
       headerName: "Description",
       width: 200,
     },
     {
-      field: "createdAt",
+      field: "purpose",
+      type: "string",
+      headerName: "Purpose",
+      width: 200,
+    },
+    {
+      field: "created_at",
       type: "date",
       headerName: "Created At",
     },
     {
-      field: "updatedAt",
+      field: "updated_at",
       type: "date",
       headerName: "Updated At",
     },

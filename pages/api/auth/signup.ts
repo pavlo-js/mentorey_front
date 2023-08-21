@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import bcrypt from "bcrypt";
-import createConnection from "~/database/db";
+import db from "~/database/db";
 import transporter from "~/mail/mailer";
 import { RowDataPacket } from "mysql2/promise";
 import { generateVerificationCode } from "~/utils/utils";
@@ -12,8 +12,7 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       req.body;
 
     try {
-      const dbConnect = await createConnection();
-      const [existingUser] = (await dbConnect.execute(
+      const [existingUser] = (await db.execute(
         "SELECT id FROM users WHERE email = ?",
         [email]
       )) as RowDataPacket[];
@@ -32,7 +31,7 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       // // Insert user into the database
 
-      await dbConnect.execute(
+      await db.execute(
         "INSERT INTO users (first_name, last_name, email, password, gender, country, birthday, verification_token, verification_token_expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
           firstName,
@@ -47,7 +46,7 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         ]
       );
 
-      const [newUser] = (await dbConnect.execute(
+      const [newUser] = (await db.execute(
         "SELECT * FROM users WHERE email = ?",
         [email]
       )) as RowDataPacket[];

@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import createConnection from "~/database/db";
+import db from "~/database/db";
 import { RowDataPacket } from "mysql2/promise";
 
 const createLesson = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -15,7 +15,6 @@ const createLesson = async (req: NextApiRequest, res: NextApiResponse) => {
     purpose,
   } = req.body;
   try {
-    const dbConnect = await createConnection();
     const query =
       "INSERT INTO lessons (ownerID, title, type, price, pack, disRate, categoryID, description, purpose) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     const params = [
@@ -29,7 +28,7 @@ const createLesson = async (req: NextApiRequest, res: NextApiResponse) => {
       description,
       purpose,
     ];
-    await dbConnect.execute(query, params);
+    await db.execute(query, params);
     res.status(200).send("success");
   } catch (error) {
     res.status(500).json(error);

@@ -55,3 +55,9 @@ export interface Category {
   id: number;
   label: string;
 }
+
+export enum LessonType {
+  "MIN30" = "60min",
+  "MIN60" = "30min",
+  "MIXED" = "Mixed",
+}

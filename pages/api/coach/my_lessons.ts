@@ -1,17 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import createConnection from "~/database/db";
+import db from "~/database/db";
 import { RowDataPacket } from "mysql2/promise";
 
 const createLesson = async (req: NextApiRequest, res: NextApiResponse) => {
   const { userID } = req.body;
   try {
-    const dbConnect = await createConnection();
     const query = "SELECT * FROM lessons WHERE ownerID = ?";
     const params = [userID];
-    const [lessons] = (await dbConnect.execute(
-      query,
-      params
-    )) as RowDataPacket[];
+    const [lessons] = (await db.execute(query, params)) as RowDataPacket[];
     res.status(200).json({ lessons });
   } catch (error) {
     res.status(500).json(error);
