@@ -228,13 +228,13 @@ function InsideHeader() {
                 My User Profile
               </MenuItem>
               {curUser && isTeacher ? (
-                <MenuItem
-                  onClick={() => router.push(`/tprof/${curUser?.["sub"]}`)}
-                >
+                <MenuItem>
                   <ListItemIcon>
                     <CoPresentIcon fontSize="small" />
                   </ListItemIcon>
-                  My Teacher Profile
+                  <Link href={`/coach/profile/${curUser.id}`}>
+                    My Coach Profile
+                  </Link>
                 </MenuItem>
               ) : null}
               <Divider />
@@ -263,7 +263,7 @@ function InsideHeader() {
                 </MenuItem>
               ) : null}
               {curUser && isTeacher ? (
-                <MenuItem onClick={() => router.push(`/coach/dashboard`)}>
+                <MenuItem>
                   <ListItemIcon>
                     <DashboardIcon fontSize="small" />
                   </ListItemIcon>
