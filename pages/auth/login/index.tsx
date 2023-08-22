@@ -70,7 +70,7 @@ export default function LoginPage() {
       const user = data.user;
       setAuthState(user);
       if (!!user.is_verified) {
-        const url = user.is_teacher ? "/coach/dashboard" : "/pupil/learn";
+        const url = user.is_teacher ? "/coach/dashboard" : "/general/learn";
         router.push(url);
       } else {
         router.push("/auth/verify");

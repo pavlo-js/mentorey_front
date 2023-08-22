@@ -88,36 +88,37 @@ const timezones = {
 const EditProfilePage = () => {
   const [user, setUser] = useState<any>();
   const curUser = useSelector(selectAuthState);
-  const [firstName, setFirstName] = useState<string>(curUser?.first_name);
-  const [lastName, setLastName] = useState<string>(curUser?.last_name);
-  const [birthday, setBirthday] = useState<any>(dayjs(curUser?.birthday));
-  const [gender, setGender] = useState<"MALE" | "FEMALE">(curUser?.gender);
+  const [firstName, setFirstName] = useState<string>(curUser.first_name);
+  const [lastName, setLastName] = useState<string>(curUser.last_name);
+  const [birthday, setBirthday] = useState<any>(dayjs(curUser.birthday));
+  const [gender, setGender] = useState<"MALE" | "FEMALE">(curUser.gender);
   const initialCountry = countries.find(
-    (country) => country.code === curUser?.country
+    (country) => country.code === curUser.country
   );
   const [country, setCountry] = useState<CountryType | undefined>(
     initialCountry
   );
-  const [preEmail, setPreEmail] = useState<string>(curUser?.email);
+  const [title, setTitle] = useState(curUser.title);
+  const [preEmail, setPreEmail] = useState<string>(curUser.email);
   const [email, setEmail] = useState<string>("");
-  const [phone, setPhone] = useState<string | undefined>(curUser?.phone);
-  const [skype, setSkype] = useState<string>(curUser?.skype);
-  const [zoom, setZoom] = useState<string>(curUser?.zoom);
-  const [slack, setSlack] = useState<string>(curUser?.slack);
-  const [discord, setDiscord] = useState<string>(curUser?.discord);
-  const [hangouts, setHangouts] = useState<string>(curUser?.hangouts);
-  const [profile, setProfile] = useState<string>(curUser?.profile);
-  const [avatar, setAvatar] = useState(curUser?.avatar);
-  const [timezone, setTimezone] = useState<any>(curUser?.timezone);
+  const [phone, setPhone] = useState<string | undefined>(curUser.phone);
+  const [skype, setSkype] = useState<string>(curUser.skype);
+  const [zoom, setZoom] = useState<string>(curUser.zoom);
+  const [slack, setSlack] = useState<string>(curUser.slack);
+  const [discord, setDiscord] = useState<string>(curUser.discord);
+  const [hangouts, setHangouts] = useState<string>(curUser.hangouts);
+  const [profile, setProfile] = useState<string>(curUser.profile);
+  const [avatar, setAvatar] = useState(curUser.avatar);
+  const [timezone, setTimezone] = useState<any>(curUser.timezone);
   const [trialPrice, setTrialPrice] = useState<number>(5);
-  const [isTeacher, setIsTeacher] = useState<boolean>(curUser?.is_teacher);
-  const [meAsTeacher, setMeAsTeacher] = useState<string>(curUser?.MAT);
-  const [lessonStyle, setLessonStyle] = useState<string>(curUser?.LS);
+  const [isTeacher, setIsTeacher] = useState<boolean>(curUser.is_teacher);
+  const [meAsTeacher, setMeAsTeacher] = useState<string>(curUser.MAT);
+  const [lessonStyle, setLessonStyle] = useState<string>(curUser.LS);
   const [saving, setSaving] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   // Video state
   const [uploading, setUploading] = useState<boolean>(false);
-  const [videoURL, setVideoURL] = useState<string>(curUser?.intro_video);
+  const [videoURL, setVideoURL] = useState<string>(curUser.intro_video);
   const [videoKey, setVideoKey] = useState<number>(0);
   // Avatar State
   const [picture, setPicture] = useState<PictureState>({
@@ -126,10 +127,10 @@ const EditProfilePage = () => {
     croppedImg: "",
   });
   // Currency state
-  const [currency, setCurrency] = useState<string>(curUser?.currency);
+  const [currency, setCurrency] = useState<string>(curUser.currency);
   // lang select
   const [languages, setLanguages] = React.useState<string[]>(
-    JSON.parse(curUser?.language.replace(/'/g, '"'))
+    JSON.parse(curUser.language.replace(/'/g, '"'))
   );
   const LangSelectBox = React.useRef<HTMLSelectElement>(null);
 
@@ -176,6 +177,7 @@ const EditProfilePage = () => {
         first_name: firstName,
         last_name: lastName,
         avatar,
+        title,
         timezone,
         birthday: JSON.stringify(birthday.$d).slice(1, 11),
         gender,
@@ -635,7 +637,21 @@ const EditProfilePage = () => {
                 </LoadingButton>
               </Box>
             )}
-
+            <div className="w-full p-2">
+              <p>Title</p>
+              <TextField
+                fullWidth
+                value={title}
+                size="small"
+                onChange={(e) => setTitle(e.target.value)}
+                FormHelperTextProps={{
+                  sx: {
+                    display: "block",
+                    marginLeft: "auto",
+                  },
+                }}
+              />
+            </div>
             <div className="w-full p-2">
               <p>About me</p>
               <TextField
