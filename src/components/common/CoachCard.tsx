@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Avatar, Tooltip, Rating } from "@mui/material";
+import { Avatar, Tooltip, Rating, Button } from "@mui/material";
 import Badge from "@mui/material/Badge";
 import ReactCountryFlag from "react-country-flag";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -128,13 +128,13 @@ const CoachCard = ({ coach }: { coach: any }) => {
             </p>
           </div>
           <div className="w-full">
-            <button
+            <Button
               onClick={() => router.push(`/general/booking/${coach.id}`)}
               type="button"
               className="w-full rounded-lg bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gradient-to-br focus:outline-none focus:ring-4 focus:ring-primary-300"
             >
               Book Trial
-            </button>
+            </Button>
           </div>
         </div>
       </div>

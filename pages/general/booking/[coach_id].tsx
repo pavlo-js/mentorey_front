@@ -1,10 +1,11 @@
 import * as React from "react";
+import InsideLayout from "~/layouts/InsideLayout";
 import Box from "@mui/material/Box";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepButton from "@mui/material/StepButton";
 import Button from "@mui/material/Button";
-import LessonType from "./LessonType";
+import ChooseLesson from "./ChooseLesson";
 import LessonOption from "./LessonOption";
 import ScheduleLesson from "./ScheduleLesson";
 import Communication from "./Communication";
@@ -23,9 +24,26 @@ export default function BookingPage() {
   const [completed, setCompleted] = React.useState<{
     [k: number]: boolean;
   }>({});
+  const [coach, setCoach] = React.useState();
 
   const router = useRouter();
-  const { coachID } = router.query;
+  const coachID = router.query.coach_id;
+
+  React.useEffect(() => {
+    if (coachID) {
+      const api = "/api/common/getCoach";
+      const request = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ coachID }),
+      };
+      fetch(api, request)
+        .then((res) => res.json())
+        .then((data) => setCoach(data.coach));
+    }
+  }, [coachID]);
 
   const totalSteps = () => {
     return steps.length;
@@ -74,46 +92,52 @@ export default function BookingPage() {
   };
 
   return (
-    <>
-      <TeacherCard />
-      <Box className="mx-auto max-w-screen-lg pb-10">
-        <Stepper nonLinear activeStep={activeStep}>
-          {steps.map((label, index) => (
-            <Step key={label} completed={completed[index]}>
-              <StepButton color="inherit" onClick={handleStep(index)}>
-                {label}
-              </StepButton>
-            </Step>
-          ))}
-        </Stepper>
-        <div className="pt-6">
-          <React.Fragment>
-            {activeStep === 0 ? <LessonType /> : null}
-            {activeStep === 1 ? <LessonOption /> : null}
-            {activeStep === 2 ? <ScheduleLesson /> : null}
-            {activeStep === 3 ? <Communication /> : null}
-            <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-              <Button
-                color="inherit"
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                sx={{ mr: 1 }}
-              >
-                Back
-              </Button>
-              <Box sx={{ flex: "1 1 auto" }} />
-              <Button
-                variant="contained"
-                className="bg-primary-600 text-white"
-                onClick={handleNext}
-                sx={{ mr: 1 }}
-              >
-                Next
-              </Button>
-            </Box>
-          </React.Fragment>
-        </div>
-      </Box>
-    </>
+    coach && (
+      <InsideLayout>
+        <TeacherCard />
+        <Box className="mx-auto max-w-screen-lg pb-10">
+          <Stepper
+            nonLinear
+            activeStep={activeStep}
+            className="mx-auto max-w-3xl pt-4"
+          >
+            {steps.map((label, index) => (
+              <Step key={label} completed={completed[index]}>
+                <StepButton color="inherit" onClick={handleStep(index)}>
+                  {label}
+                </StepButton>
+              </Step>
+            ))}
+          </Stepper>
+          <div className="pt-6">
+            <React.Fragment>
+              {activeStep === 0 ? <ChooseLesson coach={coach} /> : null}
+              {activeStep === 1 ? <LessonOption /> : null}
+              {activeStep === 2 ? <ScheduleLesson /> : null}
+              {activeStep === 3 ? <Communication /> : null}
+              <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                <Button
+                  color="inherit"
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
+                  sx={{ mr: 1 }}
+                >
+                  Back
+                </Button>
+                <Box sx={{ flex: "1 1 auto" }} />
+                <Button
+                  variant="contained"
+                  className="bg-primary-600 text-white"
+                  onClick={handleNext}
+                  sx={{ mr: 1 }}
+                >
+                  Next
+                </Button>
+              </Box>
+            </React.Fragment>
+          </div>
+        </Box>
+      </InsideLayout>
+    )
   );
 }

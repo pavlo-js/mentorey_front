@@ -4,6 +4,7 @@ import { RowDataPacket } from "mysql2/promise";
 
 const getAllCoaches = async (req: NextApiRequest, res: NextApiResponse) => {
   const { coachID } = req.body;
+
   try {
     const query = `SELECT DISTINCT c.id, c.label
     FROM users AS u
