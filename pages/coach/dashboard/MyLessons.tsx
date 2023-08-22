@@ -59,7 +59,7 @@ export default function MyLessons() {
   const [loading, setLoading] = useState<boolean>(true);
   const [categories, setCategories] = useState<any[]>([]);
   const curUser = useSelector(selectAuthState);
-  const currencySymbol = CurrencyData[curUser.currency].symbol;
+  const currencySymbol = CurrencyData[curUser?.currency].symbol;
 
   const [lessons, setLessons] = useState();
 
@@ -86,7 +86,7 @@ export default function MyLessons() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userID: curUser.id,
+          userID: curUser?.id,
         }),
       };
       const url = "/api/coach/my_lessons";
@@ -174,41 +174,31 @@ export default function MyLessons() {
       headerName: "Lesson Type",
       headerAlign: "left",
       align: "left",
+      width: 120,
     },
     {
       field: "category",
       type: "string",
       headerName: "Category",
+      width: 150,
     },
     {
       field: "price",
       type: "number",
       headerName: `Price (${currencySymbol})`,
-      width: 70,
+      width: 100,
     },
     {
       field: "pack",
       type: "number",
       headerName: "Pack count",
-      width: 70,
+      width: 100,
     },
     {
       field: "disRate",
       type: "number",
       headerName: "Discount Rate",
-      width: 70,
-    },
-    {
-      field: "description",
-      type: "string",
-      headerName: "Description",
-      width: 200,
-    },
-    {
-      field: "purpose",
-      type: "string",
-      headerName: "Purpose",
-      width: 200,
+      width: 100,
     },
     {
       field: "created_at",
@@ -250,7 +240,7 @@ export default function MyLessons() {
 
   return (
     <>
-      <Paper className="mx-auto">
+      <Paper className="mx-auto max-w-7xl">
         <DataGrid
           rows={rows}
           columns={myColumns}

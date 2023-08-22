@@ -88,36 +88,36 @@ const timezones = {
 const EditProfilePage = () => {
   const [user, setUser] = useState<any>();
   const curUser = useSelector(selectAuthState);
-  const [firstName, setFirstName] = useState<string>(curUser.first_name);
-  const [lastName, setLastName] = useState<string>(curUser.last_name);
-  const [birthday, setBirthday] = useState<any>(dayjs(curUser.birthday));
-  const [gender, setGender] = useState<"MALE" | "FEMALE">(curUser.gender);
+  const [firstName, setFirstName] = useState<string>(curUser?.first_name);
+  const [lastName, setLastName] = useState<string>(curUser?.last_name);
+  const [birthday, setBirthday] = useState<any>(dayjs(curUser?.birthday));
+  const [gender, setGender] = useState<"MALE" | "FEMALE">(curUser?.gender);
   const initialCountry = countries.find(
-    (country) => country.code === curUser.country
+    (country) => country.code === curUser?.country
   );
   const [country, setCountry] = useState<CountryType | undefined>(
     initialCountry
   );
-  const [preEmail, setPreEmail] = useState<string>(curUser.email);
+  const [preEmail, setPreEmail] = useState<string>(curUser?.email);
   const [email, setEmail] = useState<string>("");
-  const [phone, setPhone] = useState<string | undefined>(curUser.phone);
-  const [skype, setSkype] = useState<string>(curUser.skype);
-  const [zoom, setZoom] = useState<string>(curUser.zoom);
-  const [slack, setSlack] = useState<string>(curUser.slack);
-  const [discord, setDiscord] = useState<string>(curUser.discord);
-  const [hangouts, setHangouts] = useState<string>(curUser.hangouts);
-  const [profile, setProfile] = useState<string>(curUser.profile);
-  const [avatar, setAvatar] = useState(curUser.avatar);
-  const [timezone, setTimezone] = useState<any>(curUser.timezone);
+  const [phone, setPhone] = useState<string | undefined>(curUser?.phone);
+  const [skype, setSkype] = useState<string>(curUser?.skype);
+  const [zoom, setZoom] = useState<string>(curUser?.zoom);
+  const [slack, setSlack] = useState<string>(curUser?.slack);
+  const [discord, setDiscord] = useState<string>(curUser?.discord);
+  const [hangouts, setHangouts] = useState<string>(curUser?.hangouts);
+  const [profile, setProfile] = useState<string>(curUser?.profile);
+  const [avatar, setAvatar] = useState(curUser?.avatar);
+  const [timezone, setTimezone] = useState<any>(curUser?.timezone);
   const [trialPrice, setTrialPrice] = useState<number>(5);
-  const [isTeacher, setIsTeacher] = useState<boolean>(curUser.is_teacher);
-  const [meAsTeacher, setMeAsTeacher] = useState<string>(curUser.MAT);
-  const [lessonStyle, setLessonStyle] = useState<string>(curUser.LS);
+  const [isTeacher, setIsTeacher] = useState<boolean>(curUser?.is_teacher);
+  const [meAsTeacher, setMeAsTeacher] = useState<string>(curUser?.MAT);
+  const [lessonStyle, setLessonStyle] = useState<string>(curUser?.LS);
   const [saving, setSaving] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   // Video state
   const [uploading, setUploading] = useState<boolean>(false);
-  const [videoURL, setVideoURL] = useState<string>(curUser.intro_video);
+  const [videoURL, setVideoURL] = useState<string>(curUser?.intro_video);
   const [videoKey, setVideoKey] = useState<number>(0);
   // Avatar State
   const [picture, setPicture] = useState<PictureState>({
@@ -126,10 +126,10 @@ const EditProfilePage = () => {
     croppedImg: "",
   });
   // Currency state
-  const [currency, setCurrency] = useState<string>(curUser.currency);
+  const [currency, setCurrency] = useState<string>(curUser?.currency);
   // lang select
   const [languages, setLanguages] = React.useState<string[]>(
-    JSON.parse(curUser.language.replace(/'/g, '"'))
+    JSON.parse(curUser?.language.replace(/'/g, '"'))
   );
   const LangSelectBox = React.useRef<HTMLSelectElement>(null);
 
@@ -162,33 +162,6 @@ const EditProfilePage = () => {
     event.stopPropagation();
   };
 
-  function updateUser() {
-    const attributes: any = {
-      birthdate: JSON.stringify(birthday.$d).slice(1, 11),
-      gender: gender,
-      locale: country?.code,
-      "custom:first_name": firstName,
-      "custom:last_name": lastName,
-      "custom:timezone": timezone,
-      "custom:language": JSON.stringify(languages),
-      "custom:currency": currency,
-    };
-    // Assign non-requried values to attributes
-    if (avatar) attributes["picture"] = avatar;
-    if (phone) attributes["phone_number"] = phone;
-    if (profile) attributes["profile"] = profile;
-    if (skype) attributes["custom:skype"] = skype;
-    if (slack) attributes["custom:slack"] = slack;
-    if (discord) attributes["custom:discord"] = discord;
-    if (zoom) attributes["custom:zoom"] = zoom;
-    if (hangouts) attributes["custom:hangouts"] = hangouts;
-    // Attributs for teachers
-    if (videoURL) attributes["custom:intro_video"] = videoURL;
-    if (meAsTeacher) attributes["custom:MAT"] = meAsTeacher;
-    if (lessonStyle) attributes["custom:LS"] = lessonStyle;
-    setSaving(true);
-  }
-
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     setSaving(true);
@@ -199,7 +172,7 @@ const EditProfilePage = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        id: curUser.id,
+        id: curUser?.id,
         first_name: firstName,
         last_name: lastName,
         avatar,

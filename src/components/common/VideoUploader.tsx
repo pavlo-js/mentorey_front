@@ -18,11 +18,11 @@ const s3 = new AWS.S3();
 const VideoUploader = ({
   uploading, // State to set uploading status of parent element
   setUploading,
-  sendVideoName, // This state is passed to parent and sent at there.
+  sendVideoURL, // This state is passed to parent and sent at there.
 }: {
   uploading: boolean;
   setUploading: React.Dispatch<React.SetStateAction<boolean>>;
-  sendVideoName: (data: string) => void;
+  sendVideoURL: (data: string) => void;
 }) => {
   const videoInputRef = useRef<HTMLInputElement | null>(null);
   const [videoFile, setVideoFile] = useState<File | undefined>(undefined);
@@ -44,7 +44,7 @@ const VideoUploader = ({
         const uploadResponse = await s3.upload(uploadParams).promise();
         setVideoFile(video);
         setVideoKey(videoKey + 1);
-        sendVideoName(uploadResponse.Location);
+        sendVideoURL(uploadResponse.Location);
       } catch (error) {
         console.error(error);
       } finally {

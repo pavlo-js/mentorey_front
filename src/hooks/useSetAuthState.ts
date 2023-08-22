@@ -1,10 +1,9 @@
 import { useDispatch } from "react-redux";
 import { setAuthState } from "~/slices/authSlice";
-import { UserInfo } from "~/shared/types";
 
 const useSetAuthState = () => {
   const dispatch = useDispatch();
-  const updateUser = (user: UserInfo) => {
+  const updateUser = (user: any) => {
     dispatch(setAuthState(user));
   };
 

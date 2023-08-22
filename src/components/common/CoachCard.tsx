@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Avatar, Tooltip, Rating } from "@mui/material";
 import Badge from "@mui/material/Badge";
 import ReactCountryFlag from "react-country-flag";
@@ -7,15 +7,19 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 import { useRouter } from "next/navigation";
 
-const CoachCard = () => {
+const CoachCard = ({ coach }: { coach: any }) => {
   const [isLike, setIsLike] = useState<boolean>(false);
   const router = useRouter();
+
+  useEffect(() => {
+    console.log(coach);
+  }, []);
 
   return (
     <>
       <div className="m-auto w-full transform overflow-hidden rounded-lg bg-white shadow-lg transition duration-500 ease-in-out hover:-translate-y-1 hover:shadow-xl">
         <div className="w-full">
-          <video src="/video/mov_bbb.mp4" className="w-full" controls></video>
+          <video src={coach.intro_video} className="w-full" controls></video>
         </div>
         <div className="w-full p-3">
           <div className="flex items-center">

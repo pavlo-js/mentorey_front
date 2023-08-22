@@ -132,7 +132,7 @@ const EditUserProfilePage = () => {
 	const updateUserInfo = useUpdateUserInfo();
 
 	useEffect(() => {
-		getCurUser();
+		getcurUser?();
 	}, []);
 
 	// Language select
@@ -152,11 +152,11 @@ const EditUserProfilePage = () => {
 		event.stopPropagation();
 	};
 
-	async function getCurUser() {
+	async function getcurUser?() {
 		try {
-			const curUser = await Auth.currentAuthenticatedUser();
-			setUser(curUser);
-			const userAttr = curUser['attributes'];
+			const curUser? = await Auth.currentAuthenticatedUser();
+			setUser(curUser?);
+			const userAttr = curUser?['attributes'];
 			setFirstName(userAttr['custom:first_name']);
 			setLastName(userAttr['custom:last_name']);
 			setBirthday(dayjs(userAttr['birthdate']));

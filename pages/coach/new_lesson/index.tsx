@@ -18,7 +18,7 @@ export default function NewLessonPage() {
   const [desc, setDesc] = React.useState<string>("");
   const [purpose, setPurpose] = React.useState<string>("");
   const curUser = useSelector(selectAuthState);
-  const currencySymbol = CurrencyData[curUser.currency].symbol;
+  const currencySymbol = CurrencyData[curUser?.currency]?.symbol;
   const router = useRouter();
 
   React.useEffect(() => {
@@ -40,7 +40,7 @@ export default function NewLessonPage() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ...data, userID: curUser.id }),
+      body: JSON.stringify({ ...data, userID: curUser?.id }),
     };
     fetch(url, request).then((res) => {
       console.log(res);

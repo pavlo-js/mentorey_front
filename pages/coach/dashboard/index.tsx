@@ -61,12 +61,18 @@ const CoachDashboard = () => {
             />
           </Tabs>
         </Box>
-        <TabPanel value="lessons">
+        <TabPanel sx={{ padding: 0, marginTop: "16px" }} value="lessons">
           <MyLessons />
         </TabPanel>
-        <TabPanel value="students">Item Two</TabPanel>
-        <TabPanel value="schedule">Item Three</TabPanel>
-        <TabPanel value="analysis">Item Three</TabPanel>
+        <TabPanel sx={{ padding: 0, marginTop: "16px" }} value="students">
+          Item Two
+        </TabPanel>
+        <TabPanel sx={{ padding: 0, marginTop: "16px" }} value="schedule">
+          Item Three
+        </TabPanel>
+        <TabPanel sx={{ padding: 0, marginTop: "16px" }} value="analysis">
+          Item Three
+        </TabPanel>
       </TabContext>
     </InsideLayout>
   );

@@ -15,14 +15,14 @@ const VerifyPage: NextPageWithLayout = () => {
   const router = useRouter();
   const curUser = useSelector(selectAuthState);
   useEffect(() => {
-    if (curUser.is_verified) {
-      const url = curUser.is_teacher ? "/coach/dashboard" : "/general/learn";
+    if (curUser?.is_verified) {
+      const url = curUser?.is_teacher ? "/coach/dashboard" : "/general/learn";
       router.push(url);
     }
   }, []);
 
   function confirmCode() {
-    const userID = curUser.id;
+    const userID = curUser?.id;
     if (userID && code) {
       const url = "/api/auth/verify";
       const request = {
@@ -37,7 +37,7 @@ const VerifyPage: NextPageWithLayout = () => {
         })
         .then((data) => {
           if (data) {
-            curUser.is_teacher
+            curUser?.is_teacher
               ? router.push("/coach/dashboard")
               : router.push("/pupil/learn");
           } else {

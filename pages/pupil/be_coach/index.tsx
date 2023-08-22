@@ -23,7 +23,7 @@ const BeCoachPage = () => {
   const curUser: any = useSelector(selectAuthState);
   const setAuthState = useSetAuthState();
 
-  function getVideoName(data: string) {
+  function getVideoURL(data: string) {
     console.log("VideoURL parent:", data);
     setVideoName(data);
     setValidVideo(true);
@@ -47,7 +47,7 @@ const BeCoachPage = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userID: curUser.id,
+          userID: curUser?.id,
           intro_video: videoName,
           MAT: meAsTeacher,
           LS: lessonStyle,
@@ -103,7 +103,7 @@ const BeCoachPage = () => {
             <VideoUploader
               uploading={uploading}
               setUploading={setUploading}
-              sendVideoName={getVideoName}
+              sendVideoURL={getVideoURL}
             />
             <p hidden={validVideo} className="text-center text-sm text-red-600">
               Please upload your introduction video. This requirement is

@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 // Mui Components
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -31,10 +32,7 @@ import CoPresentIcon from "@mui/icons-material/CoPresent";
 // Redux
 import { selectAuthState } from "~/slices/authSlice";
 import { useSelector } from "react-redux";
-import Link from "next/link";
-
-const pages = ["Products", "Pricing", "Blog"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+import useSetAuthState from "~/hooks/useSetAuthState";
 
 const LinkStyle = {
   my: 2,
@@ -48,10 +46,11 @@ const LinkStyle = {
 function InsideHeader() {
   const router = useRouter();
   const curUser: any = useSelector(selectAuthState);
-  const isTeacher = curUser.is_teacher;
+  const setAuthState = useSetAuthState();
+  const isTeacher = curUser?.is_teacher;
 
   React.useEffect(() => {
-    console.log(curUser);
+    console.log("Current User: ", curUser);
   }, []);
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -75,6 +74,11 @@ function InsideHeader() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  function logOut() {
+    localStorage.clear();
+    router.push("/");
+  }
 
   return (
     <AppBar position="sticky" sx={{ backgroundColor: "white" }}>
@@ -200,7 +204,10 @@ function InsideHeader() {
           <Box sx={{ marginLeft: "auto" }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar
+                  alt="Remy Sharp"
+                  src={curUser?.avatar != "null" ? curUser.avatar : undefined}
+                />
               </IconButton>
             </Tooltip>
             <Menu
@@ -219,9 +226,7 @@ function InsideHeader() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <MenuItem
-                onClick={() => router.push(`/uprof/${curUser?.["sub"]}`)}
-              >
+              <MenuItem onClick={() => router.push(`/uprof/${curUser["sub"]}`)}>
                 <ListItemIcon>
                   <AccountCircleIcon fontSize="small" />
                 </ListItemIcon>
@@ -276,7 +281,7 @@ function InsideHeader() {
                 </ListItemIcon>
                 Settings
               </MenuItem>
-              <MenuItem>
+              <MenuItem onClick={logOut}>
                 <ListItemIcon>
                   <Logout fontSize="small" />
                 </ListItemIcon>
