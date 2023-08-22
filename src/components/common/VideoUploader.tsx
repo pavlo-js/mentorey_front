@@ -5,20 +5,15 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { nanoid } from "nanoid";
 import { getFileExtension, getFullS3Uri } from "~/utils/utils";
 import { toast } from "react-toastify";
+import AWS from "aws-sdk";
 // uploader
-import {
-  PutObjectCommand,
-  DeleteObjectCommand,
-  S3Client,
-} from "@aws-sdk/client-s3";
-
-const S3_Client = new S3Client({
-  region: "eu-central-1",
-  credentials: {
-    accessKeyId: "AKIA3WFV2SULDNNESNDC",
-    secretAccessKey: "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",
-  },
+AWS.config.update({
+  accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+  region: process.env.NEXT_PUBLIC_AWS_REGION,
 });
+
+const s3 = new AWS.S3();
 
 const VideoUploader = ({
   uploading, // State to set uploading status of parent element
@@ -32,60 +27,30 @@ const VideoUploader = ({
   const videoInputRef = useRef<HTMLInputElement | null>(null);
   const [videoFile, setVideoFile] = useState<File | undefined>(undefined);
   const [videoKey, setVideoKey] = useState<number>(0);
-  const [videoName, setVideoName] = useState<string>("");
 
-  function getVideo() {
-    videoInputRef.current?.click();
-  }
-
-  function uploadNewVideo(event: React.ChangeEvent<HTMLInputElement>) {
-    console.log("newVideo");
+  async function changeHandler(event: React.ChangeEvent<HTMLInputElement>) {
     const video = event.target.files?.[0];
     if (video) {
-      const fileName = `${nanoid()}.${getFileExtension(video.name)}`;
       setUploading(true);
-      const command = new PutObjectCommand({
-        Bucket: "mentorey",
+      const fileName = `${nanoid()}.${getFileExtension(video.name)}`;
+      const uploadParams = {
+        Bucket: process.env.NEXT_PUBLIC_S3_BUCKET!,
         Key: `intro_video/${fileName}`,
         Body: video,
-      });
-
-      S3_Client.send(command)
-        .then(() => {
-          setVideoFile(video);
-          setVideoKey(videoKey + 1);
-          setVideoName(fileName);
-          sendVideoName(`intro_video/${fileName}`);
-          toast.success("Video is uploaded successfully", {
-            position: toast.POSITION.BOTTOM_RIGHT,
-          });
-        })
-        .catch((err) => {
-          console.error("uploadError: ", err);
-          toast.error("Something went wrong. Please try again", {
-            position: toast.POSITION.BOTTOM_RIGHT,
-          });
-        })
-        .finally(() => setUploading(false));
+        ContentType: video.type,
+      };
+      console.log(uploadParams);
+      try {
+        const uploadResponse = await s3.upload(uploadParams).promise();
+        setVideoFile(video);
+        setVideoKey(videoKey + 1);
+        sendVideoName(uploadResponse.Location);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setUploading(false);
+      }
     }
-  }
-
-  function updateOriginalVideo(event: React.ChangeEvent<HTMLInputElement>) {
-    console.log("update");
-    const command = new DeleteObjectCommand({
-      Bucket: "mentorey",
-      Key: `intro_video/${videoName}`,
-    });
-    S3_Client.send(command)
-      .then((res) => {
-        console.log(res);
-        uploadNewVideo(event);
-      })
-      .catch((err) => console.error("Delete Error : ", err));
-  }
-
-  function changeHandler(event: React.ChangeEvent<HTMLInputElement>) {
-    videoName ? updateOriginalVideo(event) : uploadNewVideo(event);
   }
 
   return (
@@ -102,7 +67,7 @@ const VideoUploader = ({
         />
         <LoadingButton
           className="mx-auto flex"
-          onClick={getVideo}
+          onClick={() => videoInputRef.current?.click()}
           loading={uploading}
           loadingPosition="start"
           startIcon={<CloudUploadIcon />}

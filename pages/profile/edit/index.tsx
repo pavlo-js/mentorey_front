@@ -27,24 +27,16 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { CountryType } from "~/shared/types";
-import LoadingScreen from "~/components/common/LoadingScreen";
 import { countries } from "~/shared/data";
 import AvatarEditor from "react-avatar-editor";
 import ReactAvatarEditor from "react-avatar-editor";
-import BlankAvatar from "~/assets/images/blank_avatar.png";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import { nanoid } from "nanoid";
 import { toast } from "react-toastify";
 import { useTimezoneSelect, allTimezones } from "react-timezone-select";
-import ProgressModal from "~/components/common/ProgressModal";
-import VideoUploader from "~/components/common/VideoUploader";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import {
-  getFullS3Uri,
-  validatePhoneNumber,
-  getFileExtension,
-} from "~/utils/utils";
+import { validatePhoneNumber, getFileExtension } from "~/utils/utils";
 import { useRouter } from "next/navigation";
 import { CurrencyData } from "~/shared/CurrencyData";
 // language Selector
@@ -58,9 +50,15 @@ import "react-phone-input-2/lib/style.css";
 import useSetAuthState from "~/hooks/useSetAuthState";
 import { selectAuthState } from "~/slices/authSlice";
 import { useSelector } from "react-redux";
-import { log } from "console";
 // Image Upload
-import uploadBase64ImageToS3 from "~/utils/imageUpload";
+import AWS from "aws-sdk";
+AWS.config.update({
+  accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+  region: process.env.NEXT_PUBLIC_AWS_REGION,
+});
+
+const s3 = new AWS.S3();
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -87,7 +85,7 @@ const timezones = {
   ...allTimezones,
 };
 
-const EditUserProfilePage = () => {
+const EditProfilePage = () => {
   const [user, setUser] = useState<any>();
   const curUser = useSelector(selectAuthState);
   const [firstName, setFirstName] = useState<string>(curUser.first_name);
@@ -109,7 +107,7 @@ const EditUserProfilePage = () => {
   const [discord, setDiscord] = useState<string>(curUser.discord);
   const [hangouts, setHangouts] = useState<string>(curUser.hangouts);
   const [profile, setProfile] = useState<string>(curUser.profile);
-  const [avatar, setAvatar] = useState("");
+  const [avatar, setAvatar] = useState(curUser.avatar);
   const [timezone, setTimezone] = useState<any>(curUser.timezone);
   const [trialPrice, setTrialPrice] = useState<number>(5);
   const [isTeacher, setIsTeacher] = useState<boolean>(curUser.is_teacher);
@@ -119,7 +117,7 @@ const EditUserProfilePage = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   // Video state
   const [uploading, setUploading] = useState<boolean>(false);
-  const [videoName, setVideoName] = useState<string>("");
+  const [videoURL, setVideoURL] = useState<string>(curUser.intro_video);
   const [videoKey, setVideoKey] = useState<number>(0);
   // Avatar State
   const [picture, setPicture] = useState<PictureState>({
@@ -185,7 +183,7 @@ const EditUserProfilePage = () => {
     if (zoom) attributes["custom:zoom"] = zoom;
     if (hangouts) attributes["custom:hangouts"] = hangouts;
     // Attributs for teachers
-    if (videoName) attributes["custom:intro_video"] = videoName;
+    if (videoURL) attributes["custom:intro_video"] = videoURL;
     if (meAsTeacher) attributes["custom:MAT"] = meAsTeacher;
     if (lessonStyle) attributes["custom:LS"] = lessonStyle;
     setSaving(true);
@@ -193,8 +191,44 @@ const EditUserProfilePage = () => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    // setSaving(true);
-    updateUser();
+    setSaving(true);
+    const api = "/api/common/updateProfile";
+    const request = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: curUser.id,
+        first_name: firstName,
+        last_name: lastName,
+        avatar,
+        timezone,
+        birthday: JSON.stringify(birthday.$d).slice(1, 11),
+        gender,
+        country: country?.code,
+        language: JSON.stringify(languages),
+        currency,
+        phone,
+        profile,
+        intro_video: videoURL,
+        MAT: meAsTeacher,
+        LS: lessonStyle,
+        trial_price: trialPrice,
+        skype,
+        slack,
+        zoom,
+        discord,
+        hangouts,
+      }),
+    };
+    fetch(api, request)
+      .then((res) => res.json())
+      .then((data) => {
+        setAuthState(data.user);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setSaving(false));
   };
 
   const handleTimezone = (timezone: any) => {
@@ -239,33 +273,68 @@ const EditUserProfilePage = () => {
       autoClose: false,
       closeButton: false,
     });
-    uploadBase64ImageToS3(base64Data, "lll.png");
-    // uploadBase64ImageToS3(base64Data, nanoid() + ".png").then((res) => {
-    //   toast.update(uploadToast, {
-    //     render: "Avatar changed successfully!",
-    //     type: toast.TYPE.SUCCESS,
-    //     autoClose: 3000,
-    //     closeButton: true,
-    //     className: "rotateY animated",
-    //   });
-    //   setAvatar(res);
-    //   Auth.updateUserAttributes(user, { picture: res })
-    //     .then(() => {
-    //       console.log("User avatar changed successfully");
-    //     })
-    //     .catch((err) => {
-    //       console.error(err);
-    //     });
-    // });
+
+    const api = "/api/aws/imageUpload";
+    const request = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        filePath: `avatar/${nanoid()}.png`,
+        file: base64Data,
+      }),
+    };
+
+    fetch(api, request)
+      .then((res) => res.json())
+      .then((data) => {
+        toast.update(uploadToast, {
+          render:
+            "Avatar changed successfully! Please do not forget to click SAVE button.",
+          type: toast.TYPE.SUCCESS,
+          autoClose: 3000,
+          closeButton: true,
+          className: "rotateY animated",
+        });
+        setAvatar(data.imagePath);
+      })
+      .catch((err) => {
+        toast.update(uploadToast, {
+          render: "Network Error!",
+          type: toast.TYPE.ERROR,
+          autoClose: 3000,
+          closeButton: true,
+          className: "rotateY animated",
+        });
+      });
   }
 
   function getVideo() {
     videoInputRef.current?.click();
   }
 
-  function changeVideo(event: React.ChangeEvent<HTMLInputElement>) {
+  async function changeVideo(event: React.ChangeEvent<HTMLInputElement>) {
     const video = event.target.files?.[0];
     if (video) {
+      setUploading(true);
+      const fileName = `${nanoid()}.${getFileExtension(video.name)}`;
+      const uploadParams = {
+        Bucket: process.env.NEXT_PUBLIC_S3_BUCKET!,
+        Key: `intro_video/${fileName}`,
+        Body: video,
+        ContentType: video.type,
+      };
+      console.log(uploadParams);
+      try {
+        const uploadResponse = await s3.upload(uploadParams).promise();
+        setVideoKey(videoKey + 1);
+        setVideoURL(uploadResponse.Location);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setUploading(false);
+      }
     }
   }
 
@@ -358,9 +427,9 @@ const EditUserProfilePage = () => {
               <Avatar
                 alt={firstName + lastName}
                 src={
-                  avatar
-                    ? getFullS3Uri(avatar)
-                    : "https://upload.wikimedia.org/wikipedia/commons/0/09/Man_Silhouette.png"
+                  avatar === "null"
+                    ? "https://upload.wikimedia.org/wikipedia/commons/0/09/Man_Silhouette.png"
+                    : avatar
                 }
                 sx={{ width: "150px", height: "150px" }}
               />
@@ -557,7 +626,7 @@ const EditUserProfilePage = () => {
             {!!+isTeacher && (
               <Box className="my-4 w-full">
                 <p className="w-full px-2 text-lg font-semibold text-slate-600">
-                  Introduction
+                  Introduction Video
                 </p>
                 <input
                   type="file"
@@ -572,7 +641,7 @@ const EditUserProfilePage = () => {
                   <video
                     key={videoKey}
                     controls
-                    src={getFullS3Uri(videoName)}
+                    src={videoURL}
                     className="w-full"
                   ></video>
                 </div>
@@ -757,4 +826,4 @@ const EditUserProfilePage = () => {
   );
 };
 
-export default EditUserProfilePage;
+export default EditProfilePage;

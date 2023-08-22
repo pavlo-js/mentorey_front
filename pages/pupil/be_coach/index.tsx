@@ -24,6 +24,7 @@ const BeCoachPage = () => {
   const setAuthState = useSetAuthState();
 
   function getVideoName(data: string) {
+    console.log("VideoURL parent:", data);
     setVideoName(data);
     setValidVideo(true);
   }
