@@ -13,6 +13,7 @@ import AnalyticsIcon from "@mui/icons-material/Analytics";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 // Tab Contents
 import MyLessons from "./MyLessons";
+import Schedule from "./Schedule";
 
 const CoachDashboard = () => {
   const [value, setValue] = React.useState("lessons");
@@ -68,7 +69,7 @@ const CoachDashboard = () => {
           Item Two
         </TabPanel>
         <TabPanel sx={{ padding: 0, marginTop: "16px" }} value="schedule">
-          Item Three
+          <Schedule />
         </TabPanel>
         <TabPanel sx={{ padding: 0, marginTop: "16px" }} value="analysis">
           Item Three

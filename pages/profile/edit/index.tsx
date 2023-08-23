@@ -60,8 +60,8 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
+// dayjs.extend(utc);
+// dayjs.extend(timezone);
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -440,7 +440,7 @@ const EditProfilePage = () => {
                 <DatePicker
                   className="w-full"
                   value={birthday}
-                  timezone="UTC"
+                  // timezone="UTC"
                   onChange={(newDate) => {
                     setBirthday(newDate);
                   }}
