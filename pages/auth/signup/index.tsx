@@ -18,7 +18,7 @@ import Link from "next/link";
 
 // Set the datepicker's timezone as UTC
 // dayjs.extend(utc);
-// dayjs.extend(timezone);
+dayjs.extend(timezone);
 
 export default function SignUpPage() {
   // Signup parameters

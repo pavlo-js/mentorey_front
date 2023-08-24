@@ -63,7 +63,7 @@ const BeCoachPage = () => {
 
   function successHandler(data: any) {
     setAuthState(data.user);
-    router.push("/coach/new_lesson");
+    router.push("/profile/edit");
   }
 
   return (

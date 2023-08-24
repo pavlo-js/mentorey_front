@@ -201,6 +201,8 @@ const EditProfilePage = () => {
       .then((res) => res.json())
       .then((data) => {
         setAuthState(data.user);
+        const url = curUser.is_teacher ? "/coach/dashboard" : "/pupil/learn";
+        router.push(url);
       })
       .catch((err) => console.error(err))
       .finally(() => setSaving(false));
@@ -401,11 +403,7 @@ const EditProfilePage = () => {
             >
               <Avatar
                 alt={firstName + lastName}
-                src={
-                  avatar === "null"
-                    ? "https://upload.wikimedia.org/wikipedia/commons/0/09/Man_Silhouette.png"
-                    : avatar
-                }
+                src={avatar === "null" ? "" : avatar}
                 sx={{ width: "150px", height: "150px" }}
               />
             </Badge>
