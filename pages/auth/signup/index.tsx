@@ -17,7 +17,7 @@ import useSetAuthState from "~/hooks/useSetAuthState";
 import Link from "next/link";
 
 // Set the datepicker's timezone as UTC
-// dayjs.extend(utc);
+dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export default function SignUpPage() {
