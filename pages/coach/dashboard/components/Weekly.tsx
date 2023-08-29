@@ -5,6 +5,7 @@ import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 // Timepicker
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -46,19 +47,19 @@ const defaultTimeSlot: TimeSlot = {
 
 const defaultTimes: DayTimes[] = [
   {
-    times: [defaultTimeSlot],
+    times: [{ ...defaultTimeSlot }],
   },
   {
-    times: [defaultTimeSlot],
+    times: [{ ...defaultTimeSlot }],
   },
   {
-    times: [defaultTimeSlot],
+    times: [{ ...defaultTimeSlot }],
   },
   {
-    times: [defaultTimeSlot],
+    times: [{ ...defaultTimeSlot }],
   },
   {
-    times: [defaultTimeSlot],
+    times: [{ ...defaultTimeSlot }],
   },
   {
     times: [],
@@ -68,8 +69,12 @@ const defaultTimes: DayTimes[] = [
   },
 ];
 
-const isOverlap = (prevSlot: TimeSlot, lastSlot: TimeSlot) => {
-  return lastSlot.startTime.isAfter(prevSlot.endTime);
+const isValidSlot = (timeSlot: TimeSlot) => {
+  return timeSlot.endTime.isAfter(timeSlot.startTime);
+};
+
+const isOverlap = (prevSlot: TimeSlot, nextSlot: TimeSlot) => {
+  return nextSlot.startTime.isAfter(prevSlot.endTime);
 };
 
 const isOverDate = (primary: TimeSlot, temp: TimeSlot) => {
@@ -99,7 +104,7 @@ export default function Weekly() {
             };
             return { ...item, times: [...times, newSlot] };
           } else {
-            return { ...item, times: [...times, defaultTimeSlot] };
+            return { ...item, times: [...times, { ...defaultTimeSlot }] };
           }
         } else {
           return item;
@@ -114,21 +119,26 @@ export default function Weekly() {
   useEffect(() => {
     if (availableTimes.length <= 1) return;
 
-    const temp: InvalidState[] = availableTimes.flatMap((day, dayIndex) => {
-      return day.times.flatMap((times: TimeSlot, timesIndex: number) => {
-        let issues = [];
-        if (
-          day.times[timesIndex + 1] &&
-          !isOverlap(times, day.times[timesIndex + 1])
-        ) {
-          issues.push({ dayIndex, timesIndex: timesIndex + 1 });
-        }
-        if (timesIndex && !isOverDate(day.times[0], times)) {
+    const temp: InvalidState[] = availableTimes.flatMap((day, dayIndex) =>
+      day.times.flatMap((curSlot: TimeSlot, timesIndex: number) => {
+        const issues: InvalidState[] = [];
+        const nextSlot = day.times[timesIndex + 1];
+
+        if (!isValidSlot(curSlot)) {
           issues.push({ dayIndex, timesIndex });
         }
+
+        if (nextSlot && !isOverlap(curSlot, nextSlot)) {
+          issues.push({ dayIndex, timesIndex: timesIndex + 1 });
+        }
+
+        if (timesIndex && !isOverDate(day.times[0], curSlot)) {
+          issues.push({ dayIndex, timesIndex });
+        }
+
         return issues;
-      });
-    });
+      })
+    );
 
     setInvalid(temp);
   }, [availableTimes]);
@@ -147,12 +157,10 @@ export default function Weekly() {
     timesIndex: number,
     value: DateRange<Dayjs>
   ) => {
-    console.log(dayIndex, timesIndex);
     const tempTimes = [...availableTimes];
     tempTimes[dayIndex].times[timesIndex].startTime = value[0];
     tempTimes[dayIndex].times[timesIndex].endTime = value[1];
 
-    console.log("UpdateTimes :", tempTimes);
     setAvailableTimes(tempTimes);
   };
 
@@ -161,14 +169,16 @@ export default function Weekly() {
     dayIndex: number
   ) => {
     const temp = [...availableTimes];
-    temp[dayIndex].times = event.target.checked ? [defaultTimeSlot] : [];
+    temp[dayIndex].times = event.target.checked ? [{ ...defaultTimeSlot }] : [];
     setAvailableTimes(temp);
   };
+
+  const handleCopy = (dayIndex: number) => {};
 
   return (
     <>
       <Box className="m-2 rounded border border-slate-300">
-        <Typography className="font-semibold text-slate-500 m-4">
+        <Typography className="text-slate-500 m-4">
           Set your weekly hours
         </Typography>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -183,7 +193,7 @@ export default function Weekly() {
                     <FormControlLabel
                       control={
                         <Checkbox
-                          checked
+                          checked={true}
                           onChange={(event) => handleCheckbox(event, dayIndex)}
                         />
                       }
@@ -217,12 +227,15 @@ export default function Weekly() {
                                 textField: ({ position }) => ({
                                   label: position === "start" ? "From" : "To",
                                   size: "small",
-                                  sx: { width: 100 },
+                                  sx: { width: 80 },
                                   error: !!invalid.find(
                                     (item) =>
                                       item.dayIndex === dayIndex &&
                                       item.timesIndex === timesIndex
                                   ),
+                                  inputProps: {
+                                    style: { textAlign: "center" },
+                                  },
                                 }),
                               }}
                             />
@@ -243,6 +256,7 @@ export default function Weekly() {
                     <FormControlLabel
                       control={
                         <Checkbox
+                          checked={false}
                           onChange={(event) => handleCheckbox(event, dayIndex)}
                         />
                       }
@@ -257,10 +271,19 @@ export default function Weekly() {
                   className="ml-auto"
                   onClick={() => handleAdd(dayIndex)}
                 >
-                  <AddIcon />
+                  <AddIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  aria-label="add"
+                  className="ml-2"
+                  onClick={() => handleCopy(dayIndex)}
+                >
+                  <ContentCopyIcon fontSize="small" />
                 </IconButton>
               </Box>
-              <Divider />
+              {dayIndex !== availableTimes.length - 1 && (
+                <Divider className="mx-4" />
+              )}
             </>
           ))}
         </LocalizationProvider>
