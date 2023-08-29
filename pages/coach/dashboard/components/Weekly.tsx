@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import { Typography } from "@mui/material";
+import { useCallback, useEffect, useState, ChangeEvent } from "react";
+import { Box, Divider, Typography } from "@mui/material";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
@@ -16,13 +16,10 @@ import { DateRange } from "@mui/x-date-pickers-pro/internals/models/range";
 // Redux
 import { useSelector } from "react-redux";
 import { selectAuthState } from "~/slices/authSlice";
+import { log } from "console";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-
-const DAY_LABELS = ["MON", "TUE", "WED", "THR", "FRI", "SAT", "SUN"];
-const defaultStartTime = dayjs().hour(9).minute(0);
-const defaultEndTime = dayjs().hour(17).minute(0);
 
 interface TimeSlot {
   startTime: Dayjs;
@@ -38,91 +35,72 @@ interface InvalidState {
   timesIndex: number;
 }
 
+const DAY_LABELS = ["MON", "TUE", "WED", "THR", "FRI", "SAT", "SUN"];
+const defaultStartTime = dayjs().hour(9).minute(0);
+const defaultEndTime = dayjs().hour(17).minute(0);
+
+const defaultTimeSlot: TimeSlot = {
+  startTime: defaultStartTime,
+  endTime: defaultEndTime,
+};
+
 const defaultTimes: DayTimes[] = [
   {
-    times: [
-      {
-        startTime: defaultStartTime,
-        endTime: defaultEndTime,
-      },
-    ],
+    times: [defaultTimeSlot],
   },
   {
-    times: [
-      {
-        startTime: defaultStartTime,
-        endTime: defaultEndTime,
-      },
-    ],
+    times: [defaultTimeSlot],
   },
   {
-    times: [
-      {
-        startTime: defaultStartTime,
-        endTime: defaultEndTime,
-      },
-    ],
+    times: [defaultTimeSlot],
   },
   {
-    times: [
-      {
-        startTime: defaultStartTime,
-        endTime: defaultEndTime,
-      },
-    ],
+    times: [defaultTimeSlot],
   },
   {
-    times: [
-      {
-        startTime: defaultStartTime,
-        endTime: defaultEndTime,
-      },
-    ],
+    times: [defaultTimeSlot],
   },
   {
-    times: [
-      {
-        startTime: defaultStartTime,
-        endTime: defaultEndTime,
-      },
-    ],
+    times: [],
   },
   {
-    times: [
-      {
-        startTime: defaultStartTime,
-        endTime: defaultEndTime,
-      },
-    ],
+    times: [],
   },
 ];
 
+const isOverlap = (prevSlot: TimeSlot, lastSlot: TimeSlot) => {
+  return lastSlot.startTime.isAfter(prevSlot.endTime);
+};
+
+const isOverDate = (primary: TimeSlot, temp: TimeSlot) => {
+  const pri_H = primary.startTime.hour();
+  const pri_D = primary.startTime.day();
+  const tem_H = temp.startTime.hour();
+  const tem_D = temp.startTime.day();
+  if (tem_D > pri_D && tem_H > pri_H) return false;
+  return true;
+};
+
 export default function Weekly() {
-  const [availableTimes, setAvailableTimes] = useState<any[]>([]);
+  const [availableTimes, setAvailableTimes] = useState<any[]>(defaultTimes);
   const [invalid, setInvalid] = useState<InvalidState[]>([]);
-  const [flag, setFlag] = useState<Boolean>(false);
-
   const curUser = useSelector(selectAuthState);
-
-  useEffect(() => {
-    // fetch times from backend
-    setAvailableTimes(defaultTimes);
-  }, []);
 
   const handleAdd = useCallback(
     (dayIndex: number) => {
       const newTimes = availableTimes?.map((item, index) => {
         if (dayIndex === index) {
-          console.log("selectedDay :", item);
           const times = item.times;
-          const lastSlot = times[times.length - 1];
-          console.log("lastSlot", lastSlot);
-          const newSlot: TimeSlot = {
-            startTime: lastSlot.endTime.add(1, "hour"),
-            endTime: lastSlot.endTime.add(2, "hour"),
-          };
-          setFlag(!flag);
-          return { ...item, times: [...times, newSlot] };
+          if (times.length > 0) {
+            const lastSlot = times[times.length - 1];
+            const newSlot: TimeSlot = {
+              startTime: lastSlot.endTime.add(1, "hour"),
+              endTime: lastSlot.endTime.add(2, "hour"),
+            };
+            return { ...item, times: [...times, newSlot] };
+          } else {
+            return { ...item, times: [...times, defaultTimeSlot] };
+          }
         } else {
           return item;
         }
@@ -132,180 +110,161 @@ export default function Weekly() {
     [availableTimes]
   );
 
-  const isOverlap = (prevSlot: TimeSlot, lastSlot: TimeSlot) => {
-    return lastSlot.startTime.isAfter(prevSlot.endTime);
-  };
-
-  const isOverDate = (primary: TimeSlot, temp: TimeSlot) => {
-    const pri_H = primary.startTime.hour();
-    const pri_D = primary.startTime.day();
-    const tem_H = temp.startTime.hour();
-    const tem_D = temp.startTime.day();
-    if (tem_D > pri_D && tem_H > pri_H) return false;
-    return true;
-  };
-
-  // const validateTimes = useCallback(() => {
-
-  // }, [availableTimes]);
-
+  // Validate the available times
   useEffect(() => {
-    console.log(availableTimes, "CheckFunc");
-    if (availableTimes.length > 1) {
-      const temp: InvalidState[] = [];
-      availableTimes.map((day, index) => {
-        const times = day.times;
-        // Check the adjacent items
-        for (let i = 0; i < times.length; i++) {
-          if (times[i + 1]) {
-            if (!isOverlap(times[i], times[i + 1])) {
-              temp.push({ dayIndex: index, timesIndex: i + 1 });
-            }
-          }
-          if (i && !isOverDate(times[0], times[i])) {
-            temp.push({ dayIndex: index, timesIndex: i });
-          }
+    if (availableTimes.length <= 1) return;
+
+    const temp: InvalidState[] = availableTimes.flatMap((day, dayIndex) => {
+      return day.times.flatMap((times: TimeSlot, timesIndex: number) => {
+        let issues = [];
+        if (
+          day.times[timesIndex + 1] &&
+          !isOverlap(times, day.times[timesIndex + 1])
+        ) {
+          issues.push({ dayIndex, timesIndex: timesIndex + 1 });
         }
+        if (timesIndex && !isOverDate(day.times[0], times)) {
+          issues.push({ dayIndex, timesIndex });
+        }
+        return issues;
       });
-      setInvalid(temp);
-    }
-  }, [availableTimes, flag]);
+    });
 
-  useEffect(() => {
-    console.log("Invalid state :", invalid);
-  }, [invalid]);
+    setInvalid(temp);
+  }, [availableTimes]);
 
-  // const handleDelete = useCallback(
-  //   (index: number, key: number) => {
-  //     console.log(index, key);
-  //     if (availableTimes) {
-  //       const newTimes = [...availableTimes];
-  //       const targetDay = newTimes[index];
-  //       console.log(
-  //         "Eat",
-  //         targetDay,
-  //         targetDay.times[key],
-  //         targetDay.times.splice(key, 1),
-  //         newTimes
-  //       );
-  //       // targetDay.times.splice(key, 1);
-  //       setAvailableTimes(newTimes);
-  //     }
-  //   },
-  //   [availableTimes]
-  // );
-
-  const handleDelete = (position: number, key: number) => {
-    console.log(position, key);
+  const handleDelete = (dayIndex: number, timesIndex: number) => {
     if (availableTimes) {
-      // setAvailableTimes(
-      //   availableTimes.map((item, pos) => {
-      //     console.log("Check", item, pos, position);
-      //     if (pos != position) return item;
-      //     else {
-      //       const arr = [];
-      //       for (let i = 0; i < item.length; i++) {
-      //         arr.push(item[i]);
-      //       }
-      //       return arr;
-      //     }
-      //   })
-      // );
       const newTimes = [...availableTimes];
-      const targetDay = newTimes[position];
-      console.log(
-        "Eat",
-        targetDay,
-        targetDay.times[key],
-        targetDay.times.splice(key, 1),
-        newTimes
-      );
-      // targetDay.times.splice(key, 1);
-      setAvailableTimes([...newTimes]);
+      const targetDay = newTimes[dayIndex];
+      targetDay.times.splice(timesIndex, 1);
+      setAvailableTimes(newTimes);
     }
   };
 
   const updateTimes = (
     dayIndex: number,
-    key: number,
+    timesIndex: number,
     value: DateRange<Dayjs>
   ) => {
-    console.log(dayIndex, key, value);
+    console.log(dayIndex, timesIndex);
     const tempTimes = [...availableTimes];
-    tempTimes[dayIndex].times[key].startTime = value[0];
-    tempTimes[dayIndex].times[key].endTime = value[1];
+    tempTimes[dayIndex].times[timesIndex].startTime = value[0];
+    tempTimes[dayIndex].times[timesIndex].endTime = value[1];
+
+    console.log("UpdateTimes :", tempTimes);
     setAvailableTimes(tempTimes);
   };
 
-  useEffect(() => {
-    console.log("Render Here", availableTimes);
-  });
+  const handleCheckbox = (
+    event: ChangeEvent<HTMLInputElement>,
+    dayIndex: number
+  ) => {
+    const temp = [...availableTimes];
+    temp[dayIndex].times = event.target.checked ? [defaultTimeSlot] : [];
+    setAvailableTimes(temp);
+  };
 
   return (
     <>
-      <div className="m-2 rounded border border-slate-300">
+      <Box className="m-2 rounded border border-slate-300">
         <Typography className="font-semibold text-slate-500 m-4">
           Set your weekly hours
         </Typography>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          {availableTimes?.map(({ times }: DayTimes, index) => (
-            <div key={index} className="flex px-2 md:px-4 items-baseline">
-              <FormControlLabel
-                control={
-                  <Checkbox defaultChecked={index !== 5 && index !== 6} />
-                }
-                label={DAY_LABELS[index]}
-                sx={{ width: 80 }}
-              />
-              <div>
-                {times?.map(({ startTime, endTime }: TimeSlot, key: number) => (
-                  <div className="flex justify-between my-4" key={key}>
-                    <MultiInputTimeRangeField
-                      onChange={(value) => updateTimes(index, key, value)}
-                      defaultValue={[startTime, endTime]}
-                      timezone={curUser.timezone}
-                      sx={
-                        invalid.find(
-                          (item) =>
-                            item.dayIndex === index && item.timesIndex === key
-                        )
-                          ? {
-                              ".MuiOutlinedInput-notchedOutline": {
-                                borderColor: "red",
-                              },
-                            }
-                          : null
-                      }
-                      ampm={false}
-                      slotProps={{
-                        textField: ({ position }) => ({
-                          label: position === "start" ? "From" : "To",
-                          size: "small",
-                          sx: { width: 100 },
-                        }),
-                      }}
-                    />
-                    <IconButton
-                      aria-label="delete"
-                      className="ml-4"
-                      onClick={() => handleDelete(index, key)}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </div>
-                ))}
-              </div>
-              <IconButton
-                aria-label="add"
-                className="ml-auto"
-                onClick={() => handleAdd(index)}
+          {availableTimes?.map(({ times }: DayTimes, dayIndex) => (
+            <>
+              <Box
+                key={dayIndex}
+                className="flex px-2 md:px-4 py-3 items-start"
               >
-                <AddIcon />
-              </IconButton>
-            </div>
+                {times.length > 0 ? (
+                  <>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked
+                          onChange={(event) => handleCheckbox(event, dayIndex)}
+                        />
+                      }
+                      label={DAY_LABELS[dayIndex]}
+                      sx={{ width: 80 }}
+                    />
+                    <Box
+                      sx={{
+                        "& > *:not(:first-child)": {
+                          marginTop: "10px",
+                        },
+                      }}
+                    >
+                      {times?.map(
+                        (
+                          { startTime, endTime }: TimeSlot,
+                          timesIndex: number
+                        ) => (
+                          <Box
+                            className="flex justify-between"
+                            key={timesIndex}
+                          >
+                            <MultiInputTimeRangeField
+                              onChange={(value) =>
+                                updateTimes(dayIndex, timesIndex, value)
+                              }
+                              value={[startTime, endTime]}
+                              timezone={curUser.timezone}
+                              ampm={false}
+                              slotProps={{
+                                textField: ({ position }) => ({
+                                  label: position === "start" ? "From" : "To",
+                                  size: "small",
+                                  sx: { width: 100 },
+                                  error: !!invalid.find(
+                                    (item) =>
+                                      item.dayIndex === dayIndex &&
+                                      item.timesIndex === timesIndex
+                                  ),
+                                }),
+                              }}
+                            />
+                            <IconButton
+                              aria-label="delete"
+                              className="ml-4"
+                              onClick={() => handleDelete(dayIndex, timesIndex)}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Box>
+                        )
+                      )}
+                    </Box>
+                  </>
+                ) : (
+                  <>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          onChange={(event) => handleCheckbox(event, dayIndex)}
+                        />
+                      }
+                      label={DAY_LABELS[dayIndex]}
+                      sx={{ width: 80 }}
+                    />
+                    <Box className="flex justify-between pt-2">Unavailable</Box>
+                  </>
+                )}
+                <IconButton
+                  aria-label="add"
+                  className="ml-auto"
+                  onClick={() => handleAdd(dayIndex)}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Box>
+              <Divider />
+            </>
           ))}
         </LocalizationProvider>
-      </div>
+      </Box>
     </>
   );
 }
