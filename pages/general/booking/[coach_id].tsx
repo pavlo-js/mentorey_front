@@ -25,25 +25,10 @@ export default function BookingPage() {
     [k: number]: boolean;
   }>({});
   const [coach, setCoach] = React.useState();
+  const [lessonID, setLessonID] = React.useState("trial");
 
   const router = useRouter();
   const coachID = router.query.coach_id;
-
-  React.useEffect(() => {
-    if (coachID) {
-      const api = "/api/common/getCoach";
-      const request = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ coachID }),
-      };
-      fetch(api, request)
-        .then((res) => res.json())
-        .then((data) => setCoach(data.coach));
-    }
-  }, [coachID]);
 
   const totalSteps = () => {
     return steps.length;
@@ -64,9 +49,7 @@ export default function BookingPage() {
   const handleNext = () => {
     const newActiveStep =
       isLastStep() && !allStepsCompleted()
-        ? // It's the last step, but not all steps have been completed,
-          // find the first step that has been completed
-          steps.findIndex((step, i) => !(i in completed))
+        ? steps.findIndex((step, i) => !(i in completed))
         : activeStep + 1;
     setActiveStep(newActiveStep);
   };
@@ -91,10 +74,30 @@ export default function BookingPage() {
     setCompleted({});
   };
 
+  React.useEffect(() => {
+    if (coachID) {
+      const api = "/api/common/getCoach";
+      const request = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ coachID }),
+      };
+      fetch(api, request)
+        .then((res) => res.json())
+        .then((data) => setCoach(data.coach));
+    }
+  }, [coachID]);
+
+  // React.useEffect(() => {
+  //   console.log("This is coach", coach);
+  // }, [coach]);
+
   return (
     coach && (
       <InsideLayout>
-        <TeacherCard />
+        <TeacherCard coach={coach} />
         <Box className="mx-auto max-w-screen-lg pb-10">
           <Stepper
             nonLinear
@@ -111,8 +114,14 @@ export default function BookingPage() {
           </Stepper>
           <div className="pt-6">
             <React.Fragment>
-              {activeStep === 0 ? <ChooseLesson coach={coach} /> : null}
-              {activeStep === 1 ? <LessonOption /> : null}
+              {activeStep === 0 ? (
+                <ChooseLesson
+                  coach={coach}
+                  sendLessonID={setLessonID}
+                  preLessonID={lessonID}
+                />
+              ) : null}
+              {activeStep === 1 ? <LessonOption lessonID={lessonID} /> : null}
               {activeStep === 2 ? <ScheduleLesson /> : null}
               {activeStep === 3 ? <Communication /> : null}
               <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>

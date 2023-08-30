@@ -124,7 +124,6 @@ export default function SignUpPage() {
       .then((res) => res.json())
       .then((data) => handleResponse(data))
       .catch((err) => {
-        console.error("wee", err);
         toast.error("Registration failed. Please insert valid information.");
       })
       .finally(() => {

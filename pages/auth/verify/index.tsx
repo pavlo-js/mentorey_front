@@ -39,7 +39,7 @@ const VerifyPage: NextPageWithLayout = () => {
           if (data) {
             curUser?.is_teacher
               ? router.push("/coach/dashboard")
-              : router.push("/pupil/learn");
+              : router.push("/general/learn");
           } else {
             toast.error("Invalid code! Try again please");
           }

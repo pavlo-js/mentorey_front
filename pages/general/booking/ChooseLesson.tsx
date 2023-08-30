@@ -20,24 +20,29 @@ const LessonData = [
   },
 ];
 
-export default function ChooseLesson({ coach }: { coach: any }) {
+const activeStyle = {
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+  border: "1px solid #059669",
+};
+
+export default function ChooseLesson({
+  coach,
+  preLessonID,
+  sendLessonID,
+}: {
+  coach: any;
+  preLessonID: any;
+  sendLessonID: (data: any) => void;
+}) {
   const [lessonType, setLessonType] = React.useState("");
   const [lessons, setLessons] = useState<any[]>();
   const [categories, setCategories] = useState<any[]>();
+  const [activeLesson, setActiveLesson] = useState<any>(preLessonID);
   const currencySymbol = CurrencyData[coach.currency].symbol;
 
   const handleChange = (event: SelectChangeEvent) => {
     setLessonType(event.target.value);
   };
-
-  useEffect(() => {
-    getLessons();
-    // getCategories();
-  }, []);
-
-  useEffect(() => {
-    console.log(categories);
-  }, [categories]);
 
   function getCategories() {
     const api = "/api/common/getCoachCategory";
@@ -70,6 +75,15 @@ export default function ChooseLesson({ coach }: { coach: any }) {
       .then((data) => setLessons(data.lessons));
   }
 
+  useEffect(() => {
+    getLessons();
+    // getCategories();
+  }, []);
+
+  useEffect(() => {
+    sendLessonID(activeLesson);
+  }, [activeLesson]);
+
   return (
     <>
       <div className="mx-auto max-w-2xl">
@@ -90,7 +104,11 @@ export default function ChooseLesson({ coach }: { coach: any }) {
             ))}
           </Select>
         </FormControl> */}
-        <Card className="my-4 rounded-lg hover:shadow-lg">
+        <Card
+          className="my-4 rounded-lg hover:shadow-lg"
+          onClick={() => setActiveLesson("trial")}
+          style={activeLesson === "trial" ? activeStyle : {}}
+        >
           <div className="flex cursor-pointer border p-4">
             <div className="w-10/12">
               <h4 className="truncate text-lg text-slate-600">Trial Lesson</h4>
@@ -107,7 +125,12 @@ export default function ChooseLesson({ coach }: { coach: any }) {
         </Card>
         {lessons &&
           lessons.map((lesson, index) => (
-            <Card key={index} className="my-4 rounded-lg hover:shadow-lg">
+            <Card
+              key={index}
+              className="my-4 rounded-lg hover:shadow-lg"
+              onClick={() => setActiveLesson(lesson.id)}
+              style={lesson.id === activeLesson ? activeStyle : {}}
+            >
               <div className="flex cursor-pointer rounded-lg border p-4">
                 <div className="w-10/12">
                   <h4 className="truncate text-lg text-slate-600">

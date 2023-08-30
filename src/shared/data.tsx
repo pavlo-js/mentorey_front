@@ -2774,3 +2774,8 @@ export const Timezones = [
     utc: ["Pacific/Apia"],
   },
 ];
+
+export const LessonTypes = {
+  MIN30: "30 mins",
+  MIN60: "60 mins",
+};
