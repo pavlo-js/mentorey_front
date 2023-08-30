@@ -30,7 +30,15 @@ const CoachDashboard = () => {
             value={value}
             onChange={handleChange}
             variant="scrollable"
-            centered
+            sx={{
+              justifyContent: "center",
+              overflowX: "auto",
+              maxWidth: "100%", // or some other width you prefer
+              "& .MuiTabs-scroller": {
+                display: "flex",
+                justifyContent: "center",
+              },
+            }}
           >
             <Tab
               value="lessons"

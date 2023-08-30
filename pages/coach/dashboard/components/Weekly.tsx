@@ -1,5 +1,13 @@
 import { useCallback, useEffect, useState, ChangeEvent } from "react";
-import { Box, Divider, Typography } from "@mui/material";
+import {
+  Box,
+  Divider,
+  Typography,
+  Menu,
+  MenuItem,
+  MenuList,
+  Button,
+} from "@mui/material";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
@@ -14,10 +22,6 @@ import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { DateRange } from "@mui/x-date-pickers-pro/internals/models/range";
-// Redux
-import { useSelector } from "react-redux";
-import { selectAuthState } from "~/slices/authSlice";
-import { log } from "console";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -36,13 +40,22 @@ interface InvalidState {
   timesIndex: number;
 }
 
+type DayCheckboxValue = number;
+
 const DAY_LABELS = ["MON", "TUE", "WED", "THR", "FRI", "SAT", "SUN"];
-const defaultStartTime = dayjs().hour(9).minute(0);
-const defaultEndTime = dayjs().hour(17).minute(0);
+const FULL_DAY_LABELS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
 
 const defaultTimeSlot: TimeSlot = {
-  startTime: defaultStartTime,
-  endTime: defaultEndTime,
+  startTime: dayjs().hour(9).minute(0),
+  endTime: dayjs().hour(17).minute(0),
 };
 
 const defaultTimes: DayTimes[] = [
@@ -86,10 +99,16 @@ const isOverDate = (primary: TimeSlot, temp: TimeSlot) => {
   return true;
 };
 
-export default function Weekly() {
+export default function Weekly(curUser: any) {
   const [availableTimes, setAvailableTimes] = useState<any[]>(defaultTimes);
   const [invalid, setInvalid] = useState<InvalidState[]>([]);
-  const curUser = useSelector(selectAuthState);
+  const [originDay, setOriginDay] = useState<number | undefined>();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleAdd = useCallback(
     (dayIndex: number) => {
@@ -173,21 +192,46 @@ export default function Weekly() {
     setAvailableTimes(temp);
   };
 
-  const handleCopy = (dayIndex: number) => {};
+  const handleCopy = (
+    event: React.MouseEvent<HTMLElement>,
+    dayIndex: number
+  ) => {
+    setAnchorEl(event.currentTarget);
+    setOriginDay(dayIndex);
+  };
+
+  const handleCopyDates = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const checkedValues: DayCheckboxValue[] = formData
+      .getAll("days")
+      .map((value) => Number(value) as DayCheckboxValue);
+    if (originDay !== undefined) {
+      const originTimes = availableTimes[originDay].times;
+      const tempTimes = [...availableTimes];
+
+      checkedValues.forEach((item) => {
+        tempTimes[item] = {
+          ...tempTimes[item],
+          times: originTimes.map((slot: TimeSlot) => ({ ...slot })),
+        };
+      });
+      setAvailableTimes(tempTimes);
+    }
+    handleClose();
+  };
 
   return (
     <>
-      <Box className="m-2 rounded border border-slate-300">
-        <Typography className="text-slate-500 m-4">
+      <Box className="m-2 rounded border border-slate-300 px-2 md:px-4 pt-2 md:pt-4">
+        <Typography className="my-3 font-semibold">
           Set your weekly hours
         </Typography>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           {availableTimes?.map(({ times }: DayTimes, dayIndex) => (
             <>
-              <Box
-                key={dayIndex}
-                className="flex px-2 md:px-4 py-3 items-start"
-              >
+              <Box key={dayIndex} className="flex py-3 items-start">
                 {times.length > 0 ? (
                   <>
                     <FormControlLabel
@@ -202,7 +246,7 @@ export default function Weekly() {
                     />
                     <Box
                       sx={{
-                        "& > *:not(:first-child)": {
+                        "& > *:not(:first-of-type)": {
                           marginTop: "10px",
                         },
                       }}
@@ -214,7 +258,7 @@ export default function Weekly() {
                         ) => (
                           <Box
                             className="flex justify-between"
-                            key={timesIndex}
+                            key={dayIndex + timesIndex}
                           >
                             <MultiInputTimeRangeField
                               onChange={(value) =>
@@ -276,7 +320,7 @@ export default function Weekly() {
                 <IconButton
                   aria-label="add"
                   className="ml-2"
-                  onClick={() => handleCopy(dayIndex)}
+                  onClick={(event) => handleCopy(event, dayIndex)}
                 >
                   <ContentCopyIcon fontSize="small" />
                 </IconButton>
@@ -288,6 +332,62 @@ export default function Weekly() {
           ))}
         </LocalizationProvider>
       </Box>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+      >
+        <form action="#" onSubmit={handleCopyDates}>
+          <Typography className="text-slate-500 text-sm ml-4 mt-2">
+            Copy times to...
+          </Typography>
+          <MenuList sx={{ width: "150px" }}>
+            {FULL_DAY_LABELS.map((item, index) => (
+              <MenuItem className="py-0">
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      size="small"
+                      name="days"
+                      value={index}
+                      defaultChecked={index === originDay}
+                      disabled={index === originDay}
+                      sx={{ paddingRight: 0 }}
+                    />
+                  }
+                  label={item}
+                  labelPlacement="start"
+                  sx={{
+                    width: "100%",
+                    marginLeft: 0,
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                />
+              </MenuItem>
+            ))}
+          </MenuList>
+          <Box className="px-2">
+            <Button
+              type="submit"
+              variant="contained"
+              size="small"
+              fullWidth
+              className="rounded-3xl bg-primary-600"
+            >
+              Apply
+            </Button>
+          </Box>
+        </form>
+      </Menu>
     </>
   );
 }

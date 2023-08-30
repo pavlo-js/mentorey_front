@@ -23,7 +23,7 @@ export default function Schedule() {
 
   return (
     <Paper className="max-w-4xl mx-auto">
-      <Typography className="text-lg font-semibold p-5">
+      <Typography className="text-lg font-semibold p-5 text-slate-500">
         Your Timezone: {curUser.timezone}
       </Typography>
 
@@ -42,10 +42,10 @@ export default function Schedule() {
       ) : (
         <div className="flex">
           <div className="w-full md:w-7/12">
-            <Weekly />
+            <Weekly curUser={curUser} />
           </div>
           <div className="w-full md:w-5/12">
-            <Override />
+            <Override curUser={curUser} />
           </div>
         </div>
       )}

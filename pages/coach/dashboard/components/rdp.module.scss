@@ -1,0 +1,11 @@
+.selected:not([disabled]) { 
+  background-color: #059669;
+  color: #fff;
+}
+.selected:hover:not([disabled]) { 
+  border-color: #059669;
+  color: #059669;
+}
+.today {
+  border: 1px solid #059669;
+}
