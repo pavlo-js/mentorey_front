@@ -11,6 +11,8 @@ import ScheduleLesson from "./ScheduleLesson";
 import Communication from "./Communication";
 import TeacherCard from "./TeacherCard";
 import { useRouter } from "next/router";
+import { selectAuthState } from "~/slices/authSlice";
+import { useSelector } from "react-redux";
 
 const steps = [
   "Lesson type",
@@ -26,7 +28,7 @@ export default function BookingPage() {
   }>({});
   const [coach, setCoach] = React.useState();
   const [lessonID, setLessonID] = React.useState("trial");
-
+  const curUser = useSelector(selectAuthState);
   const router = useRouter();
   const coachID = router.query.coach_id;
 
@@ -116,6 +118,7 @@ export default function BookingPage() {
             <React.Fragment>
               {activeStep === 0 ? (
                 <ChooseLesson
+                  curUser={curUser}
                   coach={coach}
                   sendLessonID={setLessonID}
                   preLessonID={lessonID}

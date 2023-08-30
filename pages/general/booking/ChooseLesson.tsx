@@ -11,34 +11,39 @@ import {
   Card,
 } from "@mui/material";
 import { CurrencyData } from "~/shared/CurrencyData";
-
-const LessonData = [
-  {
-    id: "1",
-    type: "English",
-    title: "Trial Lesson",
-  },
-];
+import useCurrencyConverter from "~/hooks/useCurrencyConverter";
+import currencyConverter from "~/utils/currencyConverter";
 
 const activeStyle = {
   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
   border: "1px solid #059669",
 };
 
-export default function ChooseLesson({
-  coach,
-  preLessonID,
-  sendLessonID,
-}: {
+interface PageProps {
+  curUser: any;
   coach: any;
   preLessonID: any;
   sendLessonID: (data: any) => void;
-}) {
+}
+
+export default function ChooseLesson({
+  curUser,
+  coach,
+  preLessonID,
+  sendLessonID,
+}: PageProps) {
   const [lessonType, setLessonType] = React.useState("");
   const [lessons, setLessons] = useState<any[]>();
   const [categories, setCategories] = useState<any[]>();
   const [activeLesson, setActiveLesson] = useState<any>(preLessonID);
-  const currencySymbol = CurrencyData[coach.currency].symbol;
+  const currencySymbol = CurrencyData[curUser.currency].symbol;
+  const [prices, setPrices] = useState<any[]>([]);
+
+  const trialPrice = useCurrencyConverter(
+    coach.currency,
+    curUser.currency,
+    coach.trial_price
+  );
 
   const handleChange = (event: SelectChangeEvent) => {
     setLessonType(event.target.value);
@@ -75,10 +80,27 @@ export default function ChooseLesson({
       .then((data) => setLessons(data.lessons));
   }
 
+  async function updatePrices() {}
+
   useEffect(() => {
     getLessons();
     // getCategories();
   }, []);
+
+  useEffect(() => {
+    const temp: any[] = [];
+    lessons?.forEach((item) => {
+      currencyConverter("USD", "EUR", 100)
+        .then((convertedValue) => {
+          console.log(convertedValue);
+          temp.push(convertedValue);
+        })
+        .catch((error) => {
+          console.error("Error converting currency:", error);
+        });
+    });
+    setPrices(temp);
+  }, [lessons]);
 
   useEffect(() => {
     sendLessonID(activeLesson);
@@ -117,7 +139,7 @@ export default function ChooseLesson({
             </div>
             <div className="flex w-2/12 items-center justify-end">
               <Chip
-                label={`${currencySymbol} ${coach.trial_price}`}
+                label={`${currencySymbol} ${trialPrice}`}
                 className="bg-primary-100 px-4 font-semibold text-primary-500"
               />
             </div>
@@ -141,7 +163,7 @@ export default function ChooseLesson({
                 </div>
                 <div className="flex w-2/12 items-center justify-end">
                   <Chip
-                    label={`${currencySymbol} ${lesson.price}`}
+                    label={`${currencySymbol} ${prices[index]}`}
                     className="bg-pink-100 px-4 font-semibold text-pink-500"
                   />
                 </div>
