@@ -23,9 +23,6 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { DateRange } from "@mui/x-date-pickers-pro/internals/models/range";
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
 interface TimeSlot {
   startTime: Dayjs;
   endTime: Dayjs;
@@ -99,8 +96,19 @@ const isOverDate = (primary: TimeSlot, temp: TimeSlot) => {
   return true;
 };
 
-export default function Weekly(curUser: any) {
-  const [availableTimes, setAvailableTimes] = useState<any[]>(defaultTimes);
+interface PageProps {
+  curUser: any;
+  sendWeeklyTimes: (data: DayTimes[]) => void;
+  hasError: (data: boolean) => void;
+}
+
+export default function Weekly({
+  curUser,
+  sendWeeklyTimes,
+  hasError,
+}: PageProps) {
+  const [availableTimes, setAvailableTimes] =
+    useState<DayTimes[]>(defaultTimes);
   const [invalid, setInvalid] = useState<InvalidState[]>([]);
   const [originDay, setOriginDay] = useState<number | undefined>();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -133,35 +141,6 @@ export default function Weekly(curUser: any) {
     },
     [availableTimes]
   );
-
-  // Validate the available times
-  useEffect(() => {
-    if (availableTimes.length <= 1) return;
-
-    const temp: InvalidState[] = availableTimes.flatMap((day, dayIndex) =>
-      day.times.flatMap((curSlot: TimeSlot, timesIndex: number) => {
-        const issues: InvalidState[] = [];
-        const nextSlot = day.times[timesIndex + 1];
-
-        if (!isValidSlot(curSlot)) {
-          issues.push({ dayIndex, timesIndex });
-        }
-
-        if (nextSlot && !isOverlap(curSlot, nextSlot)) {
-          issues.push({ dayIndex, timesIndex: timesIndex + 1 });
-        }
-
-        if (timesIndex && !isOverDate(day.times[0], curSlot)) {
-          issues.push({ dayIndex, timesIndex });
-        }
-
-        return issues;
-      })
-    );
-
-    setInvalid(temp);
-  }, [availableTimes]);
-
   const handleDelete = (dayIndex: number, timesIndex: number) => {
     if (availableTimes) {
       const newTimes = [...availableTimes];
@@ -177,8 +156,8 @@ export default function Weekly(curUser: any) {
     value: DateRange<Dayjs>
   ) => {
     const tempTimes = [...availableTimes];
-    tempTimes[dayIndex].times[timesIndex].startTime = value[0];
-    tempTimes[dayIndex].times[timesIndex].endTime = value[1];
+    tempTimes[dayIndex].times[timesIndex].startTime = value[0]!;
+    tempTimes[dayIndex].times[timesIndex].endTime = value[1]!;
 
     setAvailableTimes(tempTimes);
   };
@@ -221,6 +200,39 @@ export default function Weekly(curUser: any) {
     }
     handleClose();
   };
+
+  // Validate the available times
+  useEffect(() => {
+    if (availableTimes.length <= 1) return;
+
+    const temp: InvalidState[] = availableTimes.flatMap((day, dayIndex) =>
+      day.times.flatMap((curSlot: TimeSlot, timesIndex: number) => {
+        const issues: InvalidState[] = [];
+        const nextSlot = day.times[timesIndex + 1];
+
+        if (!isValidSlot(curSlot)) {
+          issues.push({ dayIndex, timesIndex });
+        }
+
+        if (nextSlot && !isOverlap(curSlot, nextSlot)) {
+          issues.push({ dayIndex, timesIndex: timesIndex + 1 });
+        }
+
+        if (timesIndex && !isOverDate(day.times[0], curSlot)) {
+          issues.push({ dayIndex, timesIndex });
+        }
+
+        return issues;
+      })
+    );
+
+    setInvalid(temp);
+    sendWeeklyTimes(availableTimes);
+  }, [availableTimes]);
+
+  useEffect(() => {
+    hasError(invalid.length > 0);
+  }, [invalid]);
 
   return (
     <>

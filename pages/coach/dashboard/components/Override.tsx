@@ -23,6 +23,7 @@ import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { DateRange } from "@mui/x-date-pickers-pro/internals/models/range";
+
 interface TimeSlot {
   startTime: Dayjs;
   endTime: Dayjs;
@@ -33,12 +34,13 @@ interface DayTime {
   times: TimeSlot[];
 }
 
-const defaultTimeSlot: TimeSlot = {
-  startTime: dayjs().hour(9).minute(0),
-  endTime: dayjs().hour(17).minute(0),
-};
+interface PageProps {
+  curUser: any;
+  sendOverrideTimes: (data: any) => void;
+  hasError?: (data: boolean) => void;
+}
 
-export default function Override(curUser: any) {
+export default function Override({ curUser, sendOverrideTimes }: PageProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [availTimes, setAvailTimes] = useState<DayTime[]>([]);
   const [days, setDays] = useState<Date[] | undefined>([]);
@@ -64,9 +66,24 @@ export default function Override(curUser: any) {
     setDialogOpen(false);
   };
 
+  const addTimes = () => {
+    const temp = [...times];
+    temp.push({
+      startTime: temp[temp.length - 1].endTime.add(1, "hour"),
+      endTime: temp[temp.length - 1].endTime.add(2, "hour"),
+    });
+    setTimes(temp);
+  };
+
+  const updateTimes = (timesIndex: number, value: DateRange<Dayjs>) => {
+    const temp = [...times];
+    temp[timesIndex].startTime = value[0]!;
+    temp[timesIndex].endTime = value[1]!;
+    setTimes(temp);
+  };
+
   const handleApply = useCallback(() => {
     if (days) {
-      console.log("applytimes", times);
       const tempTimes: DayTime[] = [...availTimes];
       days.forEach((day) => {
         if (!tempTimes.some((item) => item.date === dayjs(day))) {
@@ -79,27 +96,10 @@ export default function Override(curUser: any) {
       setAvailTimes(tempTimes);
     }
     closeDialog();
-  }, [days]);
-
-  const addTimes = () => {
-    const temp = [...times];
-    temp.push({
-      startTime: temp[temp.length - 1].endTime.add(1, "hour"),
-      endTime: temp[temp.length - 1].endTime.add(2, "hour"),
-    });
-    console.log("temp:", temp);
-    setTimes(temp);
-  };
-
-  const updateTimes = (timesIndex: number, value: DateRange<Dayjs>) => {
-    const temp = [...times];
-    temp[timesIndex].startTime = value[0]!;
-    temp[timesIndex].endTime = value[1]!;
-    setTimes(temp);
-  };
+  }, [days, times, availTimes]);
 
   useEffect(() => {
-    console.log("AvailTimes :", availTimes);
+    sendOverrideTimes(availTimes);
   }, [availTimes]);
 
   return (
@@ -135,7 +135,7 @@ export default function Override(curUser: any) {
             <Box>
               {item.times.map((time, timeIndex) => (
                 <Typography
-                  key={timeIndex}
+                  key={dateIndex + timeIndex}
                   sx={{ marginTop: "10px", fontSize: "14px" }}
                 >
                   {time.startTime.format("HH:mm")} -{" "}
