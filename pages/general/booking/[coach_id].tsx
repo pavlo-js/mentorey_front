@@ -28,6 +28,8 @@ export default function BookingPage() {
   }>({});
   const [coach, setCoach] = React.useState();
   const [lessonID, setLessonID] = React.useState("trial");
+  const [option, setOption] = React.useState<any>();
+
   const curUser = useSelector(selectAuthState);
   const router = useRouter();
   const coachID = router.query.coach_id;
@@ -121,10 +123,18 @@ export default function BookingPage() {
                   curUser={curUser}
                   coach={coach}
                   sendLessonID={setLessonID}
-                  preLessonID={lessonID}
+                  selectedLessonID={lessonID}
                 />
               ) : null}
-              {activeStep === 1 ? <LessonOption lessonID={lessonID} /> : null}
+              {activeStep === 1 ? (
+                <LessonOption
+                  curUser={curUser}
+                  coach={coach}
+                  lessonID={lessonID}
+                  selectedOption={option}
+                  sendOption={setOption}
+                />
+              ) : null}
               {activeStep === 2 ? <ScheduleLesson /> : null}
               {activeStep === 3 ? <Communication /> : null}
               <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>

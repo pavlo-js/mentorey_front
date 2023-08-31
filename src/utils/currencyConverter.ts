@@ -1,10 +1,10 @@
 // Note that this currency data is based on EURO
+const api = "/api/common/getCurrencyRates";
 export default async function currencyConverter(
   from: string,
   to: string,
   amount: number
 ) {
-  const api = "/api/common/getCurrencyRates";
   const response = await fetch(api);
 
   if (!response.ok) {

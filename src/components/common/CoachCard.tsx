@@ -87,12 +87,11 @@ const CoachCard = ({ coach }: { coach: any }) => {
           </div>
           <div className="my-2 flex justify-between">
             <div className="flex items-center">
-              <p className="font-base font-bold">{coach.currency}&nbsp;</p>
               <p className="price font-base font-bold">
                 {coach.trial_price}
-                {currencySymbol}
+                {currencySymbol} &nbsp;
               </p>
-              <p className="text-sm text-slate-400"> / trial</p>
+              <p className="text-sm text-slate-400">/ trial</p>
             </div>
             <div className="flex items-center">
               <Rating value={4} size="small" />

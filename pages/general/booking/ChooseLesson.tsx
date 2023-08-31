@@ -22,20 +22,20 @@ const activeStyle = {
 interface PageProps {
   curUser: any;
   coach: any;
-  preLessonID: any;
+  selectedLessonID: any;
   sendLessonID: (data: any) => void;
 }
 
 export default function ChooseLesson({
   curUser,
   coach,
-  preLessonID,
+  selectedLessonID,
   sendLessonID,
 }: PageProps) {
   const [lessonType, setLessonType] = React.useState("");
   const [lessons, setLessons] = useState<any[]>();
   const [categories, setCategories] = useState<any[]>();
-  const [activeLesson, setActiveLesson] = useState<any>(preLessonID);
+  const [activeLesson, setActiveLesson] = useState<any>(selectedLessonID);
   const currencySymbol = CurrencyData[curUser.currency].symbol;
   const [prices, setPrices] = useState<any[]>([]);
 
@@ -88,18 +88,19 @@ export default function ChooseLesson({
   }, []);
 
   useEffect(() => {
-    const temp: any[] = [];
-    lessons?.forEach((item) => {
-      currencyConverter("USD", "EUR", 100)
-        .then((convertedValue) => {
-          console.log(convertedValue);
-          temp.push(convertedValue);
+    if (lessons)
+      Promise.all(
+        lessons.map((item) => {
+          return currencyConverter(
+            coach.currency,
+            curUser.currency,
+            item.price
+          ).catch(() => null);
         })
-        .catch((error) => {
-          console.error("Error converting currency:", error);
-        });
-    });
-    setPrices(temp);
+      ).then((_values) => {
+        const values = _values.filter((item) => item);
+        setPrices(values);
+      });
   }, [lessons]);
 
   useEffect(() => {
