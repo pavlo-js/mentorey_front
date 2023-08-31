@@ -4,7 +4,6 @@ import { Paper, Button, InputAdornment } from "@mui/material";
 import {
   FormContainer,
   TextFieldElement,
-  RadioButtonGroup,
   SelectElement,
 } from "react-hook-form-mui";
 import { selectAuthState } from "~/slices/authSlice";
@@ -123,18 +122,6 @@ export default function NewLessonPage() {
               InputProps={{
                 inputProps: { min: 0, max: 100 },
               }}
-            />
-          </div>
-          <div className="my-2 w-full items-center">
-            <p>Lesson Type</p>
-            <RadioButtonGroup
-              row
-              name="lessonType"
-              options={[
-                { id: "MIN30", label: "30min" },
-                { id: "MIN60", label: "60min" },
-                { id: "MIXED", label: "Let student choose" },
-              ]}
             />
           </div>
 

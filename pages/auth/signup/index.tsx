@@ -138,7 +138,6 @@ export default function SignUpPage() {
         toast.error("Your email has already taken. Please sign in.");
       return false;
     } else if (data.newUser) {
-      console.log(data.newUser);
       setAuthState(data.newUser);
       router.push(`/auth/verify/`);
     }

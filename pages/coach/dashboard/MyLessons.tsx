@@ -103,7 +103,6 @@ export default function MyLessons() {
       const {
         id,
         title,
-        type,
         price,
         pack,
         disRate,
@@ -118,7 +117,6 @@ export default function MyLessons() {
         id,
         index: key + 1,
         title,
-        type: LessonType[type],
         category: category.label,
         price,
         pack,
@@ -167,14 +165,6 @@ export default function MyLessons() {
       width: 200,
       headerAlign: "left",
       align: "left",
-    },
-    {
-      field: "type",
-      type: "string",
-      headerName: "Lesson Type",
-      headerAlign: "left",
-      align: "left",
-      width: 120,
     },
     {
       field: "category",

@@ -5,7 +5,6 @@ import { RowDataPacket } from "mysql2/promise";
 const createLesson = async (req: NextApiRequest, res: NextApiResponse) => {
   const {
     userID,
-    lessonType,
     lessonPack,
     disRate,
     lessonTitle,
@@ -16,11 +15,10 @@ const createLesson = async (req: NextApiRequest, res: NextApiResponse) => {
   } = req.body;
   try {
     const query =
-      "INSERT INTO lessons (ownerID, title, type, price, pack, disRate, categoryID, description, purpose) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      "INSERT INTO lessons (ownerID, title, price, pack, disRate, categoryID, description, purpose) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     const params = [
       userID,
       lessonTitle,
-      lessonType,
       price,
       lessonPack,
       disRate,

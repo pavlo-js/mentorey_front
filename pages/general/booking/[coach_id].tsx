@@ -13,6 +13,7 @@ import TeacherCard from "./TeacherCard";
 import { useRouter } from "next/router";
 import { selectAuthState } from "~/slices/authSlice";
 import { useSelector } from "react-redux";
+import Calendar from "./CalendarDemo";
 
 const steps = [
   "Lesson type",
@@ -135,7 +136,8 @@ export default function BookingPage() {
                   sendOption={setOption}
                 />
               ) : null}
-              {activeStep === 2 ? <ScheduleLesson /> : null}
+              {activeStep === 2 ? <Calendar /> : null}
+              {/* {activeStep === 2 ? <ScheduleLesson /> : null} */}
               {activeStep === 3 ? <Communication /> : null}
               <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
                 <Button
