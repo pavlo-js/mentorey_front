@@ -15,8 +15,10 @@ import Override from "./components/Override";
 // Date
 import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface TimeSlot {
   startTime: Dayjs;
