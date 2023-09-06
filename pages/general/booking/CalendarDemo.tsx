@@ -1,7 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { enUS } from "date-fns/locale";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 
+import { useSelector } from "react-redux";
+import { selectAuthState } from "~/slices/authSlice";
 import {
   Calendar as BigCalendar,
   dateFnsLocalizer,
@@ -33,63 +35,7 @@ type Event = {
   desc?: string;
 };
 
-const init: Event[] = [
-  {
-    id: 0,
-    title: "All Day Event very long title",
-    allDay: true,
-    start: new Date(2023, 7, 0),
-    end: new Date(2023, 7, 1),
-  },
-  {
-    id: 1,
-    title: "Long Event",
-    start: new Date(2023, 7, 7),
-    end: new Date(2023, 7, 10),
-  },
-
-  {
-    id: 2,
-    title: "Dating",
-    start: new Date(2023, 8, 1, 0, 0, 0),
-    end: new Date(2023, 8, 1, 0, 0, 0),
-  },
-
-  {
-    id: 3,
-    title: "Meeting with Girlfriend",
-    start: new Date(2023, 8, 6, 0, 0, 0),
-    end: new Date(2023, 8, 8, 22, 0, 0),
-  },
-
-  {
-    id: 4,
-    title: "Some Event",
-    start: new Date(2023, 7, 29, 0, 0, 0),
-    end: new Date(2023, 7, 29, 1, 0, 0),
-  },
-  {
-    id: 5,
-    title: "Conference",
-    start: new Date(2023, 7, 11),
-    end: new Date(2023, 7, 13),
-    desc: "Big conference for important people",
-  },
-  {
-    id: 6,
-    title: "Meeting",
-    start: new Date(2023, 8, 12, 10, 30, 0, 0),
-    end: new Date(2023, 8, 12, 12, 30, 0, 0),
-    desc: "Pre-meeting meeting, to prepare for the meeting",
-  },
-
-  {
-    id: 7,
-    title: "Today",
-    start: new Date(new Date().setHours(new Date().getHours() - 3)),
-    end: new Date(new Date().setHours(new Date().getHours() + 3)),
-  },
-];
+const init: Event[] = [];
 
 const styles = {
   container: {
@@ -99,8 +45,65 @@ const styles = {
 };
 
 export default function CalendarDemo() {
+  const [times, setTimes] = useState<any>({});
+  const curUser = useSelector(selectAuthState);
   const [events, setEvents] = React.useState(init);
-  const [uid, setUid] = React.useState<number>(10);
+  const [uid, setUid] = React.useState<number>(0);
+
+  useEffect(() => {
+    getAvails();
+  }, []);
+
+  const ulid = () => {
+    setUid(uid + 1);
+    return uid;
+  };
+
+  useEffect(() => {
+    console.log(times, times.weekly_avail);
+    const arr = [];
+    if (times.weekly_avail) {
+      for (let i = 0; i < times.weekly_avail.length; i++) {
+        arr.push({
+          id: arr.length,
+          title: "avail",
+          start: new Date(times.weekly_avail[i].from_time),
+          end: new Date(times.weekly_avail[i].to_time),
+        });
+      }
+    }
+
+    if (times.override_avail) {
+      for (let i = 0; i < times.override_avail.length; i++) {
+        arr.push({
+          id: arr.length,
+          title: "override",
+          start: new Date(times.override_avail[i].from_time),
+          end: new Date(times.override_avail[i].to_time),
+        });
+      }
+    }
+    console.log("@@@", arr);
+    setEvents(arr);
+  }, [times]);
+
+  async function getAvails() {
+    const api = "/api/coach/getAvailTimes";
+    const request = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ coachID: curUser?.id }),
+    };
+    fetch(api, request)
+      .then((res) => res.json())
+      .then((data) => {
+        setTimes(data);
+      })
+      .catch((err) => console.error(err));
+  }
+
   const [open, setOpen] = React.useState(false);
   const [title, setTitle] = React.useState<string>("");
   const [current, setCurrent] = React.useState<any>({});
@@ -108,11 +111,6 @@ export default function CalendarDemo() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const setTitleName = (val: string) => setTitle(val);
-
-  const ulid = () => {
-    setUid(uid + 1);
-    return uid;
-  };
 
   const handleSelectSlot = ({ start, end }: SlotInfo) => {
     if (typeof start === "string") {
@@ -147,18 +145,20 @@ export default function CalendarDemo() {
     ]);
   };
 
-  const handleSelect = (event: Event) => {
-    const { start, end } = event;
-    const del = window.confirm(
-      `Delete availability on ${format(start, "EEEE")} from ${format(
-        start,
-        "h:mma"
-      )} to ${format(end, "h:mm")}?`
-    );
-    if (del) {
-      const index = events.findIndex((e) => e.id == event.id);
-      setEvents([...events.slice(0, index), ...events.slice(index + 1)]);
-    }
+  const handleSelect = (event: any) => {
+    // const { start, end } = event;
+    console.log(event);
+
+    // const del = window.confirm(
+    //   `Delete availability on ${format(start, "EEEE")} from ${format(
+    //     start,
+    //     "h:mma"
+    //   )} to ${format(end, "h:mm")}?`
+    // );
+    // if (del) {
+    //   const index = events.findIndex((e) => e.id == event.id);
+    //   setEvents([...events.slice(0, index), ...events.slice(index + 1)]);
+    // }
   };
 
   useEffect(() => {
@@ -176,6 +176,10 @@ export default function CalendarDemo() {
     open && setTitle("");
   }, [open]);
 
+  useEffect(() => {
+    console.log("Se", events);
+  }, [events]);
+
   return (
     <Box
       style={styles.container}
@@ -187,6 +191,24 @@ export default function CalendarDemo() {
           backgroundColor: "#32b189 !important",
           border: "1px solid #36c499 !important",
           borderRadius: "0px !Important",
+          "&:focus": {
+            border: "2px solid black !important",
+          },
+          "&:hover": {
+            border: "2px solid black !important",
+          },
+          "&:focus-within": {
+            border: "2px solid black !important",
+          },
+          "&:focus-visible": {
+            border: "2px solid black !important",
+          },
+          "&:active": {
+            border: "2px solid black !important",
+          },
+          "&:target": {
+            border: "2px solid black !important",
+          },
         },
         "& .rbc-allday-cell": {
           display: "none !important",
@@ -246,7 +268,10 @@ export default function CalendarDemo() {
         ]}
         defaultDate={new Date()}
         onSelectSlot={handleSelectSlot}
-        onSelectEvent={handleSelect}
+        // onSelectEvent={handleSelect}
+        onClick={(e: any) => {
+          console.log(e);
+        }}
         style={{
           height: "100%",
         }}
