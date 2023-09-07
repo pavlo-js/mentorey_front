@@ -20,10 +20,8 @@
     "@mui/x-data-grid": "^6.11.2",
     "@mui/x-date-pickers": "^6.11.1",
     "@mui/x-date-pickers-pro": "^6.11.2",
+    "@pubnub/react-chat-components": "^0.30.0",
     "@reduxjs/toolkit": "^1.9.5",
-    "@types/node": "20.5.0",
-    "@types/react": "18.2.20",
-    "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.15",
     "aws-sdk": "^2.1441.0",
     "bcrypt": "^5.1.1",
@@ -34,6 +32,8 @@
     "next-redux-wrapper": "^8.1.0",
     "nodemailer": "^6.9.4",
     "postcss": "8.4.28",
+    "pubnub": "^7.3.2",
+    "pubnub-react": "^3.0.2",
     "react": "18.2.0",
     "react-avatar-editor": "^13.0.0",
     "react-big-calendar": "^1.8.2",
@@ -56,6 +56,9 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/nodemailer": "^6.4.9",
-    "@types/react-avatar-editor": "^13.0.0"
+    "@types/react-avatar-editor": "^13.0.0",
+    "@types/node": "20.5.0",
+    "@types/react": "18.2.20",
+    "@types/react-dom": "18.2.7"
   }
 }
