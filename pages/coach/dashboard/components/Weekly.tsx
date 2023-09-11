@@ -22,6 +22,7 @@ import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { DateRange } from "@mui/x-date-pickers-pro/internals/models/range";
+import { useQuery } from "react-query";
 
 interface TimeSlot {
   startTime: Dayjs;
@@ -113,6 +114,50 @@ export default function Weekly({
   const [originDay, setOriginDay] = useState<number | undefined>();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
+  // const { data: availTimes } = useQuery({
+  //   queryKey: ["getWeeklyTimes"],
+  //   queryFn: () => {
+  //     const api = "/api/coach/getAvailTimes";
+  //     const request = {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         coachID: curUser?.id,
+  //       }),
+  //     };
+
+  //     return fetch(api, request).then((res) => res.json());
+  //   },
+  // });
+
+  useEffect(() => {
+    const api = "/api/coach/getAvailTimes";
+    const request = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        coachID: curUser?.id,
+      }),
+    };
+    fetch(api, request)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data.weekly_avail);
+        const temp: DayTimes[] = [];
+        data.weekly_avail.map((item: any, index: number) => {
+          temp[item.day_of_week][times].push({
+            startTime: dayjs(item.from_time),
+            endTime: dayjs(item.to_time),
+          });
+        });
+        setAvailableTimes(temp);
+      });
+  }, []);
 
   const handleClose = () => {
     setAnchorEl(null);

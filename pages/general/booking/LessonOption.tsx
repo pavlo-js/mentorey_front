@@ -19,7 +19,6 @@ interface LessonOption {
 
 const LessonType = [
   { label: "30 min", value: "MIN30" },
-  { label: "45 min", value: "MIN45" },
   { label: "60 min", value: "MIN60" },
   { label: "90 min", value: "MIN90" },
 ];
