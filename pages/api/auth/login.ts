@@ -14,12 +14,13 @@ const loginHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       if (results.length === 0) {
         return res.status(400).json({ message: "EMAIL_NOT_FOUND" });
       } else {
-        const getUser = results[0];
+        const user = results[0];
         // check if password is correct
-        const re = await bcrypt.compare(password, getUser.password);
-        re
-          ? res.status(200).json({ user: getUser })
-          : res.status(200).json({ message: "INVALID_PASSWORD" });
+        const re = await bcrypt.compare(password, user.password);
+        res.status(200).json({ user });
+        // re
+        //   ? res.status(200).json(user)
+        //   : res.status(200).json({ message: "INVALID_PASSWORD" });
       }
     } catch (error) {
       res.status(500).json(error);

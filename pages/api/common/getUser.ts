@@ -6,11 +6,11 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { coachID } = req.body;
+  const { userID } = req.body;
 
-  const query = `SELECT * FROM users WHERE id = ${coachID}`;
+  const query = `SELECT * FROM users WHERE id = ${userID}`;
   try {
     const [result] = (await db.execute(query)) as RowDataPacket[];
-    res.status(200).json({ coach: result[0] });
+    res.status(200).json({ user: result[0] });
   } catch (error) {}
 }

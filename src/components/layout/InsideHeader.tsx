@@ -32,7 +32,6 @@ import CoPresentIcon from "@mui/icons-material/CoPresent";
 // Redux
 import { selectAuthState } from "~/slices/authSlice";
 import { useSelector } from "react-redux";
-import useSetAuthState from "~/hooks/useSetAuthState";
 
 const LinkStyle = {
   my: 2,
@@ -46,7 +45,6 @@ const LinkStyle = {
 function InsideHeader() {
   const router = useRouter();
   const curUser: any = useSelector(selectAuthState);
-  const setAuthState = useSetAuthState();
   const isTeacher = curUser?.is_teacher;
 
   React.useEffect(() => {
@@ -205,7 +203,6 @@ function InsideHeader() {
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar
-                  alt="Remy Sharp"
                   src={curUser?.avatar != "null" ? curUser.avatar : undefined}
                 />
               </IconButton>

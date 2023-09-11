@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Avatar, Tooltip, Rating, Button } from "@mui/material";
+import { Avatar, Tooltip, Rating, Button, Box } from "@mui/material";
 import Badge from "@mui/material/Badge";
 import ReactCountryFlag from "react-country-flag";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -37,12 +37,15 @@ const CoachCard = ({ coach }: { coach: any }) => {
 
   return (
     <>
-      <div className="m-auto w-full transform overflow-hidden rounded-lg bg-white shadow-lg transition duration-500 ease-in-out hover:shadow-2xl">
-        <div className="w-full">
+      <Box className="m-auto w-full transform overflow-hidden rounded-lg bg-white shadow-lg transition duration-500 ease-in-out hover:shadow-2xl hover:cursor-pointer">
+        <Box className="w-full">
           <video src={coach.intro_video} className="w-full" controls></video>
-        </div>
-        <div className="w-full p-3">
-          <div className="flex items-center">
+        </Box>
+        <Box
+          className="w-full p-3"
+          onClick={() => router.push(`/profile/coach/${coach.id}`)}
+        >
+          <Box className="flex items-center">
             <Tooltip title={country}>
               <Badge
                 overlap="circular"
@@ -65,13 +68,13 @@ const CoachCard = ({ coach }: { coach: any }) => {
                 <Avatar alt="Travis Howard" src={coach.avatar} />
               </Badge>
             </Tooltip>
-            <div className="ml-3">
-              <div className="text-large font-bold">
+            <Box className="ml-3">
+              <Box className="text-large font-bold">
                 {coach.first_name + " " + coach.last_name}
-              </div>
-              <div className="text-sm text-gray-600">{coach.title}</div>
-            </div>
-            <div className="ml-auto">
+              </Box>
+              <Box className="text-sm text-gray-600">{coach.title}</Box>
+            </Box>
+            <Box className="ml-auto">
               {isLike ? (
                 <FavoriteIcon
                   className="text-red-400"
@@ -83,23 +86,23 @@ const CoachCard = ({ coach }: { coach: any }) => {
                   onClick={() => setIsLike(true)}
                 />
               )}
-            </div>
-          </div>
-          <div className="my-2 flex justify-between">
-            <div className="flex items-center">
+            </Box>
+          </Box>
+          <Box className="my-2 flex justify-between">
+            <Box className="flex items-center">
               <p className="price font-base font-bold">
                 {coach.trial_price}
                 {currencySymbol} &nbsp;
               </p>
               <p className="text-sm text-slate-400">/ trial</p>
-            </div>
-            <div className="flex items-center">
+            </Box>
+            <Box className="flex items-center">
               <Rating value={4} size="small" />
               <p className="text-sm font-bold text-gray-900">4.95</p>
-            </div>
-          </div>
-          <div className="w-full bg-white">
-            <div className="flex flex-wrap items-center text-xs font-medium text-white">
+            </Box>
+          </Box>
+          <Box className="w-full bg-white">
+            <Box className="flex flex-wrap items-center text-xs font-medium text-white">
               {categories &&
                 categories.map((item: any, index: number) => (
                   <span
@@ -109,8 +112,8 @@ const CoachCard = ({ coach }: { coach: any }) => {
                     {item.label}
                   </span>
                 ))}
-            </div>
-            <div className="mt-2 flex flex-wrap items-center text-xs font-medium text-white">
+            </Box>
+            <Box className="mt-2 flex flex-wrap items-center text-xs font-medium text-white">
               {languages.map((item: any, index: number) => (
                 <span
                   key={index}
@@ -119,14 +122,14 @@ const CoachCard = ({ coach }: { coach: any }) => {
                   {item}
                 </span>
               ))}
-            </div>
-          </div>
-          <div className="my-3 w-full">
+            </Box>
+          </Box>
+          <Box className="my-3 w-full">
             <p className="line-clamp-3 select-none break-words text-sm">
               {coach.profile == "null" ? "" : coach.profile}
             </p>
-          </div>
-          <div className="w-full">
+          </Box>
+          <Box className="w-full">
             <Button
               onClick={() => router.push(`/general/booking/${coach.id}`)}
               type="button"
@@ -134,9 +137,9 @@ const CoachCard = ({ coach }: { coach: any }) => {
             >
               Book Trial
             </Button>
-          </div>
-        </div>
-      </div>
+          </Box>
+        </Box>
+      </Box>
     </>
   );
 };

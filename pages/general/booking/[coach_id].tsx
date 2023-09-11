@@ -81,17 +81,17 @@ export default function BookingPage() {
 
   React.useEffect(() => {
     if (coachID) {
-      const api = "/api/common/getCoach";
+      const api = "/api/common/getUser";
       const request = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ coachID }),
+        body: JSON.stringify({ userID: coachID }),
       };
       fetch(api, request)
         .then((res) => res.json())
-        .then((data) => setCoach(data.coach));
+        .then((data) => setCoach(data.user));
     }
   }, [coachID]);
 

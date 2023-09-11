@@ -2,8 +2,10 @@ import { Box, Avatar, Typography, Tooltip, Badge } from "@mui/material";
 import sampleBanner from "~/assets/images/user_banner.jpg";
 import ReactCountryFlag from "react-country-flag";
 import Image from "next/image";
+import { countries } from "~/shared/data";
 
-const Banner = () => {
+const Banner = ({ coach }: { coach: any }) => {
+  const country = countries.find((country) => country.code === coach.country);
   return (
     <>
       <Box className="relative mb-14 h-32 w-full md:h-40 lg:mb-24 lg:h-48">
@@ -20,10 +22,10 @@ const Banner = () => {
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           badgeContent={
             <>
-              <Tooltip title="Austria">
+              <Tooltip title={country?.label}>
                 <div>
                   <ReactCountryFlag
-                    countryCode="at"
+                    countryCode={country?.code!}
                     svg
                     style={{
                       width: 30,
@@ -41,7 +43,7 @@ const Banner = () => {
           <Avatar
             alt="Travis Howard"
             className="h-28 w-28 md:h-32 md:w-32 lg:h-44 lg:w-44"
-            src="https://plus.unsplash.com/premium_photo-1688350808212-4e6908a03925?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80"
+            src={coach.avatar || "/img/default_avatar.jpeg"}
           />
         </Badge>
       </Box>

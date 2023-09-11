@@ -51,7 +51,7 @@ export default function LoginPage() {
       .then((res) => res.json())
       .then((data) => handleResponse(data))
       .catch((err) => {
-        console.error(err);
+        console.log(err);
         toast.error("Sorry, Internel Server Error. Try again later.");
       })
       .finally(() => setSpin(false));
