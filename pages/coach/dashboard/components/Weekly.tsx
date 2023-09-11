@@ -22,16 +22,17 @@ import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { DateRange } from "@mui/x-date-pickers-pro/internals/models/range";
-import { useQuery } from "react-query";
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+dayjs.utc();
 interface TimeSlot {
   startTime: Dayjs;
   endTime: Dayjs;
 }
 
-interface DayTimes {
-  times: TimeSlot[];
-}
+type DayTimes = TimeSlot[];
 
 interface InvalidState {
   dayIndex: number;
@@ -57,27 +58,13 @@ const defaultTimeSlot: TimeSlot = {
 };
 
 const defaultTimes: DayTimes[] = [
-  {
-    times: [{ ...defaultTimeSlot }],
-  },
-  {
-    times: [{ ...defaultTimeSlot }],
-  },
-  {
-    times: [{ ...defaultTimeSlot }],
-  },
-  {
-    times: [{ ...defaultTimeSlot }],
-  },
-  {
-    times: [{ ...defaultTimeSlot }],
-  },
-  {
-    times: [],
-  },
-  {
-    times: [],
-  },
+  [{ ...defaultTimeSlot }],
+  [{ ...defaultTimeSlot }],
+  [{ ...defaultTimeSlot }],
+  [{ ...defaultTimeSlot }],
+  [{ ...defaultTimeSlot }],
+  [],
+  [],
 ];
 
 const isValidSlot = (timeSlot: TimeSlot) => {
@@ -108,30 +95,11 @@ export default function Weekly({
   sendWeeklyTimes,
   hasError,
 }: PageProps) {
-  const [availableTimes, setAvailableTimes] =
-    useState<DayTimes[]>(defaultTimes);
+  const [availableTimes, setAvailableTimes] = useState<DayTimes[]>([]);
   const [invalid, setInvalid] = useState<InvalidState[]>([]);
   const [originDay, setOriginDay] = useState<number | undefined>();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-
-  // const { data: availTimes } = useQuery({
-  //   queryKey: ["getWeeklyTimes"],
-  //   queryFn: () => {
-  //     const api = "/api/coach/getAvailTimes";
-  //     const request = {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         coachID: curUser?.id,
-  //       }),
-  //     };
-
-  //     return fetch(api, request).then((res) => res.json());
-  //   },
-  // });
 
   useEffect(() => {
     const api = "/api/coach/getAvailTimes";
@@ -147,15 +115,22 @@ export default function Weekly({
     fetch(api, request)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data.weekly_avail);
-        const temp: DayTimes[] = [];
-        data.weekly_avail.map((item: any, index: number) => {
-          temp[item.day_of_week][times].push({
-            startTime: dayjs(item.from_time),
-            endTime: dayjs(item.to_time),
+        if (data.weekly_avail.length > 0) {
+          const temp: DayTimes[] = Array(7)
+            .fill(null)
+            .map(() => []);
+
+          data.weekly_avail.forEach((item: any, index: number) => {
+            temp[item.day_of_week].push({
+              startTime: dayjs(item.from_time),
+              endTime: dayjs(item.to_time),
+            });
           });
-        });
-        setAvailableTimes(temp);
+
+          setAvailableTimes(temp);
+        } else {
+          setAvailableTimes(defaultTimes);
+        }
       });
   }, []);
 
@@ -167,16 +142,15 @@ export default function Weekly({
     (dayIndex: number) => {
       const newTimes = availableTimes?.map((item, index) => {
         if (dayIndex === index) {
-          const times = item.times;
-          if (times.length > 0) {
-            const lastSlot = times[times.length - 1];
+          if (item.length > 0) {
+            const lastSlot = item[item.length - 1];
             const newSlot: TimeSlot = {
               startTime: lastSlot.endTime.add(1, "hour"),
               endTime: lastSlot.endTime.add(2, "hour"),
             };
-            return { ...item, times: [...times, newSlot] };
+            return [...item, newSlot];
           } else {
-            return { ...item, times: [...times, { ...defaultTimeSlot }] };
+            return [...item, { ...defaultTimeSlot }];
           }
         } else {
           return item;
@@ -190,7 +164,7 @@ export default function Weekly({
     if (availableTimes) {
       const newTimes = [...availableTimes];
       const targetDay = newTimes[dayIndex];
-      targetDay.times.splice(timesIndex, 1);
+      targetDay.splice(timesIndex, 1);
       setAvailableTimes(newTimes);
     }
   };
@@ -201,8 +175,8 @@ export default function Weekly({
     value: DateRange<Dayjs>
   ) => {
     const tempTimes = [...availableTimes];
-    tempTimes[dayIndex].times[timesIndex].startTime = value[0]!;
-    tempTimes[dayIndex].times[timesIndex].endTime = value[1]!;
+    tempTimes[dayIndex][timesIndex].startTime = value[0]!;
+    tempTimes[dayIndex][timesIndex].endTime = value[1]!;
 
     setAvailableTimes(tempTimes);
   };
@@ -212,7 +186,7 @@ export default function Weekly({
     dayIndex: number
   ) => {
     const temp = [...availableTimes];
-    temp[dayIndex].times = event.target.checked ? [{ ...defaultTimeSlot }] : [];
+    temp[dayIndex] = event.target.checked ? [{ ...defaultTimeSlot }] : [];
     setAvailableTimes(temp);
   };
 
@@ -232,14 +206,10 @@ export default function Weekly({
       .getAll("days")
       .map((value) => Number(value) as DayCheckboxValue);
     if (originDay !== undefined) {
-      const originTimes = availableTimes[originDay].times;
+      const originTimes = availableTimes[originDay];
       const tempTimes = [...availableTimes];
-
       checkedValues.forEach((item) => {
-        tempTimes[item] = {
-          ...tempTimes[item],
-          times: originTimes.map((slot: TimeSlot) => ({ ...slot })),
-        };
+        tempTimes[item] = originTimes.map((slot: TimeSlot) => ({ ...slot }));
       });
       setAvailableTimes(tempTimes);
     }
@@ -251,9 +221,9 @@ export default function Weekly({
     if (availableTimes.length <= 1) return;
 
     const temp: InvalidState[] = availableTimes.flatMap((day, dayIndex) =>
-      day.times.flatMap((curSlot: TimeSlot, timesIndex: number) => {
+      day.flatMap((curSlot: TimeSlot, timesIndex: number) => {
         const issues: InvalidState[] = [];
-        const nextSlot = day.times[timesIndex + 1];
+        const nextSlot = day[timesIndex + 1];
 
         if (!isValidSlot(curSlot)) {
           issues.push({ dayIndex, timesIndex });
@@ -263,7 +233,7 @@ export default function Weekly({
           issues.push({ dayIndex, timesIndex: timesIndex + 1 });
         }
 
-        if (timesIndex && !isOverDate(day.times[0], curSlot)) {
+        if (timesIndex && !isOverDate(day[0], curSlot)) {
           issues.push({ dayIndex, timesIndex });
         }
 
@@ -286,10 +256,10 @@ export default function Weekly({
           Set your weekly hours
         </Typography>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          {availableTimes?.map(({ times }: DayTimes, dayIndex) => (
+          {availableTimes?.map((item: TimeSlot[], dayIndex) => (
             <>
               <Box key={dayIndex} className="flex py-3 items-start">
-                {times.length > 0 ? (
+                {item.length > 0 ? (
                   <>
                     <FormControlLabel
                       control={
@@ -308,7 +278,7 @@ export default function Weekly({
                         },
                       }}
                     >
-                      {times?.map(
+                      {item?.map(
                         (
                           { startTime, endTime }: TimeSlot,
                           timesIndex: number

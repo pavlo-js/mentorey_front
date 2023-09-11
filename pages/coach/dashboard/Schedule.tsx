@@ -16,6 +16,8 @@ import Override from "./components/Override";
 import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+// Toast
+import { toast } from "react-toastify";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -25,9 +27,7 @@ interface TimeSlot {
   endTime: Dayjs;
 }
 
-interface DayTimes {
-  times: TimeSlot[];
-}
+type DayTimes = TimeSlot[];
 
 interface OverrideTimes {
   date: Dayjs;
@@ -35,14 +35,14 @@ interface OverrideTimes {
 }
 
 interface WeeklyData {
-  coach_id: number;
+  coach_id: any;
   dayOfWeek: number;
   from: string;
   to: string;
 }
 
 interface OverrideData {
-  coach_id: number;
+  coach_id: any;
   date: string;
   from: string;
   to: string;
@@ -65,7 +65,7 @@ export default function Schedule() {
       const temp: WeeklyData[] = [];
       if (weeklyTimes) {
         weeklyTimes.forEach((item: DayTimes, dayIndex: number) => {
-          item.times.forEach((time: TimeSlot) => {
+          item.forEach((time: TimeSlot) => {
             temp.push({
               coach_id: curUser.id,
               dayOfWeek: dayIndex,
@@ -84,9 +84,12 @@ export default function Schedule() {
         },
         body: JSON.stringify({ weeklyAvailTimes: temp }),
       };
+
       fetch(api, request)
         .then((res) => res.json())
         .then((data) => console.log(data));
+    } else {
+      toast.error("Please fix the override times");
     }
   };
 
@@ -116,7 +119,7 @@ export default function Schedule() {
   };
 
   const handleSave = () => {
-    // saveWeeklyTimes();
+    saveWeeklyTimes();
     saveOverrideTimes();
   };
 
