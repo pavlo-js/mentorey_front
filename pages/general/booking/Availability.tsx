@@ -60,7 +60,6 @@ export default function Availability() {
   };
 
   useEffect(() => {
-    console.log(times, times.weekly_avail);
     const arr = [];
     if (times.weekly_avail) {
       for (let i = 0; i < times.weekly_avail.length; i++) {
@@ -83,7 +82,6 @@ export default function Availability() {
         });
       }
     }
-    console.log("@@@", arr);
     setEvents(arr);
   }, [times]);
 
@@ -120,8 +118,6 @@ export default function Availability() {
     if (typeof end === "string") {
       end = new Date(end);
     }
-
-    console.log(events, start, end);
 
     for (let i = 0; i < events.length; i++) {
       const tempSt = events[i].start;

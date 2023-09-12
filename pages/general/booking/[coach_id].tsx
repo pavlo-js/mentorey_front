@@ -14,34 +14,70 @@ import { useRouter } from "next/router";
 import { selectAuthState } from "~/slices/authSlice";
 import { useSelector } from "react-redux";
 import Availability from "./Availability";
+import axios from "axios";
+import { useQuery } from "react-query";
 interface LessonOption {
-  lessonID: number;
+  lessonID: any;
   lessonType: string;
   lessonPack: number;
 }
 
-const steps = [
-  "Lesson type",
-  "Lesson Options",
-  "Schedule lesson",
-  "Communication",
-];
-
 export default function BookingPage() {
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = React.useState("choose");
   const [completed, setCompleted] = React.useState<{
     [k: number]: boolean;
   }>({});
-  const [coach, setCoach] = React.useState();
-  const [lessonID, setLessonID] = React.useState("trial");
-  const [option, setOption] = React.useState<LessonOption>();
+  // const [coach, setCoach] = React.useState();
+  const [lessonID, setLessonID] = React.useState<any>("trial");
+  const [option, setOption] = React.useState<LessonOption>({
+    lessonID: "trial",
+    lessonType: "30min",
+    lessonPack: 1,
+  });
+  const [steps, setSteps] = React.useState<string[]>([
+    "choose",
+    "option",
+    "communication",
+  ]);
 
   const curUser = useSelector(selectAuthState);
   const router = useRouter();
   const coachID = router.query.coach_id;
 
+  const { data: coach } = useQuery({
+    queryKey: ["getCoach", coachID],
+    queryFn: async () => {
+      if (coachID) {
+        const { data: response } = await axios.post("/api/common/getUser", {
+          userID: coachID,
+        });
+        return response.user;
+      }
+    },
+  });
+
+  React.useEffect(() => {
+    if (lessonID != "trial") {
+      setSteps(["choose", "option", "schedule", "communication"]);
+    } else if (lessonID === "trial") {
+      setSteps(["choose", "schedule", "communication"]);
+    }
+  }, [lessonID]);
+
+  React.useEffect(() => {
+    if (option?.lessonPack && option?.lessonPack > 1) {
+      setSteps(["choose", "option", "communication"]);
+    } else if (
+      option?.lessonPack &&
+      option?.lessonPack === 1 &&
+      lessonID != "trial"
+    ) {
+      setSteps(["choose", "option", "schedule", "communication"]);
+    }
+  }, [option]);
+
   const totalSteps = () => {
-    return steps.length;
+    return steps?.length;
   };
 
   const completedSteps = () => {
@@ -49,7 +85,7 @@ export default function BookingPage() {
   };
 
   const isLastStep = () => {
-    return activeStep === totalSteps() - 1;
+    return activeStep === "communication";
   };
 
   const allStepsCompleted = () => {
@@ -57,110 +93,60 @@ export default function BookingPage() {
   };
 
   const handleNext = () => {
-    const newActiveStep =
-      isLastStep() && !allStepsCompleted()
-        ? steps.findIndex((step, i) => !(i in completed))
-        : activeStep + 1;
-    setActiveStep(newActiveStep);
+    isLastStep() && !allStepsCompleted()
+      ? router.push("/test")
+      : setActiveStep(steps[steps.indexOf(activeStep) + 1]);
   };
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    setActiveStep(steps[steps.indexOf(activeStep) - 1]);
   };
-
-  const handleStep = (step: number) => () => {
-    setActiveStep(step);
-  };
-
-  const handleComplete = () => {
-    const newCompleted = completed;
-    newCompleted[activeStep] = true;
-    setCompleted(newCompleted);
-    handleNext();
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
-    setCompleted({});
-  };
-
-  React.useEffect(() => {
-    if (coachID) {
-      const api = "/api/common/getUser";
-      const request = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userID: coachID }),
-      };
-      fetch(api, request)
-        .then((res) => res.json())
-        .then((data) => setCoach(data.user));
-    }
-  }, [coachID]);
 
   return (
     coach && (
       <InsideLayout>
         <TeacherCard coach={coach} />
-        <Box className="mx-auto max-w-4xl pb-10">
-          <Stepper
-            nonLinear
-            activeStep={activeStep}
-            className="mx-auto max-w-3xl pt-4"
+        <Box className="mx-auto max-w-2xl lg:max-w-3xl pb-10">
+          {activeStep === "choose" ? (
+            <ChooseLesson
+              curUser={curUser}
+              coach={coach}
+              sendLessonID={setLessonID}
+              selectedLessonID={lessonID}
+            />
+          ) : null}
+          {activeStep === "option" ? (
+            <LessonOption
+              curUser={curUser}
+              coach={coach}
+              lessonID={lessonID}
+              selectedOption={option}
+              sendOption={setOption}
+            />
+          ) : null}
+          {activeStep === "schedule" ? <Availability /> : null}
+          {activeStep === "communication" ? <Communication /> : null}
+          <Box
+            display={"flex"}
+            flexDirection={"row"}
+            paddingTop={2}
+            justifyContent={"space-between"}
           >
-            {steps.map((label, index) => (
-              <Step key={label} completed={completed[index]}>
-                <StepButton color="inherit" onClick={handleStep(index)}>
-                  {label}
-                </StepButton>
-              </Step>
-            ))}
-          </Stepper>
-          <div className="pt-6">
-            <React.Fragment>
-              {activeStep === 0 ? (
-                <ChooseLesson
-                  curUser={curUser}
-                  coach={coach}
-                  sendLessonID={setLessonID}
-                  selectedLessonID={lessonID}
-                />
-              ) : null}
-              {activeStep === 1 ? (
-                <LessonOption
-                  curUser={curUser}
-                  coach={coach}
-                  lessonID={lessonID}
-                  selectedOption={option}
-                  sendOption={setOption}
-                />
-              ) : null}
-              {activeStep === 2 ? <Availability /> : null}
-              {/* {activeStep === 2 ? <ScheduleLesson /> : null} */}
-              {activeStep === 3 ? <Communication /> : null}
-              <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                <Button
-                  color="inherit"
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                  sx={{ mr: 1 }}
-                >
-                  Back
-                </Button>
-                <Box sx={{ flex: "1 1 auto" }} />
-                <Button
-                  variant="contained"
-                  className="bg-primary-600 text-white"
-                  onClick={handleNext}
-                  sx={{ mr: 1 }}
-                >
-                  Next
-                </Button>
-              </Box>
-            </React.Fragment>
-          </div>
+            <Button
+              variant="outlined"
+              disabled={activeStep === "choose"}
+              onClick={handleBack}
+            >
+              Back
+            </Button>
+            <Button
+              variant="contained"
+              className="bg-primary-600 text-white"
+              onClick={handleNext}
+            >
+              Next
+            </Button>
+          </Box>
         </Box>
       </InsideLayout>
     )

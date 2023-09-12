@@ -7,7 +7,7 @@ interface PageProps {
   lessonID: any;
   curUser: any;
   coach: any;
-  selectedOption: LessonOption | undefined;
+  selectedOption: any;
   sendOption: (data: any) => void;
 }
 
@@ -40,9 +40,8 @@ export default function LessonOption({
   const [prices, setPrices] = useState<number[]>([]);
   const currencySymbol = CurrencyData[curUser.currency].symbol;
 
-  const [activeOption, setActiveOption] = useState<LessonOption | undefined>(
-    selectedOption
-  );
+  const [activeOption, setActiveOption] =
+    useState<LessonOption>(selectedOption);
 
   useEffect(() => {
     const api = "/api/common/getLesson";
@@ -55,7 +54,9 @@ export default function LessonOption({
     };
     fetch(api, request)
       .then((res) => res.json())
-      .then((data) => setLesson(data.lesson));
+      .then((data) => {
+        setLesson(data.lesson);
+      });
   }, []);
 
   useEffect(() => {
