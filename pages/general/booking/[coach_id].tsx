@@ -1,13 +1,9 @@
 import * as React from "react";
 import InsideLayout from "~/layouts/InsideLayout";
 import Box from "@mui/material/Box";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepButton from "@mui/material/StepButton";
 import Button from "@mui/material/Button";
 import ChooseLesson from "./ChooseLesson";
 import LessonOption from "./LessonOption";
-import ScheduleLesson from "./ScheduleLesson";
 import Communication from "./Communication";
 import TeacherCard from "./TeacherCard";
 import { useRouter } from "next/router";
@@ -24,10 +20,6 @@ interface LessonOption {
 
 export default function BookingPage() {
   const [activeStep, setActiveStep] = React.useState("choose");
-  const [completed, setCompleted] = React.useState<{
-    [k: number]: boolean;
-  }>({});
-  // const [coach, setCoach] = React.useState();
   const [lessonID, setLessonID] = React.useState<any>("trial");
   const [option, setOption] = React.useState<LessonOption>({
     lessonID: "trial",
@@ -39,6 +31,7 @@ export default function BookingPage() {
     "option",
     "communication",
   ]);
+  const [channel, setChannel] = React.useState<any>();
 
   const curUser = useSelector(selectAuthState);
   const router = useRouter();
@@ -76,24 +69,12 @@ export default function BookingPage() {
     }
   }, [option]);
 
-  const totalSteps = () => {
-    return steps?.length;
-  };
-
-  const completedSteps = () => {
-    return Object.keys(completed).length;
-  };
-
   const isLastStep = () => {
     return activeStep === "communication";
   };
 
-  const allStepsCompleted = () => {
-    return completedSteps() === totalSteps();
-  };
-
   const handleNext = () => {
-    isLastStep() && !allStepsCompleted()
+    isLastStep()
       ? router.push("/test")
       : setActiveStep(steps[steps.indexOf(activeStep) + 1]);
   };
@@ -124,8 +105,14 @@ export default function BookingPage() {
               sendOption={setOption}
             />
           ) : null}
-          {activeStep === "schedule" ? <Availability /> : null}
-          {activeStep === "communication" ? <Communication /> : null}
+          {activeStep === "schedule" ? <Availability coach={coach} /> : null}
+          {activeStep === "communication" ? (
+            <Communication
+              coach={coach}
+              channel={channel}
+              sendChannel={setChannel}
+            />
+          ) : null}
           <Box
             display={"flex"}
             flexDirection={"row"}

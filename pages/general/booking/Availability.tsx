@@ -17,6 +17,10 @@ const locales = {
   "en-US": enUS,
 };
 
+interface PageProps {
+  coach: any;
+}
+
 const localizer = dateFnsLocalizer({
   format,
   parse,
@@ -44,7 +48,78 @@ const styles = {
   },
 };
 
-export default function Availability() {
+const calendarStyle = {
+  "& .rbc-events-container": {
+    marginRight: "0px !important",
+  },
+  "& .rbc-event": {
+    backgroundColor: "#32b189 !important",
+    border: "1px solid #36c499 !important",
+    borderRadius: "0px !Important",
+    "&:focus": {
+      border: "2px solid black !important",
+    },
+    "&:hover": {
+      border: "2px solid black !important",
+    },
+    "&:focus-within": {
+      border: "2px solid black !important",
+    },
+    "&:focus-visible": {
+      border: "2px solid black !important",
+    },
+    "&:active": {
+      border: "2px solid black !important",
+    },
+    "&:target": {
+      border: "2px solid black !important",
+    },
+  },
+  "& .rbc-allday-cell": {
+    display: "none !important",
+  },
+  "& .rbc-header": {
+    height: "50px",
+    justifyContent: "center",
+    display: "flex",
+    "& span": {
+      color: "#125a45 !important",
+      display: "flex",
+      alignItems: "center",
+    },
+  },
+  "& .rbc-time-content": {
+    "& .rbc-time-column:nth-child(2),.rbc-time-column:nth-child(8)": {
+      background: "#fbf1f1 !important",
+    },
+  },
+  "& .rbc-btn-group": {
+    mb: 1,
+    "& button": {
+      backgroundColor: "#059669 !important",
+      color: "white !important",
+      border: "0px !important",
+      "&:hover": {
+        backgroundColor: "#139e72 !important",
+      },
+    },
+    "& .rbc-active": {
+      backgroundColor: "#23bb8b !important",
+      "&:hover": {
+        backgroundColor: "#23bb8b !important",
+      },
+    },
+  },
+  "& .rbc-agenda-table": {
+    "& .rbc-header": {
+      display: "table-cell !Important",
+      textAlign: "center",
+      color: "#125a45",
+    },
+  },
+};
+
+export default function Availability({ coach }: PageProps) {
   const [times, setTimes] = useState<any>({});
   const curUser = useSelector(selectAuthState);
   const [events, setEvents] = React.useState(init);
@@ -85,14 +160,14 @@ export default function Availability() {
     setEvents(arr);
   }, [times]);
 
-  async function getAvails() {
+  function getAvails() {
     const api = "/api/coach/getAvailTimes";
     const request = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ coachID: curUser?.id }),
+      body: JSON.stringify({ coachID: coach.id }),
     };
     fetch(api, request)
       .then((res) => res.json())
@@ -177,91 +252,13 @@ export default function Availability() {
   }, [events]);
 
   return (
-    <Box
-      style={styles.container}
-      sx={{
-        "& .rbc-events-container": {
-          marginRight: "0px !important",
-        },
-        "& .rbc-event": {
-          backgroundColor: "#32b189 !important",
-          border: "1px solid #36c499 !important",
-          borderRadius: "0px !Important",
-          "&:focus": {
-            border: "2px solid black !important",
-          },
-          "&:hover": {
-            border: "2px solid black !important",
-          },
-          "&:focus-within": {
-            border: "2px solid black !important",
-          },
-          "&:focus-visible": {
-            border: "2px solid black !important",
-          },
-          "&:active": {
-            border: "2px solid black !important",
-          },
-          "&:target": {
-            border: "2px solid black !important",
-          },
-        },
-        "& .rbc-allday-cell": {
-          display: "none !important",
-        },
-        "& .rbc-header": {
-          height: "50px",
-          justifyContent: "center",
-          display: "flex",
-          "& span": {
-            color: "#125a45 !important",
-            display: "flex",
-            alignItems: "center",
-          },
-        },
-        "& .rbc-time-content": {
-          "& .rbc-time-column:nth-child(2),.rbc-time-column:nth-child(8)": {
-            background: "#fbf1f1 !important",
-          },
-        },
-        "& .rbc-btn-group": {
-          mb: 1,
-          "& button": {
-            backgroundColor: "#059669 !important",
-            color: "white !important",
-            border: "0px !important",
-            "&:hover": {
-              backgroundColor: "#139e72 !important",
-            },
-          },
-          "& .rbc-active": {
-            backgroundColor: "#23bb8b !important",
-            "&:hover": {
-              backgroundColor: "#23bb8b !important",
-            },
-          },
-        },
-        "& .rbc-agenda-table": {
-          "& .rbc-header": {
-            display: "table-cell !Important",
-            textAlign: "center",
-            color: "#125a45",
-          },
-        },
-      }}
-    >
+    <Box style={styles.container} sx={calendarStyle}>
       <BigCalendar
         selectable
         localizer={localizer}
         events={events}
         defaultView={Views.WEEK}
-        views={[
-          Views.DAY,
-          Views.WEEK,
-          Views.MONTH,
-          Views.AGENDA,
-          Views.WORK_WEEK,
-        ]}
+        views={[Views.WEEK]}
         defaultDate={new Date()}
         onSelectSlot={handleSelectSlot}
         // onSelectEvent={handleSelect}
@@ -272,13 +269,6 @@ export default function Availability() {
           height: "100%",
         }}
         timeslots={2} // number of per section
-      />
-      <ScheduleAddModal
-        open={open}
-        handleOpen={handleOpen}
-        handleClose={handleClose}
-        title={title}
-        setTitle={setTitleName}
       />
     </Box>
   );
