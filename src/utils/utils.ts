@@ -85,3 +85,12 @@ export function validatePhoneNumber(phoneNumber: string | undefined) {
     return isValid;
   }
 }
+
+export function formatDate(date: Date) {
+  if (date) {
+    const year = date.getFullYear();
+    let month = (1 + date.getMonth()).toString().padStart(2, "0"); // Months are 0-based
+    let day = date.getDate().toString().padStart(2, "0");
+    return year + "-" + month + "-" + day;
+  }
+}

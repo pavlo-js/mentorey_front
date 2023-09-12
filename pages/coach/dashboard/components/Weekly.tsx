@@ -127,6 +127,18 @@ export default function Weekly({
             });
           });
 
+          temp.forEach((dayTimes) => {
+            dayTimes.sort((a, b) => {
+              if (a.startTime.isBefore(b.startTime)) {
+                return -1;
+              } else if (a.startTime.isAfter(b.startTime)) {
+                return 1;
+              } else {
+                return 0;
+              }
+            });
+          });
+
           setAvailableTimes(temp);
         } else {
           setAvailableTimes(defaultTimes);

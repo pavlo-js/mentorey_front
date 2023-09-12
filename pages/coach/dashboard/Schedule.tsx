@@ -16,6 +16,7 @@ import Override from "./components/Override";
 import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { formatDate } from "~/utils/utils";
 // Toast
 import { toast } from "react-toastify";
 
@@ -30,7 +31,7 @@ interface TimeSlot {
 type DayTimes = TimeSlot[];
 
 interface OverrideTimes {
-  date: Dayjs;
+  date: Date;
   times: TimeSlot[];
 }
 
@@ -99,7 +100,7 @@ export default function Schedule() {
       item.times.forEach((times) => {
         temp.push({
           coach_id: curUser.id,
-          date: item.date.format("YYYY-MM-DD"),
+          date: formatDate(item.date)!,
           from: times.startTime.toISOString(),
           to: times.endTime.toISOString(),
         });
@@ -119,9 +120,21 @@ export default function Schedule() {
   };
 
   const handleSave = () => {
-    saveWeeklyTimes();
+    // saveWeeklyTimes();
     saveOverrideTimes();
   };
+
+  const WeeklyAvail = (
+    <Weekly
+      curUser={curUser}
+      sendWeeklyTimes={setWeeklyTimes}
+      hasError={setWeeklyError}
+    />
+  );
+
+  const OverrideAvail = (
+    <Override curUser={curUser} sendOverrideTimes={setOverrideTimes} />
+  );
 
   return (
     <Paper className="max-w-4xl mx-auto">
@@ -135,33 +148,14 @@ export default function Schedule() {
             <Tab label="Date override" />
           </Tabs>
           <Box p={3}>
-            {tabValue === 0 && (
-              <Weekly
-                curUser={curUser}
-                sendWeeklyTimes={setWeeklyTimes}
-                hasError={setWeeklyError}
-              />
-            )}
-            {tabValue === 1 && (
-              <Override
-                curUser={curUser}
-                sendOverrideTimes={setOverrideTimes}
-              />
-            )}
+            {tabValue === 0 && WeeklyAvail}
+            {tabValue === 1 && OverrideAvail}
           </Box>
         </>
       ) : (
         <div className="flex">
-          <div className="w-full md:w-7/12">
-            <Weekly
-              curUser={curUser}
-              sendWeeklyTimes={setWeeklyTimes}
-              hasError={setWeeklyError}
-            />
-          </div>
-          <div className="w-full md:w-5/12">
-            <Override curUser={curUser} sendOverrideTimes={setOverrideTimes} />
-          </div>
+          <div className="w-full md:w-7/12">{WeeklyAvail}</div>
+          <div className="w-full md:w-5/12">{OverrideAvail}</div>
         </div>
       )}
       <Button

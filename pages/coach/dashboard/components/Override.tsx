@@ -6,7 +6,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
   DialogActions,
   IconButton,
 } from "@mui/material";
@@ -23,6 +22,10 @@ import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { DateRange } from "@mui/x-date-pickers-pro/internals/models/range";
+import { formatDate } from "~/utils/utils";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface TimeSlot {
   startTime: Dayjs;
@@ -30,7 +33,7 @@ interface TimeSlot {
 }
 
 interface DayTime {
-  date: Dayjs;
+  date: Date;
   times: TimeSlot[];
 }
 
@@ -51,18 +54,77 @@ export default function Override({ curUser, sendOverrideTimes }: PageProps) {
     },
   ]);
 
-  const openDialog = () => {
-    setTimes([
-      {
-        startTime: dayjs().hour(9).minute(0),
-        endTime: dayjs().hour(17).minute(0),
+  useEffect(() => {
+    const api = "/api/coach/getAvailTimes";
+    const request = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    ]);
+      body: JSON.stringify({
+        coachID: curUser?.id,
+      }),
+    };
+    fetch(api, request)
+      .then((res) => res.json())
+      .then((data) => {
+        const overAvail = data.override_avail;
+        const tempDates = overAvail.map((item: any) => item.date);
+        const stringDates = tempDates.filter(
+          (date: string, index: number) => tempDates.indexOf(date) === index
+        );
+        const dates = stringDates.map((item: string) => new Date(item));
+        setDays(dates);
+
+        const tempStartTimes = overAvail.map((item: any) => item.from_time);
+        const tempEndTimes = overAvail.map((item: any) => item.to_time);
+        const stringStartTimes = tempStartTimes.filter(
+          (time: string, index: number) =>
+            tempStartTimes.indexOf(time) === index
+        );
+        const stringEndTimes = tempEndTimes.filter(
+          (time: string, index: number) => tempEndTimes.indexOf(time) === index
+        );
+
+        const tempTimes = stringStartTimes.map(
+          (time: string, index: number) => {
+            return {
+              startTime: dayjs(time),
+              endTime: dayjs(stringEndTimes[index]),
+            };
+          }
+        );
+
+        tempTimes.sort((a: TimeSlot, b: TimeSlot) => {
+          if (a.startTime.isBefore(b.startTime)) {
+            return -1;
+          } else if (a.startTime.isAfter(b.startTime)) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+
+        setTimes(tempTimes);
+      });
+  }, []);
+
+  useEffect(() => {
+    combineDayAndTimes();
+  }, [days, times]);
+
+  useEffect(() => {
+    if (days) {
+      setDays([...days.sort((a: Date, b: Date) => a.getTime() - b.getTime())]);
+    }
+  }, [days]);
+
+  const openDialog = () => {
     setDialogOpen(true);
   };
 
   const closeDialog = () => {
-    setDays([]);
+    // setDays([]);
     setDialogOpen(false);
   };
 
@@ -83,20 +145,24 @@ export default function Override({ curUser, sendOverrideTimes }: PageProps) {
   };
 
   const handleApply = useCallback(() => {
+    combineDayAndTimes();
+    closeDialog();
+  }, [days, times, availTimes]);
+
+  const combineDayAndTimes = () => {
     if (days) {
       const tempTimes: DayTime[] = [...availTimes];
       days.forEach((day) => {
-        if (!tempTimes.some((item) => item.date === dayjs(day))) {
+        if (!tempTimes.some((item) => item.date === day)) {
           tempTimes.push({
-            date: dayjs(day),
+            date: day,
             times: [...times],
           });
         }
       });
       setAvailTimes(tempTimes);
     }
-    closeDialog();
-  }, [days, times, availTimes]);
+  };
 
   useEffect(() => {
     sendOverrideTimes(availTimes);
@@ -130,7 +196,7 @@ export default function Override({ curUser, sendOverrideTimes }: PageProps) {
             }
           >
             <Typography sx={{ marginTop: "10px" }}>
-              {item.date.format("DD MMM YYYY")}
+              {formatDate(item.date)}
             </Typography>
             <Box>
               {item.times.map((time, timeIndex) => (
