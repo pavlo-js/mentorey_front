@@ -14,6 +14,11 @@ import { useRouter } from "next/router";
 import { selectAuthState } from "~/slices/authSlice";
 import { useSelector } from "react-redux";
 import Availability from "./Availability";
+interface LessonOption {
+  lessonID: number;
+  lessonType: string;
+  lessonPack: number;
+}
 
 const steps = [
   "Lesson type",
@@ -29,7 +34,7 @@ export default function BookingPage() {
   }>({});
   const [coach, setCoach] = React.useState();
   const [lessonID, setLessonID] = React.useState("trial");
-  const [option, setOption] = React.useState<any>();
+  const [option, setOption] = React.useState<LessonOption>();
 
   const curUser = useSelector(selectAuthState);
   const router = useRouter();
@@ -95,15 +100,11 @@ export default function BookingPage() {
     }
   }, [coachID]);
 
-  // React.useEffect(() => {
-  //   console.log("This is coach", coach);
-  // }, [coach]);
-
   return (
     coach && (
       <InsideLayout>
         <TeacherCard coach={coach} />
-        <Box className="mx-auto max-w-screen-lg pb-10">
+        <Box className="mx-auto max-w-4xl pb-10">
           <Stepper
             nonLinear
             activeStep={activeStep}

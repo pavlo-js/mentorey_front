@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Paper } from "@mui/material";
+import { Paper, Box } from "@mui/material";
 import { CurrencyData } from "~/shared/CurrencyData";
 import useCurrencyConverter from "~/hooks/useCurrencyConverter";
 import currencyConverter from "~/utils/currencyConverter";
@@ -7,7 +7,7 @@ interface PageProps {
   lessonID: any;
   curUser: any;
   coach: any;
-  selectedOption: any;
+  selectedOption: LessonOption | undefined;
   sendOption: (data: any) => void;
 }
 
@@ -40,8 +40,9 @@ export default function LessonOption({
   const [prices, setPrices] = useState<number[]>([]);
   const currencySymbol = CurrencyData[curUser.currency].symbol;
 
-  const [activeOption, setActiveOption] =
-    useState<LessonOption>(selectedOption);
+  const [activeOption, setActiveOption] = useState<LessonOption | undefined>(
+    selectedOption
+  );
 
   useEffect(() => {
     const api = "/api/common/getLesson";
@@ -84,9 +85,9 @@ export default function LessonOption({
   return (
     <>
       {prices.length > 0 && (
-        <div className="flex w-full flex-wrap">
+        <Box className="flex w-full flex-wrap max-w-4xl mx-auto">
           {LessonType.map((lessonType, index) => (
-            <div key={index} className="w-1/2 px-2 text-center lg:w-1/4">
+            <Box key={index} className="w-1/2 px-2 text-center lg:w-1/3">
               <p className="text-2xl">{lessonType.label}</p>
               <Paper
                 className="my-3 flex h-14 cursor-pointer items-center justify-between rounded-xl px-4 hover:shadow-md"
@@ -134,8 +135,8 @@ export default function LessonOption({
                       : {}
                   }
                 >
-                  <p> Lessons</p>
-                  <div>
+                  <p>{lesson.pack} Lessons</p>
+                  <Box>
                     <p>{`${currencySymbol}  ${parseFloat(
                       (
                         (prices[index] * lesson.pack * (100 - lesson.disRate)) /
@@ -145,12 +146,12 @@ export default function LessonOption({
                     <p className="text-sm text-primary-500">
                       SAVE {lesson.disRate}%
                     </p>
-                  </div>
+                  </Box>
                 </Paper>
               )}
-            </div>
+            </Box>
           ))}
-        </div>
+        </Box>
       )}
     </>
   );
