@@ -7,11 +7,12 @@ import LessonOption from "./LessonOption";
 import Communication from "./Communication";
 import TeacherCard from "./TeacherCard";
 import { useRouter } from "next/router";
-import { selectAuthState } from "~/slices/authSlice";
-import { useSelector } from "react-redux";
 import Availability from "./Availability";
 import axios from "axios";
 import { useQuery } from "react-query";
+import { useSelector, useDispatch } from "react-redux";
+import { selectAuthState } from "~/slices/authSlice";
+import { setLessonBookingState } from "~/slices/lessonBookingSlice";
 interface LessonOption {
   lessonID: any;
   lessonType: string;
@@ -23,7 +24,7 @@ export default function BookingPage() {
   const [lessonID, setLessonID] = React.useState<any>("trial");
   const [option, setOption] = React.useState<LessonOption>({
     lessonID: "trial",
-    lessonType: "30min",
+    lessonType: "MIN30",
     lessonPack: 1,
   });
   const [steps, setSteps] = React.useState<string[]>([
@@ -36,6 +37,8 @@ export default function BookingPage() {
   const curUser = useSelector(selectAuthState);
   const router = useRouter();
   const coachID = router.query.coach_id;
+
+  const dispatch = useDispatch();
 
   const { data: coach } = useQuery({
     queryKey: ["getCoach", coachID],
@@ -75,12 +78,33 @@ export default function BookingPage() {
 
   const handleNext = () => {
     isLastStep()
-      ? router.push("/test")
+      ? saveLessonBooking()
       : setActiveStep(steps[steps.indexOf(activeStep) + 1]);
   };
 
   const handleBack = () => {
     setActiveStep(steps[steps.indexOf(activeStep) - 1]);
+  };
+
+  const saveLessonBooking = () => {
+    const lessonBooking = {
+      coach: coach,
+      lessonID: lessonID,
+      lessonPack: option.lessonPack,
+      lessonType: option.lessonType,
+      timeline:
+        option.lessonPack > 1
+          ? null
+          : {
+              startTime: "2023-09-15T14:00:00.000Z",
+              endTime: "2023-09-15T15:00:00.000Z",
+            },
+      channel: channel,
+    };
+
+    dispatch(setLessonBookingState(lessonBooking));
+
+    router.push("/general/checkout/LessonBookingCheckout");
   };
 
   return (

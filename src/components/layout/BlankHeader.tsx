@@ -5,29 +5,22 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Link from "next/link";
+import Image from "next/image";
 
 function BlankHeader() {
   return (
     <AppBar position="static" sx={{ backgroundColor: "white" }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography
-              variant="h6"
-              noWrap
-              component="a"
-              href="/"
-              sx={{
-                mr: 2,
-                display: { xs: "none", md: "flex" },
-                fontFamily: "monospace",
-                fontWeight: 700,
-                color: "black",
-                textDecoration: "none",
-              }}
-            >
-              Mentorey
-            </Typography>
+          <Box
+            sx={{
+              width: 180,
+              height: "50px",
+              marginRight: "auto",
+              position: "relative",
+            }}
+          >
+            <Image src="/logo.svg" alt="logo" fill priority={false} />
           </Box>
           <Box sx={{ marginLeft: "auto" }}>
             <Link href="/auth/logout">

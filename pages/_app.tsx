@@ -2,22 +2,24 @@ import "~/styles/globals.css";
 import type { ReactElement, ReactNode } from "react";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
-// Redux import
 import { wrapper } from "~/store/store";
 import { PersistGate } from "redux-persist/integration/react";
 import { useStore } from "react-redux";
-// Next theme and MUI
 import {
   ThemeProvider as MuiThemeProvider,
   createTheme,
 } from "@mui/material/styles";
-// Toast
+import CssBaseline from "@mui/material/CssBaseline";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// Loading
 import LoadingScreen from "~/components/common/LoadingScreen";
-// React-Query
 import { QueryClient, QueryClientProvider } from "react-query";
+import { Noto_Sans } from "next/font/google";
+
+const notoSans = Noto_Sans({
+  weight: "400",
+  subsets: ["latin"],
+});
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -34,23 +36,31 @@ let theme = createTheme({
       light: "#10b981",
     },
   },
+  typography: {
+    fontFamily: "inherit",
+  },
 });
 
 function App({ Component, pageProps }: AppPropsWithLayout) {
-  // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page);
   const store: any = useStore();
   const queryClient = new QueryClient();
   return getLayout(
     <>
-      <QueryClientProvider client={queryClient}>
-        <PersistGate loading={<LoadingScreen />} persistor={store.__persistor}>
-          <ToastContainer position="top-center" />
-          <MuiThemeProvider theme={theme}>
-            <Component {...pageProps} />
-          </MuiThemeProvider>
-        </PersistGate>
-      </QueryClientProvider>
+      <main className={notoSans.className}>
+        <QueryClientProvider client={queryClient}>
+          <PersistGate
+            loading={<LoadingScreen />}
+            persistor={store.__persistor}
+          >
+            <ToastContainer position="top-center" />
+            <MuiThemeProvider theme={theme}>
+              <CssBaseline />
+              <Component {...pageProps} />
+            </MuiThemeProvider>
+          </PersistGate>
+        </QueryClientProvider>
+      </main>
     </>
   );
 }

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Paper, Box } from "@mui/material";
 import { CurrencyData } from "~/shared/CurrencyData";
-import useCurrencyConverter from "~/hooks/useCurrencyConverter";
 import currencyConverter from "~/utils/currencyConverter";
 interface PageProps {
   lessonID: any;
@@ -37,7 +36,7 @@ export default function LessonOption({
 }: PageProps) {
   const [lesson, setLesson] = useState<any>();
   const [convertedPrice, setConvertedPrice] = useState<number>();
-  const [prices, setPrices] = useState<number[]>([]);
+  const [pricesForMultiPack, setPricesForMultiPack] = useState<number[]>([]);
   const currencySymbol = CurrencyData[curUser.currency].symbol;
 
   const [activeOption, setActiveOption] =
@@ -69,13 +68,8 @@ export default function LessonOption({
 
   useEffect(() => {
     if (convertedPrice) {
-      const temp = [
-        convertedPrice * 0.5,
-        convertedPrice * 0.75,
-        convertedPrice,
-        convertedPrice * 1.5,
-      ];
-      setPrices(temp);
+      const temp = [convertedPrice * 0.5, convertedPrice, convertedPrice * 1.5];
+      setPricesForMultiPack(temp);
     }
   }, [convertedPrice]);
 
@@ -85,7 +79,7 @@ export default function LessonOption({
 
   return (
     <>
-      {prices.length > 0 && (
+      {pricesForMultiPack.length > 0 && (
         <Box className="flex w-full flex-wrap max-w-4xl mx-auto">
           {LessonType.map((lessonType, index) => (
             <Box key={index} className="w-1/2 px-2 text-center lg:w-1/3">
@@ -112,7 +106,7 @@ export default function LessonOption({
               >
                 <p>1 Lesson</p>
                 <p>{`${currencySymbol}  ${parseFloat(
-                  prices[index].toFixed(2)
+                  pricesForMultiPack[index].toFixed(2)
                 )}`}</p>
               </Paper>
               {lesson && +lesson.pack > 1 && (
@@ -140,7 +134,9 @@ export default function LessonOption({
                   <Box>
                     <p>{`${currencySymbol}  ${parseFloat(
                       (
-                        (prices[index] * lesson.pack * (100 - lesson.disRate)) /
+                        (pricesForMultiPack[index] *
+                          lesson.pack *
+                          (100 - lesson.disRate)) /
                         100
                       ).toFixed(2)
                     )}`}</p>

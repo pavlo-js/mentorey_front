@@ -33,6 +33,8 @@ import CoPresentIcon from "@mui/icons-material/CoPresent";
 import { selectAuthState } from "~/slices/authSlice";
 import { useSelector } from "react-redux";
 
+import Image from "next/image";
+
 const LinkStyle = {
   my: 2,
   display: "block",
@@ -83,22 +85,18 @@ function InsideHeader() {
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           {/* Desktop Logo */}
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="/"
-            color="primary"
+          <Box
             sx={{
-              mr: 2,
+              width: 180,
+              height: "50px",
+
               display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
-              fontWeight: 700,
-              textDecoration: "none",
+              marginRight: "auto",
+              position: "relative",
             }}
           >
-            Mentorey
-          </Typography>
+            <Image src="/logo.svg" alt="logo" fill priority={false} />
+          </Box>
           {/* Mobile Link Menu */}
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
@@ -156,23 +154,18 @@ function InsideHeader() {
             </Menu>
           </Box>
           {/* Mobile Logo */}
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href="/"
-            color="primary"
+          <Box
             sx={{
-              mr: 2,
+              width: 180,
+              height: "50px",
+
               display: { xs: "flex", md: "none" },
-              flexGrow: 1,
-              fontFamily: "monospace",
-              fontWeight: 700,
-              textDecoration: "none",
+              marginRight: "auto",
+              position: "relative",
             }}
           >
-            Mentorey
-          </Typography>
+            <Image src="/logo.svg" alt="logo" fill priority={false} />
+          </Box>
           {/* Desktop Link Box */}
           <Box
             sx={{

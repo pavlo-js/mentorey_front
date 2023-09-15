@@ -124,8 +124,8 @@ export default function Page({
                 </Box>
                 <Box className="flex w-2/12 items-center justify-end">
                   <Chip
-                    label={`${currencySymbol} ${prices[index]}`}
-                    className="bg-pink-100 px-4 font-semibold text-pink-500"
+                    label={`${currencySymbol} ${prices[index]} /hr`}
+                    className="bg-pink-100 px-1 font-semibold text-pink-500"
                   />
                 </Box>
               </Box>

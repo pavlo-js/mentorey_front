@@ -5,12 +5,14 @@ import {
   Action,
 } from "@reduxjs/toolkit";
 import { authSlice } from "~/slices/authSlice";
+import { lessonBookingSlice } from "~/slices/lessonBookingSlice";
 import { createWrapper } from "next-redux-wrapper";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 const rootReducer = combineReducers({
   [authSlice.name]: authSlice.reducer,
+  [lessonBookingSlice.name]: lessonBookingSlice.reducer,
 });
 
 const makeConfiguredStore = () =>
@@ -29,7 +31,7 @@ export const makeStore = () => {
 
     const persistConfig = {
       key: "nextjs",
-      whitelist: ["auth"], // make sure it does not clash with server keys
+      whitelist: ["auth", "lesson_booking"], // make sure it does not clash with server keys
       storage,
     };
 

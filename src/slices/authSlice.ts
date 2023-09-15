@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { AppState } from "~/store/store";
-import { HYDRATE } from "next-redux-wrapper";
 
 export interface AuthState {
   authState: any;

@@ -11,7 +11,6 @@ import {
   Views,
 } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import ScheduleAddModal from "./ScheduleAddModal";
 import { Box } from "@mui/material";
 const locales = {
   "en-US": enUS,
@@ -246,10 +245,6 @@ export default function Availability({ coach }: PageProps) {
   useEffect(() => {
     open && setTitle("");
   }, [open]);
-
-  useEffect(() => {
-    console.log("Se", events);
-  }, [events]);
 
   return (
     <Box style={styles.container} sx={calendarStyle}>

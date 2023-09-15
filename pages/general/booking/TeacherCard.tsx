@@ -7,9 +7,7 @@ import Link from "next/link";
 
 export default function TeacherCard({ coach }: { coach: any }) {
   const country = countries.find((item) => item.code === coach.country);
-  useEffect(() => {
-    console.log(coach);
-  }, []);
+
   return (
     <>
       <Paper className="mx-auto my-4 flex max-w-2xl p-4">
