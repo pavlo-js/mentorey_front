@@ -6,6 +6,7 @@ import {
   Tooltip,
   Badge,
   Button,
+  TextField,
 } from "@mui/material";
 import BlankLayout from "~/layouts/BlankLayout";
 import { useSelector } from "react-redux";
@@ -18,12 +19,17 @@ import { useQuery } from "react-query";
 import currencyConverter from "~/utils/currencyConverter";
 import { CurrencyData } from "~/shared/CurrencyData";
 import styled from "@emotion/styled";
-
+import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import {
+  useStripe,
+  useElements,
+  PaymentElement,
+} from "@stripe/react-stripe-js";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-);
+const stripePromise = loadStripe("pk_test_gktDH2EZfKhkRYLkJGwjQQuQ00O15ZHjaO");
 
 const StyledCaption = styled.span`
   font-size: 16px;
@@ -51,7 +57,12 @@ const trialLesson = {
   isTrialLesson: true,
 };
 
+const testPromoCode = "123456";
+
 export default function LessonBookingCheckout() {
+  const [price, setPrice] = useState<number>();
+  const [promocode, setPromocode] = useState<string>("");
+
   const { coach, lessonID, lessonPack, lessonType, timeline, channel } =
     useSelector(selectLessonBookingState) || {};
   const curUser = useSelector(selectAuthState);
@@ -72,47 +83,89 @@ export default function LessonBookingCheckout() {
     enabled: !!lessonID,
   });
 
-  const { data: price } = useQuery({
-    queryKey: [
-      "calcPrice",
-      lessonID,
-      lessonPack,
-      lessonType,
-      lesson,
-      curUser,
-      coach,
-    ],
-    queryFn: async () => {
-      if (lesson.isTrialLesson) {
-        const trialPrice = await currencyConverter(
-          coach.currency,
-          curUser.currency,
-          coach.trial_price
-        );
-        return trialPrice;
-      } else {
-        const initialPrice = await currencyConverter(
-          coach.currency,
-          curUser.currency,
-          lesson.price
-        );
-        if (lessonPack > 1) {
-          return parseFloat(
-            (
-              lessonPack *
-              lessonTypeSet[lessonType as LessonType] *
-              ((initialPrice * (100 - lesson.disRate)) / 100)
-            ).toFixed(2)
+  useEffect(() => {
+    const getPrice = async () => {
+      if (lesson) {
+        if (lesson.isTrialLesson) {
+          const trialPrice = await currencyConverter(
+            coach.currency,
+            curUser.currency,
+            coach.trial_price
           );
-        } else if (lessonPack === 1) {
-          return parseFloat(
-            (lessonTypeSet[lessonType as LessonType] * initialPrice).toFixed(2)
+          setPrice(trialPrice);
+        } else {
+          const initialPrice = await currencyConverter(
+            coach.currency,
+            curUser.currency,
+            lesson.price
           );
+          if (lessonPack > 1) {
+            setPrice(
+              parseFloat(
+                (
+                  lessonPack *
+                  lessonTypeSet[lessonType as LessonType] *
+                  ((initialPrice * (100 - lesson.disRate)) / 100)
+                ).toFixed(2)
+              )
+            );
+          } else if (lessonPack === 1) {
+            setPrice(
+              parseFloat(
+                (
+                  lessonTypeSet[lessonType as LessonType] * initialPrice
+                ).toFixed(2)
+              )
+            );
+          }
         }
       }
-    },
-    enabled: !!lesson,
-  });
+    };
+
+    getPrice();
+  }, [lesson]);
+
+  // const { data: price } = useQuery({
+  //   queryKey: [
+  //     "calcPrice",
+  //     lessonID,
+  //     lessonPack,
+  //     lessonType,
+  //     lesson,
+  //     curUser,
+  //     coach,
+  //   ],
+  //   queryFn: async () => {
+  //     if (lesson.isTrialLesson) {
+  //       const trialPrice = await currencyConverter(
+  //         coach.currency,
+  //         curUser.currency,
+  //         coach.trial_price
+  //       );
+  //       return trialPrice;
+  //     } else {
+  //       const initialPrice = await currencyConverter(
+  //         coach.currency,
+  //         curUser.currency,
+  //         lesson.price
+  //       );
+  //       if (lessonPack > 1) {
+  //         return parseFloat(
+  //           (
+  //             lessonPack *
+  //             lessonTypeSet[lessonType as LessonType] *
+  //             ((initialPrice * (100 - lesson.disRate)) / 100)
+  //           ).toFixed(2)
+  //         );
+  //       } else if (lessonPack === 1) {
+  //         return parseFloat(
+  //           (lessonTypeSet[lessonType as LessonType] * initialPrice).toFixed(2)
+  //         );
+  //       }
+  //     }
+  //   },
+  //   enabled: !!lesson,
+  // });
 
   const { data: category = { label: "Trial Lesson" } } = useQuery({
     queryKey: ["getLessonCategoryByID", lesson],
@@ -132,24 +185,45 @@ export default function LessonBookingCheckout() {
     enabled: !!lesson,
   });
 
-  const sendPaymentRequest = async () => {
-    const api = "/api/payment/lessonBookingCheckout";
-    try {
-      const res = await axios.post(api);
-    } catch (error) {
-      console.log(error);
+  const { data: clientSecret } = useQuery({
+    queryKey: ["getStripeClientSecret", price],
+    queryFn: async () => {
+      try {
+        const api = "/api/payment/create-payment-intent";
+        const params = {
+          amount: price,
+          currency: curUser.currency,
+        };
+        const { data: response } = await axios.post(api, params);
+        return response.client_secret;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    enabled: !!price,
+  });
+
+  const options = {
+    clientSecret: clientSecret,
+  };
+
+  const checkPromoCode = () => {
+    if (promocode === testPromoCode && price) {
+      setPrice(price * 0.8);
     }
   };
 
   return (
-    lesson && (
+    lesson &&
+    clientSecret &&
+    price && (
       <BlankLayout>
         <Paper
-          className="max-w-xl w-fit mx-auto my-4 py-4 px-2 lg:py-6 lg:px-3"
+          className="max-w-2xl w-fit mx-2 md:mx-auto my-4 py-4 px-2 lg:py-6 lg:px-4 flex flex-wrap"
           sx={{ minWidth: 350 }}
         >
-          <Box display={"flex"} alignItems={"center"}>
-            <Box>
+          <Box className="w-full md:w-1/2">
+            <Box display={"flex"} alignItems={"center"}>
               <Tooltip title={country?.label}>
                 <Badge
                   overlap="circular"
@@ -176,30 +250,50 @@ export default function LessonBookingCheckout() {
                   />
                 </Badge>
               </Tooltip>
+              <Box marginLeft={"20px"}>
+                <Typography className="first-letter:capitalize text-lg font-semibold">
+                  {`${coach.first_name} ${coach.last_name}`}
+                </Typography>
+                <Typography className="text-slate-600 text-sm">
+                  {coach.title || ""}
+                </Typography>
+              </Box>
             </Box>
-            <Box marginLeft={"20px"}>
-              <Typography className="first-letter:capitalize text-lg font-semibold">
-                {`${coach.first_name} ${coach.last_name}`}
-              </Typography>
-              <Typography className="text-slate-600 text-sm">
-                {coach.title || ""}
-              </Typography>
-            </Box>
+
+            <DetailComponent caption="Category" content={category.label} />
+            <DetailComponent
+              caption="Lesson Type"
+              content={`${
+                LessonTypeLabels[lessonType as LessonType]
+              } / ${lessonPack}lessons`}
+            />
+            <DetailComponent
+              caption="Description"
+              content={lesson.description}
+            />
+            <DetailComponent caption="Aimed at" content={lesson.purpose} />
           </Box>
-          <Button
-            onClick={sendPaymentRequest}
-            variant="contained"
-            className="bg-primary-600 w-full max-w-lg mx-auto my-3 lg:my-5 text-lg block"
-          >
-            Checkout {`${currencySymbol}${price}`}
-          </Button>
-          <DetailComponent caption="Category" content={category.label} />
-          <DetailComponent
-            caption="Lesson Type"
-            content={LessonTypeLabels[lessonType as LessonType]}
-          />
-          <DetailComponent caption="Description" content={lesson.description} />
-          <DetailComponent caption="Aimed at" content={lesson.purpose} />
+          <Box className="w-full md:w-1/2 lg:p-4">
+            <Box className="flex justify-between items-center my-2">
+              <TextField
+                placeholder="promo code"
+                size="small"
+                value={promocode}
+                onChange={(e) => setPromocode(e.target.value)}
+              />
+              <Button
+                type="button"
+                onClick={checkPromoCode}
+                variant="outlined"
+                className="ml-2"
+              >
+                Redeem
+              </Button>
+            </Box>
+            <Elements stripe={stripePromise} options={options}>
+              <CheckoutForm symbol={currencySymbol} amount={price} />
+            </Elements>
+          </Box>
         </Paper>
       </BlankLayout>
     )
@@ -221,3 +315,65 @@ function DetailComponent({
     </Box>
   );
 }
+
+const CheckoutForm = ({
+  symbol,
+  amount,
+}: {
+  symbol: string;
+  amount: number;
+}) => {
+  const [isPaying, setIsPaying] = useState<boolean>(false);
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const handleSubmit = async (event: any) => {
+    event.preventDefault();
+    setIsPaying(true);
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    const result = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: "http://localhost:3000/payment/ConfirmPayment",
+      },
+    });
+
+    if (result.error) {
+      setIsPaying(false);
+      if (result.error.code === "card_declined")
+        toast.error("Sorry! Your card has been declined.");
+      if (result.error.code === "expired_card")
+        toast.error("Sorry! Your card has been expired.");
+      if (result.error.code === "incorrect_cvc")
+        toast.error("Sorry! Please insert valid CVC.");
+      if (result.error.code === "incorrect_number")
+        toast.error("Sorry! Please insert valid card number.");
+      if (result.error.code === "processing_error")
+        toast.error(
+          "Sorry! Something went wrong. Check your card information again."
+        );
+    } else {
+      // Your customer will be redirected to your `return_url`. For some payment
+      // methods like iDEAL, your customer will be redirected to an intermediate
+      // site first to authorize the payment, then redirected to the `return_url`.
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <PaymentElement />
+      <Button
+        type="submit"
+        disabled={!stripe && !isPaying}
+        variant="contained"
+        className="bg-primary-600 w-full max-w-lg mx-auto my-3 lg:my-5 text-lg block"
+      >
+        Checkout {`${symbol}${amount}`}
+      </Button>
+    </form>
+  );
+};

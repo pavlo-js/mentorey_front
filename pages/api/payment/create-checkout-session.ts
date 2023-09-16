@@ -26,11 +26,12 @@ export default async function handler(
           },
         ],
         mode: "payment",
-        success_url: "https://your-domain.com/success",
-        cancel_url: "https://your-domain.com/cancel",
+        success_url: "http://localhost:3000/test",
+        cancel_url: "https://localhost:3000/",
       });
-
-      res.status(200).json({ sessionId: session.id });
+      if (session.url) {
+        res.status(200).send(session.url);
+      }
     } catch (error: any) {
       res.status(400).json({ error: { message: error.message } });
     }

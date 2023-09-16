@@ -1,40 +1,39 @@
+import React, { useState, useEffect } from "react";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import CheckoutForm from "./CheckoutForm";
 import axios from "axios";
-import { useEffect } from "react";
 
-function CheckoutButton() {
-  const handleCheckout = async () => {
-    console.log("clickes");
-    try {
-      // Call the backend to create a checkout sessio
+const stripePromise = loadStripe("pk_test_gktDH2EZfKhkRYLkJGwjQQuQ00O15ZHjaO");
 
-      const { data: response } = await axios.post(
-        "/api/payment/create-checkout-session"
-      );
+export default function App() {
+  const [clientSecret, setClientSecret] = useState();
 
-      const sessionId = response.sessionId;
-
-      // Use Stripe.js to redirect to the Checkout page
-
-      if (typeof window !== "undefined" && window.Stripe) {
-        const stripe = window.Stripe(
-          process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+  useEffect(() => {
+    const fetchClientSecret = async () => {
+      try {
+        const { data: response } = await axios.post(
+          "/api/payment/create-payment-intent"
         );
-        if (stripe) {
-          const { error } = await stripe.redirectToCheckout({ sessionId });
 
-          if (error) {
-            console.error(error);
-          }
-        } else {
-          console.error("Stripe is not available.");
-        }
+        setClientSecret(response.client_secret);
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.error("There was an issue:", error);
-    }
+    };
+
+    fetchClientSecret();
+  }, []);
+
+  const options = {
+    clientSecret: clientSecret,
   };
 
-  return <button onClick={handleCheckout}>Checkout</button>;
+  return (
+    clientSecret && (
+      <Elements stripe={stripePromise} options={options}>
+        <CheckoutForm />
+      </Elements>
+    )
+  );
 }
-
-export default CheckoutButton;
