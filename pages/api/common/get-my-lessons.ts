@@ -7,6 +7,7 @@ const getMyLessons = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const query = `SELECT 
                         lb.*,
+                        lb.id AS lesson_booking_id,
                         l.*,
                         l.title AS lesson_title,
                         u.*,

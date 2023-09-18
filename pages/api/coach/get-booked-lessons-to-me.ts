@@ -25,7 +25,7 @@ const getBookedLessonsToMe = async (
                     JOIN 
                         category c ON l.categoryID = c.id
                     WHERE 
-                        lb.coach_id = ${coachID} AND lb.is_completed = 'incomplete'; 
+                        lb.coach_id = ${coachID} AND lb.is_completed = 'incomplete' OR lb.is_completed = 'pending'; 
                     `;
     const [lessons] = (await db.execute(query)) as RowDataPacket[];
     res.status(200).json({ lessons });

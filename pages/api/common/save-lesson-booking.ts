@@ -11,11 +11,13 @@ const SaveTransaction = async (req: NextApiRequest, res: NextApiResponse) => {
     lessonType,
     timeline,
     channel,
+    amount,
+    currency,
   } = req.body;
   try {
     const query = `
-    INSERT INTO lesson_booking (buyer_id, coach_id, lesson_id, lesson_pack, lesson_type, timeline, channel)
-    VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    INSERT INTO lesson_booking (buyer_id, coach_id, lesson_id, lesson_pack, lesson_type, timeline, channel, paid_amount, paid_currency)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const params = [
       buyerID,
       coachID,
@@ -24,6 +26,8 @@ const SaveTransaction = async (req: NextApiRequest, res: NextApiResponse) => {
       lessonType,
       JSON.stringify(timeline),
       channel,
+      amount,
+      currency,
     ];
     const result = await db.execute(query, params);
     res.status(200).json({ result });

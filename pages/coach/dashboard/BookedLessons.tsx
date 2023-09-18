@@ -144,15 +144,27 @@ export default function BookedLessons() {
               >
                 Go to lesson
               </Button>
-
-              <Button
-                variant="outlined"
-                size="small"
-                className="block text-center w-full"
-                onClick={() => sendCompleteRequest(item.lesson_booking_id)}
-              >
-                Request to complete
-              </Button>
+              {item.is_completed === "incomplete" && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  className="block text-center w-full"
+                  onClick={() => sendCompleteRequest(item.lesson_booking_id)}
+                >
+                  Request to complete
+                </Button>
+              )}
+              {item.is_completed === "pending" && (
+                <Button
+                  variant="outlined"
+                  disabled
+                  size="small"
+                  className="block text-center w-full"
+                  onClick={() => sendCompleteRequest(item.lesson_booking_id)}
+                >
+                  Waiting Acceptance
+                </Button>
+              )}
             </Box>
           </Paper>
         ))}

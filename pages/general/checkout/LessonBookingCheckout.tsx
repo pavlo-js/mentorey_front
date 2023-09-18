@@ -374,8 +374,16 @@ const CheckoutForm = ({
         lessonType,
         timeline,
         channel,
+        amount,
+        currency: curUser.currency,
       };
-      const res = await axios.post(api, params);
+
+      try {
+        await axios.post(api, params);
+      } catch (err) {
+        toast.error("Sorry! Something went wrong. Please try again.");
+        console.log(err);
+      }
 
       router.push("/payment/ConfirmPayment");
     }

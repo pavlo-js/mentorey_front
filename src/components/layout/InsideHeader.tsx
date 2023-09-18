@@ -272,12 +272,14 @@ function InsideHeader() {
                   <Link href="/coach/dashboard">My Coach Dashboard</Link>
                 </MenuItem>
               ) : null}
-              <MenuItem onClick={handleCloseUserMenu}>
-                <ListItemIcon>
-                  <Settings fontSize="small" />
-                </ListItemIcon>
-                Settings
-              </MenuItem>
+              {curUser && isTeacher ? (
+                <MenuItem onClick={handleCloseUserMenu}>
+                  <ListItemIcon>
+                    <Settings fontSize="small" />
+                  </ListItemIcon>
+                  <Link href="/coach/settings">Settings</Link>
+                </MenuItem>
+              ) : null}
               <MenuItem onClick={logOut}>
                 <ListItemIcon>
                   <Logout fontSize="small" />
