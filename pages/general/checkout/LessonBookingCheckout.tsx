@@ -28,6 +28,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
 const stripePromise = loadStripe("pk_test_gktDH2EZfKhkRYLkJGwjQQuQ00O15ZHjaO");
 
@@ -324,6 +325,13 @@ const CheckoutForm = ({
   amount: number;
 }) => {
   const [isPaying, setIsPaying] = useState<boolean>(false);
+
+  const curUser = useSelector(selectAuthState);
+  const { coach, lessonID, lessonPack, lessonType, timeline, channel } =
+    useSelector(selectLessonBookingState) || {};
+
+  const router = useRouter();
+
   const stripe = useStripe();
   const elements = useElements();
 
@@ -340,8 +348,8 @@ const CheckoutForm = ({
       confirmParams: {
         return_url: "http://localhost:3000/payment/ConfirmPayment",
       },
+      redirect: "if_required",
     });
-
     if (result.error) {
       setIsPaying(false);
       if (result.error.code === "card_declined")
@@ -357,9 +365,19 @@ const CheckoutForm = ({
           "Sorry! Something went wrong. Check your card information again."
         );
     } else {
-      // Your customer will be redirected to your `return_url`. For some payment
-      // methods like iDEAL, your customer will be redirected to an intermediate
-      // site first to authorize the payment, then redirected to the `return_url`.
+      const api = "/api/common/save-lesson-booking";
+      const params = {
+        buyerID: curUser.id,
+        coachID: coach.id,
+        lessonID,
+        lessonPack,
+        lessonType,
+        timeline,
+        channel,
+      };
+      const res = await axios.post(api, params);
+
+      router.push("/payment/ConfirmPayment");
     }
   };
 

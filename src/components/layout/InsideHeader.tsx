@@ -29,6 +29,7 @@ import ForumIcon from "@mui/icons-material/Forum";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import CoPresentIcon from "@mui/icons-material/CoPresent";
+import SchoolIcon from "@mui/icons-material/School";
 // Redux
 import { selectAuthState } from "~/slices/authSlice";
 import { useSelector } from "react-redux";
@@ -233,6 +234,12 @@ function InsideHeader() {
                 </MenuItem>
               ) : null}
               <Divider />
+              <MenuItem>
+                <ListItemIcon>
+                  <SchoolIcon fontSize="small" />
+                </ListItemIcon>
+                <Link href="/general/mylessons">My Lessons as a Student</Link>
+              </MenuItem>
               <MenuItem>
                 <ListItemIcon>
                   <BorderColorIcon fontSize="small" />

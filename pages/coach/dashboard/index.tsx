@@ -11,9 +11,11 @@ import CastForEducationIcon from "@mui/icons-material/CastForEducation";
 import SchoolIcon from "@mui/icons-material/School";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 // Tab Contents
 import MyLessons from "./MyLessons";
 import Schedule from "./Schedule";
+import BookedLessons from "./BookedLessons";
 
 const CoachDashboard = () => {
   const [value, setValue] = React.useState("lessons");
@@ -48,6 +50,13 @@ const CoachDashboard = () => {
               sx={{ minHeight: "45px", width: 180 }}
             />
             <Tab
+              value="booking"
+              label="Booked Lessons to me"
+              icon={<EmojiPeopleIcon />}
+              iconPosition="start"
+              sx={{ minHeight: "45px", width: 180 }}
+            />
+            <Tab
               value="students"
               label="My students"
               icon={<SchoolIcon />}
@@ -72,6 +81,9 @@ const CoachDashboard = () => {
         </Box>
         <TabPanel sx={{ padding: 0, marginTop: "16px" }} value="lessons">
           <MyLessons />
+        </TabPanel>
+        <TabPanel sx={{ padding: 0, marginTop: "16px" }} value="booking">
+          <BookedLessons />
         </TabPanel>
         <TabPanel sx={{ padding: 0, marginTop: "16px" }} value="students">
           Item Two

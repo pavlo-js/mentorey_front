@@ -24,7 +24,7 @@ export default function ConfirmPayment() {
           <Button
             variant="contained"
             className="bg-primary-600 mt-4"
-            href="/general/MyLessons"
+            href="/general/mylessons"
           >
             Go to my lessons page
           </Button>
