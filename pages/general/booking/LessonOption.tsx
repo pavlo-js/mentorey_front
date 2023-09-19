@@ -17,9 +17,9 @@ interface LessonOption {
 }
 
 const LessonType = [
-  { label: "30 min", value: "MIN30" },
-  { label: "60 min", value: "MIN60" },
-  { label: "90 min", value: "MIN90" },
+  { label: "30 minutes", value: "MIN30" },
+  { label: "60 minutes", value: "MIN60" },
+  { label: "90 minutes", value: "MIN90" },
 ];
 
 const activeStyle = {
@@ -36,7 +36,7 @@ export default function LessonOption({
 }: PageProps) {
   const [lesson, setLesson] = useState<any>();
   const [convertedPrice, setConvertedPrice] = useState<number>();
-  const [pricesForMultiPack, setPricesForMultiPack] = useState<number[]>([]);
+  const [pricesPerTypes, setPricesPerTypes] = useState<string[]>([]);
   const currencySymbol = CurrencyData[curUser.currency].symbol;
 
   const [activeOption, setActiveOption] =
@@ -68,8 +68,12 @@ export default function LessonOption({
 
   useEffect(() => {
     if (convertedPrice) {
-      const temp = [convertedPrice * 0.5, convertedPrice, convertedPrice * 1.5];
-      setPricesForMultiPack(temp);
+      const temp = [
+        (convertedPrice * 0.5).toFixed(2),
+        convertedPrice.toFixed(2),
+        (convertedPrice * 1.5).toFixed(2),
+      ];
+      setPricesPerTypes(temp);
     }
   }, [convertedPrice]);
 
@@ -79,7 +83,7 @@ export default function LessonOption({
 
   return (
     <>
-      {pricesForMultiPack.length > 0 && (
+      {pricesPerTypes.length > 0 && (
         <Box className="flex w-full flex-wrap max-w-4xl mx-auto">
           {LessonType.map((lessonType, index) => (
             <Box key={index} className="w-1/2 px-2 text-center lg:w-1/3">
@@ -105,9 +109,7 @@ export default function LessonOption({
                 }
               >
                 <p>1 Lesson</p>
-                <p>{`${currencySymbol}  ${parseFloat(
-                  pricesForMultiPack[index].toFixed(2)
-                )}`}</p>
+                <p>{`${currencySymbol}  ${pricesPerTypes[index]}`}</p>
               </Paper>
               {lesson && +lesson.pack > 1 && (
                 <Paper
@@ -134,10 +136,12 @@ export default function LessonOption({
                   <Box>
                     <p>{`${currencySymbol}  ${parseFloat(
                       (
-                        (pricesForMultiPack[index] *
+                        (Number(pricesPerTypes[index]) *
                           lesson.pack *
                           (100 - lesson.disRate)) /
-                        100
+                          100 /
+                          0.97 +
+                        1
                       ).toFixed(2)
                     )}`}</p>
                     <p className="text-sm text-primary-500">

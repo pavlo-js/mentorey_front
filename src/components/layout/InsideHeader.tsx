@@ -99,7 +99,7 @@ function InsideHeader() {
             <Image src="/logo.svg" alt="logo" fill priority={false} />
           </Box>
           {/* Mobile Link Menu */}
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+          <Box sx={{ display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
               aria-label="account of current user"
@@ -158,8 +158,7 @@ function InsideHeader() {
           <Box
             sx={{
               width: 180,
-              height: "50px",
-
+              height: 50,
               display: { xs: "flex", md: "none" },
               marginRight: "auto",
               position: "relative",

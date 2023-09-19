@@ -24,15 +24,70 @@ const CompleteLesson = async (req: NextApiRequest, res: NextApiResponse) => {
 
     await db.execute(query);
 
-    const query_1 = `SELECT * FROM lesson_booking WHERE id = ${lessonBookingID}`;
+    const query_1 = `SELECT 
+                        lb.*,
+                        lb.id AS lesson_booking_id,
+                        l.*,
+                        l.id AS lesson_id_copy,
+                        l.title AS lesson_title,
+                        u.*,
+                        u.id AS coach_user_id,
+                        u.title AS coach_title,
+                        c.label AS category_label
+                    FROM 
+                        lesson_booking lb
+                    LEFT JOIN 
+                        lessons l ON lb.lesson_id = l.id
+                    JOIN 
+                        users u ON lb.coach_id = u.id
+                    LEFT JOIN 
+                        category c ON l.categoryID = c.id
+                    WHERE 
+                        lb.id = ${lessonBookingID}`;
     const [result] = (await db.execute(query_1)) as RowDataPacket[];
-    const paid_currency = result[0].paid_currency;
-    const paid_amount = result[0].paid_amount;
+    const paidCurrency = result[0].paid_currency;
+    const originPrice = result[0].origin_price;
+    const coachCurrency = result[0].currency;
+    const stripeID = result[0].stripe_id;
+
+    const query_2 = `SELECT data FROM currency_rates WHERE id = 0`;
+
+    const [res] = (await db.execute(query_2)) as RowDataPacket[];
+
+    const currencyRates = JSON.parse(JSON.parse(res[0]).data);
+
+    const temp = currencyConverter(
+      paidCurrency,
+      coachCurrency,
+      originPrice,
+      currencyRates
+    );
+    // except the 15% fee
+    const amountToPay = temp * 0.85;
+
+    const transfer = await stripe.transfers.create({
+      amount: Math.round(amountToPay * 100),
+      currency: coachCurrency,
+      destination: stripeID,
+    });
 
     res.status(200);
   } catch (error) {
     res.status(500).json(error);
   }
 };
+
+function currencyConverter(
+  from: string,
+  to: string,
+  amount: number,
+  currencyRates: any
+) {
+  const euroAmount = from === "EUR" ? amount : amount / currencyRates[from];
+  const rawConvertedAmount = euroAmount * currencyRates[to];
+  const convertedAmount = parseFloat(rawConvertedAmount.toFixed(2));
+
+  return convertedAmount;
+}
 
 export default CompleteLesson;

@@ -86,7 +86,7 @@ export default function Page({
           style={activeLesson === "trial" ? activeStyle : {}}
         >
           <Box className="flex cursor-pointer border p-4">
-            <Box className="w-10/12">
+            <Box className="flex-grow mr-4">
               <Typography
                 variant="h4"
                 className="truncate text-lg text-slate-600"
@@ -96,10 +96,12 @@ export default function Page({
               <Divider />
               <Typography className="mt-1 text-sm">382 lessons</Typography>
             </Box>
-            <Box className="flex w-2/12 items-center justify-end">
+            <Box className="flex w-32 items-center justify-end">
               <Chip
-                label={`${currencySymbol} ${trialPrice}`}
-                className="bg-primary-100 px-4 font-semibold text-primary-500"
+                label={`${currencySymbol} ${(trialPrice / 0.97 + 1).toFixed(
+                  2
+                )} / 30mins`}
+                className="bg-primary-100 text-center font-semibold text-primary-500 w-full"
               />
             </Box>
           </Box>
@@ -113,7 +115,7 @@ export default function Page({
               style={lesson.id === activeLesson ? activeStyle : {}}
             >
               <Box className="flex cursor-pointer rounded-lg border p-4">
-                <Box className="w-10/12">
+                <Box className="flex-grow mr-2 md:mr-4">
                   <Typography className="truncate text-lg text-slate-600">
                     {lesson.title}
                   </Typography>
@@ -122,10 +124,13 @@ export default function Page({
                     General 382 lessons
                   </Typography>
                 </Box>
-                <Box className="flex w-2/12 items-center justify-end">
+                <Box className="flex w-24 md:w-32 items-center justify-end">
                   <Chip
-                    label={`${currencySymbol} ${prices[index]} /hr`}
-                    className="bg-pink-100 px-1 font-semibold text-pink-500"
+                    label={`${currencySymbol} ${(
+                      prices[index] / 0.97 +
+                      1
+                    ).toFixed(2)} /hr`}
+                    className="bg-pink-100 w-full text-center font-semibold text-pink-500"
                   />
                 </Box>
               </Box>

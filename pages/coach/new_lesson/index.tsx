@@ -46,6 +46,7 @@ export default function NewLessonPage() {
 
   React.useEffect(() => {
     if (!!!curUser.stripe_id) {
+      setModalOpen(true);
     }
     getAllCategories();
   }, []);

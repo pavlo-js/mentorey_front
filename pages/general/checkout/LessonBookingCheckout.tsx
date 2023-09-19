@@ -68,6 +68,7 @@ const testPromoCode = "123456";
 
 export default function LessonBookingCheckout() {
   const [price, setPrice] = useState<number>();
+  const [originPrice, setOriginPrice] = useState<number>();
   const [promocode, setPromocode] = useState<string>();
   const [clientSecret, setClientSecret] = useState<string>();
 
@@ -107,16 +108,37 @@ export default function LessonBookingCheckout() {
           lesson.price
         );
         if (lessonPack > 1) {
+          setOriginPrice(
+            parseFloat(
+              (
+                lessonPack *
+                lessonTypeSet[lessonType as LessonType] *
+                ((initialPrice * (100 - lesson.disRate)) / 100)
+              ).toFixed(2)
+            )
+          );
           return parseFloat(
             (
-              lessonPack *
-              lessonTypeSet[lessonType as LessonType] *
-              ((initialPrice * (100 - lesson.disRate)) / 100)
+              (lessonPack *
+                lessonTypeSet[lessonType as LessonType] *
+                ((initialPrice * (100 - lesson.disRate)) / 100)) /
+                0.97 +
+              1
             ).toFixed(2)
           );
         } else if (lessonPack === 1) {
+          setOriginPrice(
+            parseFloat(
+              (lessonTypeSet[lessonType as LessonType] * initialPrice).toFixed(
+                2
+              )
+            )
+          );
           return parseFloat(
-            (lessonTypeSet[lessonType as LessonType] * initialPrice).toFixed(2)
+            (
+              (lessonTypeSet[lessonType as LessonType] * initialPrice) / 0.97 +
+              1
+            ).toFixed(2)
           );
         }
       }
@@ -126,14 +148,12 @@ export default function LessonBookingCheckout() {
   useEffect(() => {
     if (promocode) {
       (async () => {
-        const price = await getPrice();
-        if (price) {
+        const tempPrice = await getPrice();
+        if (tempPrice) {
           if (checkPromocode(promocode)) {
-            console.log("aaaaaaaaaaaaaaaaaaaaaaaa");
-            setPrice(price * 0.8);
+            setPrice(parseFloat((tempPrice * 0.95).toFixed(2)));
           } else {
-            console.log("bbbbbbbbbbbbbbbbbbbbbb");
-            setPrice(price);
+            setPrice(tempPrice);
           }
         }
       })();
@@ -183,7 +203,7 @@ export default function LessonBookingCheckout() {
   return (
     <>
       <PromoModal sendPromocode={setPromocode} />
-      {lesson && price && (
+      {lesson && (
         <BlankLayout>
           <Paper
             className="max-w-2xl w-fit mx-2 md:mx-auto my-4 py-4 px-2 lg:py-6 lg:px-4 flex flex-wrap"
@@ -241,11 +261,12 @@ export default function LessonBookingCheckout() {
               <DetailComponent caption="Aimed at" content={lesson.purpose} />
             </Box>
             <Box className="w-full md:w-1/2 lg:p-4">
-              {clientSecret && (
+              {clientSecret && price && originPrice && (
                 <Elements stripe={stripePromise} options={{ clientSecret }}>
                   <CheckoutForm
                     symbol={currencySymbol}
                     amount={price}
+                    originPrice={originPrice}
                     clientSecret={clientSecret}
                   />
                 </Elements>
@@ -278,10 +299,12 @@ const CheckoutForm = ({
   symbol,
   amount,
   clientSecret,
+  originPrice,
 }: {
   symbol: string;
   amount: number;
   clientSecret: string;
+  originPrice: number;
 }) => {
   const [isPaying, setIsPaying] = useState<boolean>(false);
 
@@ -337,6 +360,7 @@ const CheckoutForm = ({
       param.amount = amount;
       param.currency = curUser.currency;
       param.clientSecret = clientSecret;
+      param.originPrice = originPrice;
 
       try {
         await axios.post(api, param);

@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 
 // Initialize Stripe with your secret key
-const stripe = new Stripe("sk_test_SlWzn8XyMbMU4QBdCo2aoHqX00zVdg9YG1", {
+const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY!, {
   apiVersion: "2023-08-16",
 });
 
@@ -13,7 +13,7 @@ export default async function CreatePaymentIntent(
   const { amount, currency } = req.body;
   try {
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount * 100,
+      amount: Math.round(amount * 100),
       currency: currency,
     });
 
