@@ -68,7 +68,8 @@ const testPromoCode = "123456";
 
 export default function LessonBookingCheckout() {
   const [price, setPrice] = useState<number>();
-  const [promocode, setPromocode] = useState<string>("");
+  const [promocode, setPromocode] = useState<string>();
+  const [clientSecret, setClientSecret] = useState<string>();
 
   const { coach, lessonID, lessonPack, lessonType, timeline, channel } =
     useSelector(selectLessonBookingState) || {};
@@ -90,89 +91,76 @@ export default function LessonBookingCheckout() {
     enabled: !!lessonID,
   });
 
-  useEffect(() => {
-    const getPrice = async () => {
-      if (lesson) {
-        if (lesson.isTrialLesson) {
-          const trialPrice = await currencyConverter(
-            coach.currency,
-            curUser.currency,
-            coach.trial_price
+  const getPrice = async () => {
+    if (lesson) {
+      if (lesson.isTrialLesson) {
+        const trialPrice = await currencyConverter(
+          coach.currency,
+          curUser.currency,
+          coach.trial_price
+        );
+        return trialPrice;
+      } else {
+        const initialPrice = await currencyConverter(
+          coach.currency,
+          curUser.currency,
+          lesson.price
+        );
+        if (lessonPack > 1) {
+          return parseFloat(
+            (
+              lessonPack *
+              lessonTypeSet[lessonType as LessonType] *
+              ((initialPrice * (100 - lesson.disRate)) / 100)
+            ).toFixed(2)
           );
-          setPrice(trialPrice);
-        } else {
-          const initialPrice = await currencyConverter(
-            coach.currency,
-            curUser.currency,
-            lesson.price
+        } else if (lessonPack === 1) {
+          return parseFloat(
+            (lessonTypeSet[lessonType as LessonType] * initialPrice).toFixed(2)
           );
-          if (lessonPack > 1) {
-            setPrice(
-              parseFloat(
-                (
-                  lessonPack *
-                  lessonTypeSet[lessonType as LessonType] *
-                  ((initialPrice * (100 - lesson.disRate)) / 100)
-                ).toFixed(2)
-              )
-            );
-          } else if (lessonPack === 1) {
-            setPrice(
-              parseFloat(
-                (
-                  lessonTypeSet[lessonType as LessonType] * initialPrice
-                ).toFixed(2)
-              )
-            );
-          }
         }
       }
-    };
+    }
+  };
 
-    getPrice();
-  }, [lesson]);
+  useEffect(() => {
+    if (promocode) {
+      (async () => {
+        const price = await getPrice();
+        if (price) {
+          if (checkPromocode(promocode)) {
+            console.log("aaaaaaaaaaaaaaaaaaaaaaaa");
+            setPrice(price * 0.8);
+          } else {
+            console.log("bbbbbbbbbbbbbbbbbbbbbb");
+            setPrice(price);
+          }
+        }
+      })();
+    }
+  }, [promocode]);
 
-  // const { data: price } = useQuery({
-  //   queryKey: [
-  //     "calcPrice",
-  //     lessonID,
-  //     lessonPack,
-  //     lessonType,
-  //     lesson,
-  //     curUser,
-  //     coach,
-  //   ],
-  //   queryFn: async () => {
-  //     if (lesson.isTrialLesson) {
-  //       const trialPrice = await currencyConverter(
-  //         coach.currency,
-  //         curUser.currency,
-  //         coach.trial_price
-  //       );
-  //       return trialPrice;
-  //     } else {
-  //       const initialPrice = await currencyConverter(
-  //         coach.currency,
-  //         curUser.currency,
-  //         lesson.price
-  //       );
-  //       if (lessonPack > 1) {
-  //         return parseFloat(
-  //           (
-  //             lessonPack *
-  //             lessonTypeSet[lessonType as LessonType] *
-  //             ((initialPrice * (100 - lesson.disRate)) / 100)
-  //           ).toFixed(2)
-  //         );
-  //       } else if (lessonPack === 1) {
-  //         return parseFloat(
-  //           (lessonTypeSet[lessonType as LessonType] * initialPrice).toFixed(2)
-  //         );
-  //       }
-  //     }
-  //   },
-  //   enabled: !!lesson,
-  // });
+  const checkPromocode = (code: string) => {
+    return code === testPromoCode;
+  };
+
+  useEffect(() => {
+    if (price) {
+      (async () => {
+        try {
+          const api = "/api/payment/create-payment-intent";
+          const params = {
+            amount: price,
+            currency: curUser.currency,
+          };
+          const { data: response } = await axios.post(api, params);
+          setClientSecret(response.client_secret);
+        } catch (error) {
+          console.log(error);
+        }
+      })();
+    }
+  }, [price]);
 
   const { data: category = { label: "Trial Lesson" } } = useQuery({
     queryKey: ["getLessonCategoryByID", lesson],
@@ -192,123 +180,81 @@ export default function LessonBookingCheckout() {
     enabled: !!lesson,
   });
 
-  const { data: clientSecret } = useQuery({
-    queryKey: ["getStripeClientSecret", price],
-    queryFn: async () => {
-      try {
-        const api = "/api/payment/create-payment-intent";
-        const params = {
-          amount: price,
-          currency: curUser.currency,
-        };
-        const { data: response } = await axios.post(api, params);
-        return response.client_secret;
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    enabled: !!price,
-  });
-
-  const options = {
-    clientSecret: clientSecret,
-  };
-
-  const checkPromoCode = () => {
-    if (promocode === testPromoCode && price) {
-      setPrice(price * 0.8);
-    }
-  };
-
   return (
-    lesson &&
-    clientSecret &&
-    price && (
-      <BlankLayout>
-        <PromoModal />
-        <Paper
-          className="max-w-2xl w-fit mx-2 md:mx-auto my-4 py-4 px-2 lg:py-6 lg:px-4 flex flex-wrap"
-          sx={{ minWidth: 350 }}
-        >
-          <Box className="w-full md:w-1/2">
-            <Box display={"flex"} alignItems={"center"}>
-              <Tooltip title={country?.label}>
-                <Badge
-                  overlap="circular"
-                  className="rounded-full shadow-md"
-                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                  badgeContent={
-                    <ReactCountryFlag
-                      countryCode={coach.country}
-                      svg
-                      style={{
-                        width: "15px",
-                        height: "15px",
-                        border: "1px solid white",
-                        borderRadius: "20px",
-                        objectFit: "cover",
-                      }}
+    <>
+      <PromoModal sendPromocode={setPromocode} />
+      {lesson && price && (
+        <BlankLayout>
+          <Paper
+            className="max-w-2xl w-fit mx-2 md:mx-auto my-4 py-4 px-2 lg:py-6 lg:px-4 flex flex-wrap"
+            sx={{ minWidth: 350 }}
+          >
+            <Box className="w-full md:w-1/2">
+              <Box display={"flex"} alignItems={"center"}>
+                <Tooltip title={country?.label}>
+                  <Badge
+                    overlap="circular"
+                    className="rounded-full shadow-md"
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    badgeContent={
+                      <ReactCountryFlag
+                        countryCode={coach.country}
+                        svg
+                        style={{
+                          width: "15px",
+                          height: "15px",
+                          border: "1px solid white",
+                          borderRadius: "20px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    }
+                  >
+                    <Avatar
+                      sx={{ width: "55px", height: "55px" }}
+                      alt={coach.first_name + " " + coach.last_name}
+                      src={coach.avatar}
                     />
-                  }
-                >
-                  <Avatar
-                    sx={{ width: "55px", height: "55px" }}
-                    alt={coach.first_name + " " + coach.last_name}
-                    src={coach.avatar}
-                  />
-                </Badge>
-              </Tooltip>
-              <Box marginLeft={"20px"}>
-                <Typography className="first-letter:capitalize text-lg font-semibold">
-                  {`${coach.first_name} ${coach.last_name}`}
-                </Typography>
-                <Typography className="text-slate-600 text-sm">
-                  {coach.title || ""}
-                </Typography>
+                  </Badge>
+                </Tooltip>
+                <Box marginLeft={"20px"}>
+                  <Typography className="first-letter:capitalize text-lg font-semibold">
+                    {`${coach.first_name} ${coach.last_name}`}
+                  </Typography>
+                  <Typography className="text-slate-600 text-sm">
+                    {coach.title || ""}
+                  </Typography>
+                </Box>
               </Box>
-            </Box>
 
-            <DetailComponent caption="Category" content={category.label} />
-            <DetailComponent
-              caption="Lesson Type"
-              content={`${
-                LessonTypeLabels[lessonType as LessonType]
-              } / ${lessonPack}lessons`}
-            />
-            <DetailComponent
-              caption="Description"
-              content={lesson.description}
-            />
-            <DetailComponent caption="Aimed at" content={lesson.purpose} />
-          </Box>
-          <Box className="w-full md:w-1/2 lg:p-4">
-            <Box className="flex justify-between items-center my-2">
-              <TextField
-                placeholder="promo code"
-                size="small"
-                value={promocode}
-                onChange={(e) => setPromocode(e.target.value)}
+              <DetailComponent caption="Category" content={category.label} />
+              <DetailComponent
+                caption="Lesson Type"
+                content={`${
+                  LessonTypeLabels[lessonType as LessonType]
+                } / ${lessonPack}lessons`}
               />
-              <Button
-                type="button"
-                onClick={checkPromoCode}
-                variant="outlined"
-                className="ml-2"
-              >
-                Redeem
-              </Button>
+              <DetailComponent
+                caption="Description"
+                content={lesson.description}
+              />
+              <DetailComponent caption="Aimed at" content={lesson.purpose} />
             </Box>
-            <Elements stripe={stripePromise} options={options}>
-              <CheckoutForm
-                symbol={currencySymbol}
-                amount={price}
-                clientSecret={clientSecret}
-              />
-            </Elements>
-          </Box>
-        </Paper>
-      </BlankLayout>
-    )
+            <Box className="w-full md:w-1/2 lg:p-4">
+              {clientSecret && (
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                  <CheckoutForm
+                    symbol={currencySymbol}
+                    amount={price}
+                    clientSecret={clientSecret}
+                  />
+                </Elements>
+              )}
+            </Box>
+          </Paper>
+        </BlankLayout>
+      )}
+    </>
   );
 }
 
@@ -423,7 +369,13 @@ interface ModalProps {
 
 function PromoModal({ sendPromocode }: ModalProps) {
   const [isOpen, setIsOpen] = useState<boolean>(true);
+  const [code, setCode] = useState<string>("");
   const handleClose = () => {
+    if (code) {
+      sendPromocode(code);
+    } else {
+      sendPromocode("not_defined");
+    }
     setIsOpen(false);
   };
   return (
@@ -454,7 +406,8 @@ function PromoModal({ sendPromocode }: ModalProps) {
           fullWidth
           variant="standard"
           helperText="123456 for test"
-          onChange={(e) => sendPromocode(e.target.value)}
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
         />
       </DialogContent>
       <DialogActions>
