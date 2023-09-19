@@ -7,6 +7,11 @@ import {
   Badge,
   Button,
   TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import BlankLayout from "~/layouts/BlankLayout";
 import { useSelector } from "react-redux";
@@ -29,6 +34,7 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const stripePromise = loadStripe("pk_test_gktDH2EZfKhkRYLkJGwjQQuQ00O15ZHjaO");
 
@@ -219,6 +225,7 @@ export default function LessonBookingCheckout() {
     clientSecret &&
     price && (
       <BlankLayout>
+        <PromoModal />
         <Paper
           className="max-w-2xl w-fit mx-2 md:mx-auto my-4 py-4 px-2 lg:py-6 lg:px-4 flex flex-wrap"
           sx={{ minWidth: 350 }}
@@ -292,7 +299,11 @@ export default function LessonBookingCheckout() {
               </Button>
             </Box>
             <Elements stripe={stripePromise} options={options}>
-              <CheckoutForm symbol={currencySymbol} amount={price} />
+              <CheckoutForm
+                symbol={currencySymbol}
+                amount={price}
+                clientSecret={clientSecret}
+              />
             </Elements>
           </Box>
         </Paper>
@@ -320,9 +331,11 @@ function DetailComponent({
 const CheckoutForm = ({
   symbol,
   amount,
+  clientSecret,
 }: {
   symbol: string;
   amount: number;
+  clientSecret: string;
 }) => {
   const [isPaying, setIsPaying] = useState<boolean>(false);
 
@@ -366,26 +379,26 @@ const CheckoutForm = ({
         );
     } else {
       const api = "/api/common/save-lesson-booking";
-      const params = {
-        buyerID: curUser.id,
-        coachID: coach.id,
-        lessonID,
-        lessonPack,
-        lessonType,
-        timeline,
-        channel,
-        amount,
-        currency: curUser.currency,
-      };
+
+      const param: any = {};
+      param.buyerID = curUser.id;
+      param.coachID = coach.id;
+      param.lessonID = lessonID === "trial" ? 0 : lessonID;
+      param.lessonPack = lessonPack;
+      param.lessonType = lessonType;
+      param.timeline = timeline;
+      param.channel = channel;
+      param.amount = amount;
+      param.currency = curUser.currency;
+      param.clientSecret = clientSecret;
 
       try {
-        await axios.post(api, params);
+        await axios.post(api, param);
+        router.push("/payment/ConfirmPayment");
       } catch (err) {
         toast.error("Sorry! Something went wrong. Please try again.");
         console.log(err);
       }
-
-      router.push("/payment/ConfirmPayment");
     }
   };
 
@@ -403,3 +416,57 @@ const CheckoutForm = ({
     </form>
   );
 };
+
+interface ModalProps {
+  sendPromocode: (data: any) => void;
+}
+
+function PromoModal({ sendPromocode }: ModalProps) {
+  const [isOpen, setIsOpen] = useState<boolean>(true);
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+  return (
+    <Dialog open={isOpen} onClose={handleClose}>
+      <DialogTitle>Promocode</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Mentorey provides promo code to help students. If you have got one,
+          please insert below. <br />
+          <strong>
+            But please note that the promo code is usable for only one time.
+          </strong>{" "}
+          <br />
+          You can check your promocode on your{" "}
+          <Link
+            href={"/pupil/dashboard"}
+            className="font-semibold text-primary-700"
+          >
+            dashboard
+          </Link>{" "}
+          page.
+        </DialogContentText>
+        <TextField
+          autoFocus
+          margin="dense"
+          label="Promo code"
+          type="text"
+          fullWidth
+          variant="standard"
+          helperText="123456 for test"
+          onChange={(e) => sendPromocode(e.target.value)}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose}>Cancel</Button>
+        <Button
+          onClick={handleClose}
+          variant="contained"
+          className="bg-primary-600"
+        >
+          Redeem
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}

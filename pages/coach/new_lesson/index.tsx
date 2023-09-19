@@ -1,6 +1,6 @@
 import * as React from "react";
 import InsideLayout from "~/layouts/InsideLayout";
-import { Paper, Button, InputAdornment } from "@mui/material";
+import { Paper, Button, InputAdornment, Typography } from "@mui/material";
 import {
   FormContainer,
   TextFieldElement,
@@ -11,16 +11,42 @@ import { useSelector } from "react-redux";
 import { CurrencyData } from "~/shared/CurrencyData";
 import { Category } from "~/shared/types";
 import { useRouter } from "next/router";
+import styled from "@emotion/styled";
+import axios from "axios";
+import { toast } from "react-toastify";
+
+const CustomModalContainer = styled.div`
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #00000099;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const CustomModal = styled.div`
+  background-color: #fff;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+  padding: 20px 10px;
+`;
 
 export default function NewLessonPage() {
   const [categories, setCategories] = React.useState<Category[]>([]);
   const [desc, setDesc] = React.useState<string>("");
   const [purpose, setPurpose] = React.useState<string>("");
+  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
   const curUser = useSelector(selectAuthState);
   const currencySymbol = CurrencyData[curUser?.currency]?.symbol;
   const router = useRouter();
 
   React.useEffect(() => {
+    if (!!!curUser.stripe_id) {
+    }
     getAllCategories();
   }, []);
 
@@ -46,6 +72,17 @@ export default function NewLessonPage() {
       router.push("/coach/dashboard");
     });
   }
+
+  const addPayment = async () => {
+    const api = "/api/payment/add-payment";
+    try {
+      const { data: res } = await axios.post(api, { userID: curUser.id });
+      router.push(res.accountLink.url);
+    } catch (err) {
+      toast.error("Sorry! Something went wrong. Please try again.");
+      console.log(err);
+    }
+  };
 
   return (
     <InsideLayout>
@@ -171,6 +208,19 @@ export default function NewLessonPage() {
           </div>
         </Paper>
       </FormContainer>
+      <CustomModalContainer hidden={false}>
+        <CustomModal>
+          <Typography>You must add a payment to your account.</Typography>
+          <Button
+            onClick={addPayment}
+            variant="contained"
+            fullWidth
+            className="bg-primary-600 mt-3"
+          >
+            Add Payment
+          </Button>
+        </CustomModal>
+      </CustomModalContainer>
     </InsideLayout>
   );
 }

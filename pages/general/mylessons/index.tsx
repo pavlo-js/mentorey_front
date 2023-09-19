@@ -184,7 +184,7 @@ export default function MyLessons() {
                 className="mx-auto mb-2 w-full justify-between items-center p-2 lg:px-3 lg:py-2"
               >
                 <Typography className="text-lg lg:text-xl">
-                  {item.lesson_title}
+                  {item.lesson_id === 0 ? "Trial Lesson" : item.lesson_title}
                 </Typography>
                 <Divider className="my-1" />
                 <Box className="flex flex-wrap justify-between">
@@ -232,7 +232,11 @@ export default function MyLessons() {
                     } / ${item.lesson_pack} lesson(s)`}</Typography>
                     <LessonDescription
                       label="Category : "
-                      content={item.category_label}
+                      content={
+                        item.lesson_id === 0
+                          ? "Trial lesson"
+                          : item.category_label
+                      }
                     />
                     {item.lesson_pack === 1 && (
                       <>
