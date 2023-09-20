@@ -1,6 +1,6 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import db from "~/database/db";
-import { RowDataPacket } from "mysql2/promise";
+import { NextApiRequest, NextApiResponse } from 'next';
+import db from '~/database/db';
+import { RowDataPacket } from 'mysql2/promise';
 
 const getAllCoaches = async (req: NextApiRequest, res: NextApiResponse) => {
   const { myID } = req.body;

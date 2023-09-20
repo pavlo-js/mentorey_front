@@ -1,30 +1,35 @@
-import * as React from "react";
-import InsideLayout from "~/layouts/InsideLayout";
-import { Box, Button, Paper, Typography } from "@mui/material";
-import Banner from "./components/banner";
-import Grid from "@mui/material/Unstable_Grid2";
-import Overview from "./components/overview";
-import StackBar from "./components/stackbar";
-import Tabs from "./components/tabs";
-import Review from "./components/review";
-import { useRouter } from "next/router";
-import { useQuery } from "react-query";
-import ScheduleSendIcon from "@mui/icons-material/ScheduleSend";
-import ConnectWithoutContactIcon from "@mui/icons-material/ConnectWithoutContact";
+import * as React from 'react';
+import InsideLayout from '~/layouts/InsideLayout';
+import { Box, Button, Paper, Typography } from '@mui/material';
+import Banner from './components/banner';
+import Grid from '@mui/material/Unstable_Grid2';
+import Overview from './components/overview';
+import StackBar from './components/stackbar';
+import Tabs from './components/tabs';
+import Review from './components/review';
+import { useRouter } from 'next/router';
+import { useQuery } from 'react-query';
+import ScheduleSendIcon from '@mui/icons-material/ScheduleSend';
+import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
+import { useSelector } from 'react-redux';
+import { selectAuthState } from '~/slices/authSlice';
+import axios from 'axios';
 
 export default function Profile() {
   const router = useRouter();
   const coachID = router.query.coach_id;
 
+  const curUser = useSelector(selectAuthState);
+
   const { data: coach } = useQuery({
-    queryKey: ["getCoach", coachID],
+    queryKey: ['getCoach', coachID],
     queryFn: () => {
       if (coachID) {
-        const api = "/api/common/getUser";
+        const api = '/api/common/getUser';
         const request = {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({ userID: coachID }),
         };
@@ -37,6 +42,16 @@ export default function Profile() {
     },
   });
 
+  const contactTeacher = async () => {
+    const api = '/api/common/create-channel';
+    try {
+      const result = await axios.post(api, { ownerID: curUser.id, oppositeID: coach.id });
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     coach && (
       <InsideLayout>
@@ -48,7 +63,7 @@ export default function Profile() {
             </Typography>
             <div className="px-4 md:px-8 lg:px-12">
               <Overview coachID={coach.id} />
-              <Box display={"flex"} margin={"auto"} width={"fit-content"}>
+              <Box display={'flex'} margin={'auto'} width={'fit-content'}>
                 <Button
                   startIcon={<ScheduleSendIcon />}
                   size="large"
@@ -63,6 +78,7 @@ export default function Profile() {
                   size="large"
                   variant="contained"
                   className="bg-primary-600 ml-2"
+                  onClick={contactTeacher}
                 >
                   Contact
                 </Button>
@@ -80,11 +96,7 @@ export default function Profile() {
                   <p className="pl-2 text-sm">74 Moricho, Kyoto City, Japan</p> */}
                 </Grid>
                 <Grid xs={12} md={6}>
-                  <video
-                    src={coach.intro_video}
-                    className="rounded-lg w-full"
-                    controls
-                  ></video>
+                  <video src={coach.intro_video} className="rounded-lg w-full" controls></video>
                 </Grid>
               </Grid>
               <Tabs coach={coach} />

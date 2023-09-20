@@ -11,6 +11,8 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.391.0",
     "@aws-sdk/s3-request-presigner": "^3.395.0",
+    "@emoji-mart/data": "^1.1.2",
+    "@emoji-mart/react": "^1.1.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@heroicons/react": "^2.0.18",
@@ -31,7 +33,9 @@
     "bcrypt": "^5.1.1",
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.9",
+    "emoji-mart": "^5.5.2",
     "mysql2": "^3.6.0",
+    "nanoid": "^5.0.1",
     "next": "^13.5.1",
     "next-redux-wrapper": "^8.1.0",
     "nodemailer": "^6.9.4",
@@ -67,6 +71,8 @@
     "@types/react": "18.2.20",
     "@types/react-avatar-editor": "^13.0.0",
     "@types/react-big-calendar": "^1.6.4",
-    "@types/react-dom": "18.2.7"
+    "@types/react-dom": "18.2.7",
+    "prettier": "^3.0.3",
+    "prettier-plugin-tailwindcss": "^0.5.4"
   }
 }

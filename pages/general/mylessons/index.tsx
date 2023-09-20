@@ -19,19 +19,19 @@ import {
   Rating,
   TextField,
   Chip,
-} from "@mui/material";
-import axios from "axios";
-import { useQuery } from "react-query";
-import { useSelector } from "react-redux";
-import InsideLayout from "~/layouts/InsideLayout";
-import { selectAuthState } from "~/slices/authSlice";
-import ReactCountryFlag from "react-country-flag";
-import { countries } from "~/shared/data";
-import { useState } from "react";
-import CloseIcon from "@mui/icons-material/Close";
-import { toast } from "react-toastify";
+} from '@mui/material';
+import axios from 'axios';
+import { useQuery } from 'react-query';
+import { useSelector } from 'react-redux';
+import InsideLayout from '~/layouts/InsideLayout';
+import { selectAuthState } from '~/slices/authSlice';
+import ReactCountryFlag from 'react-country-flag';
+import { countries } from '~/shared/data';
+import { useState } from 'react';
+import CloseIcon from '@mui/icons-material/Close';
+import { toast } from 'react-toastify';
 
-type LessonType = "MIN30" | "MIN60" | "MIN90";
+type LessonType = 'MIN30' | 'MIN60' | 'MIN90';
 
 interface FilterOption {
   type: string;
@@ -40,17 +40,17 @@ interface FilterOption {
 }
 
 const lessonTypeLabel = {
-  MIN30: "30 minutes",
-  MIN60: "60 minutes",
-  MIN90: "90 minutes",
+  MIN30: '30 minutes',
+  MIN60: '60 minutes',
+  MIN90: '90 minutes',
 };
 
 export default function MyLessons() {
   const [open, setOpen] = useState<boolean>(false);
   const [filterOption, setFilterOption] = useState<FilterOption>({
-    type: "all",
-    category: "all",
-    status: "all",
+    type: 'all',
+    category: 'all',
+    status: 'all',
   });
 
   const [relevance, setRelevance] = useState<number>(0);
@@ -58,17 +58,17 @@ export default function MyLessons() {
   const [expertise, setExpertise] = useState<number>(0);
   const [attendance, setAttendance] = useState<number>(0);
   const [kindness, setKindness] = useState<number>(0);
-  const [feedback, setFeedback] = useState<string>("");
+  const [feedback, setFeedback] = useState<string>('');
   const [feedbackValid, setFeedbackValid] = useState<boolean>(true);
   const [activeLesson, setActiveLesson] = useState<number>();
 
   const curUser = useSelector(selectAuthState);
 
   const { data: lessons } = useQuery({
-    queryKey: ["getMyLessons", curUser],
+    queryKey: ['getMyLessons', curUser],
 
     queryFn: async () => {
-      const api = "/api/common/get-my-lessons";
+      const api = '/api/common/get-my-lessons';
       const userID = curUser.id;
       const { data: res } = await axios.post(api, { userID });
       return res.lessons;
@@ -78,16 +78,16 @@ export default function MyLessons() {
   });
 
   const formatDate = (date: Date) => {
-    const datePart = new Intl.DateTimeFormat("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
+    const datePart = new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
     }).format(date);
 
-    const timePart = date.toLocaleTimeString("en-US", {
+    const timePart = date.toLocaleTimeString('en-US', {
       hour12: false,
-      hour: "2-digit",
-      minute: "2-digit",
+      hour: '2-digit',
+      minute: '2-digit',
     });
 
     return `${datePart}/${timePart}`;
@@ -100,7 +100,7 @@ export default function MyLessons() {
 
   const completeLesson = async () => {
     if (feedback.length > 1) {
-      const api = "/api/common/complete-lesson";
+      const api = '/api/common/complete-lesson';
       const params = {
         lessonBookingID: activeLesson,
         relevance,
@@ -114,13 +114,13 @@ export default function MyLessons() {
         await axios.post(api, params);
         setOpen(false);
       } catch (err) {
-        toast.error("Sorry! Something went wrong. Please try again.");
+        toast.error('Sorry! Something went wrong. Please try again.');
         console.log(err);
       } finally {
         setOpen(false);
       }
     } else {
-      toast.warning("Please provide some feedback.");
+      toast.warning('Please provide some feedback.');
       setFeedbackValid(false);
     }
   };
@@ -176,12 +176,9 @@ export default function MyLessons() {
           </Paper>
           <Box className="w-3/4 pl-2">
             {lessons.map((item: any, index: number) => (
-              <Paper
-                key={index}
-                className="mx-auto mb-2 w-full justify-between items-center p-2 lg:px-3 lg:py-2"
-              >
+              <Paper key={index} className="mx-auto mb-2 w-full justify-between p-2 items-center  lg:px-3 lg:py-2">
                 <Typography className="text-lg lg:text-xl">
-                  {item.lesson_id === 0 ? "Trial Lesson" : item.lesson_title}
+                  {item.lesson_id === 0 ? 'Trial Lesson' : item.lesson_title}
                 </Typography>
                 <Divider className="my-1" />
                 <Box className="flex flex-wrap justify-between">
@@ -191,23 +188,19 @@ export default function MyLessons() {
                         overlap="circular"
                         className="rounded-full shadow-md"
                         anchorOrigin={{
-                          vertical: "bottom",
-                          horizontal: "right",
+                          vertical: 'bottom',
+                          horizontal: 'right',
                         }}
                         badgeContent={
                           <ReactCountryFlag
-                            countryCode={
-                              countries.find(
-                                (country) => country.code === item.country
-                              )?.code!
-                            }
+                            countryCode={countries.find((country) => country.code === item.country)?.code!}
                             svg
                             style={{
-                              width: "20px",
-                              height: "20px",
-                              border: "1px solid white",
-                              borderRadius: "20px",
-                              objectFit: "cover",
+                              width: '20px',
+                              height: '20px',
+                              border: '1px solid white',
+                              borderRadius: '20px',
+                              objectFit: 'cover',
                             }}
                           />
                         }
@@ -216,53 +209,36 @@ export default function MyLessons() {
                       </Badge>
                       <Box className="ml-2">
                         <Typography>{`${item.first_name} ${item.last_name}`}</Typography>
-                        <Typography className="text-sm text-gray-400">
-                          {item.coach_title}
-                        </Typography>
+                        <Typography className="text-sm text-gray-400">{item.coach_title}</Typography>
                       </Box>
                     </Box>
                   </Box>
 
                   <Box className="w-full md:w-5/12">
-                    <Typography>{`${
-                      lessonTypeLabel[item.lesson_type as LessonType]
-                    } / ${item.lesson_pack} lesson(s)`}</Typography>
+                    <Typography>{`${lessonTypeLabel[item.lesson_type as LessonType]} / ${
+                      item.lesson_pack
+                    } lesson(s)`}</Typography>
                     <LessonDescription
                       label="Category : "
-                      content={
-                        item.lesson_id === 0
-                          ? "Trial lesson"
-                          : item.category_label
-                      }
+                      content={item.lesson_id === 0 ? 'Trial lesson' : item.category_label}
                     />
                     {item.lesson_pack === 1 && (
                       <>
                         <LessonDescription
                           label="Start Time : "
-                          content={`${formatDate(
-                            new Date(JSON.parse(item.timeline).startTime)
-                          )}`}
+                          content={`${formatDate(new Date(JSON.parse(item.timeline).startTime))}`}
                         />
                         <LessonDescription
                           label="End Time : "
-                          content={`${formatDate(
-                            new Date(JSON.parse(item.timeline).endTime)
-                          )}`}
+                          content={`${formatDate(new Date(JSON.parse(item.timeline).endTime))}`}
                         />
                       </>
                     )}
-                    <LessonDescription
-                      label="Channel : "
-                      content={`${item.channel}`}
-                    />
+                    <LessonDescription label="Channel : " content={`${item.channel}`} />
                   </Box>
                   <Box className="w-full md:w-3/12">
-                    {item.is_completed === "completed" ? (
-                      <Chip
-                        label="Completed"
-                        className="w-full text-center select-none"
-                        color="primary"
-                      />
+                    {item.is_completed === 'completed' ? (
+                      <Chip label="Completed" className="w-full text-center select-none" color="primary" />
                     ) : (
                       <>
                         <Button
@@ -271,7 +247,7 @@ export default function MyLessons() {
                           fullWidth
                           className="block bg-primary-600 mb-1 text-center"
                           size="small"
-                          disabled={item.is_completed != "incomplete"}
+                          disabled={item.is_completed != 'incomplete'}
                         >
                           Go to lesson
                         </Button>
@@ -280,11 +256,7 @@ export default function MyLessons() {
                             setActiveLesson(item.lesson_booking_id);
                             setOpen(true);
                           }}
-                          color={
-                            item.is_completed === "pending"
-                              ? "secondary"
-                              : "primary"
-                          }
+                          color={item.is_completed === 'pending' ? 'secondary' : 'primary'}
                           variant="outlined"
                           fullWidth
                           className="block text-center"
@@ -300,11 +272,7 @@ export default function MyLessons() {
             ))}
           </Box>
         </Container>
-        <Dialog
-          onClose={closeDialog}
-          aria-labelledby="customized-dialog-title"
-          open={open}
-        >
+        <Dialog onClose={closeDialog} aria-labelledby="customized-dialog-title" open={open}>
           <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
             Leave a Feedback
           </DialogTitle>
@@ -312,7 +280,7 @@ export default function MyLessons() {
             aria-label="close"
             onClick={closeDialog}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -322,9 +290,7 @@ export default function MyLessons() {
           </IconButton>
           <DialogContent dividers sx={{ minWidth: 400 }}>
             <Box className="w-full">
-              <Typography component="legend">
-                Content Relevance & Accuracy
-              </Typography>
+              <Typography component="legend">Content Relevance & Accuracy</Typography>
               <Rating
                 name="simple-controlled"
                 value={relevance}
@@ -332,9 +298,7 @@ export default function MyLessons() {
                   setRelevance(value!);
                 }}
               />
-              <Typography component="legend">
-                Engagement & Interaction
-              </Typography>
+              <Typography component="legend">Engagement & Interaction</Typography>
               <Rating
                 name="simple-controlled"
                 value={interaction}
@@ -342,9 +306,7 @@ export default function MyLessons() {
                   setInteraction(value!);
                 }}
               />
-              <Typography component="legend">
-                Mentor's Delivery & Expertise
-              </Typography>
+              <Typography component="legend">Mentor's Delivery & Expertise</Typography>
               <Rating
                 name="simple-controlled"
                 value={expertise}
@@ -393,21 +355,11 @@ export default function MyLessons() {
   );
 }
 
-function LessonDescription({
-  label,
-  content,
-}: {
-  label: string;
-  content: any;
-}) {
+function LessonDescription({ label, content }: { label: string; content: any }) {
   return (
     <Box className="flex">
-      <Typography className="text-sm font-semibold text-gray-500">
-        {label}
-      </Typography>
-      <Typography className="overflow-hidden text-sm text-gray-400 ml-1 first-letter:capitalize">
-        {content}
-      </Typography>
+      <Typography className="text-sm font-semibold text-gray-500">{label}</Typography>
+      <Typography className="overflow-hidden text-sm text-gray-400 ml-1 first-letter:capitalize">{content}</Typography>
     </Box>
   );
 }
