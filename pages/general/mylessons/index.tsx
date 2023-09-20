@@ -138,7 +138,6 @@ export default function MyLessons() {
                 id="type_filter"
                 value={filterOption.type}
                 // onChange={}
-                fullWidth
                 label="Lesson Type"
               >
                 <MenuItem value="all">All lesson types</MenuItem>
@@ -153,7 +152,6 @@ export default function MyLessons() {
                 id="category_filter"
                 value={filterOption.category}
                 // onChange={}
-                fullWidth
                 label="Category"
               >
                 <MenuItem value="all">All Categories</MenuItem>
@@ -168,7 +166,6 @@ export default function MyLessons() {
                 id="status_filter"
                 value={filterOption.status}
                 // onChange={}
-                fullWidth
                 label="Lesson Status"
               >
                 <MenuItem value="all">All</MenuItem>
@@ -379,7 +376,7 @@ export default function MyLessons() {
                 fullWidth
                 multiline
                 value={feedback}
-                onChange={(e) => {
+                onChange={(e: any) => {
                   setFeedbackValid(true);
                   setFeedback(e.target.value);
                 }}
@@ -388,7 +385,7 @@ export default function MyLessons() {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={completeLesson}>Save changes</Button>
+            <Button onClick={completeLesson}>Complete Lesson</Button>
           </DialogActions>
         </Dialog>
       </InsideLayout>

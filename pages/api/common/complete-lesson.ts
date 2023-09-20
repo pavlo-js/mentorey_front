@@ -52,9 +52,12 @@ const CompleteLesson = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const query_2 = `SELECT data FROM currency_rates WHERE id = 0`;
 
-    const [res] = (await db.execute(query_2)) as RowDataPacket[];
+    const [response] = (await db.execute(query_2)) as RowDataPacket[];
 
-    const currencyRates = JSON.parse(JSON.parse(res[0]).data);
+    // const currencyRates = JSON.parse(JSON.parse(response[0]).data);
+
+    const t = response[0];
+    const currencyRates = JSON.parse(t.data);
 
     const temp = currencyConverter(
       paidCurrency,

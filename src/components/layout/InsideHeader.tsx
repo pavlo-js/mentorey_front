@@ -111,7 +111,7 @@ function InsideHeader() {
               <MenuIcon />
             </IconButton>
             <Menu
-              id="menu-appbar"
+              id="menu-appbar-mobile"
               anchorEl={anchorElNav}
               anchorOrigin={{
                 vertical: "bottom",

@@ -3,18 +3,14 @@ import InsideLayout from "~/layouts/InsideLayout";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import Banner from "./components/banner";
 import Grid from "@mui/material/Unstable_Grid2";
-import VideoPlayer from "./components/videoPlayer";
-import PersonPinCircleIcon from "@mui/icons-material/PersonPinCircle";
 import Overview from "./components/overview";
 import StackBar from "./components/stackbar";
 import Tabs from "./components/tabs";
-import Availability from "./components/availabilty";
 import Review from "./components/review";
 import { useRouter } from "next/router";
 import { useQuery } from "react-query";
 import ScheduleSendIcon from "@mui/icons-material/ScheduleSend";
 import ConnectWithoutContactIcon from "@mui/icons-material/ConnectWithoutContact";
-// const VideoPlayer = dynamic(() => import('../components/videoPlayer'), { ssr: false });
 
 export default function Profile() {
   const router = useRouter();
@@ -41,24 +37,6 @@ export default function Profile() {
     },
   });
 
-  // const { data: coach } = useQuery("getCoach", () => {
-  //   if (coachID) {
-  //     const api = "/api/common/getUser";
-  //     const request = {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ userID: coachID }),
-  //     };
-  //     return fetch(api, request)
-  //       .then((res) => res.json())
-  //       .then((data) => data.user);
-  //   } else {
-  //     return null;
-  //   }
-  // });
-
   return (
     coach && (
       <InsideLayout>
@@ -69,13 +47,14 @@ export default function Profile() {
               {`${coach.first_name} ${coach.last_name}`}
             </Typography>
             <div className="px-4 md:px-8 lg:px-12">
-              <Overview />
+              <Overview coachID={coach.id} />
               <Box display={"flex"} margin={"auto"} width={"fit-content"}>
                 <Button
                   startIcon={<ScheduleSendIcon />}
                   size="large"
                   variant="contained"
                   className="bg-primary-600 mr-2"
+                  href={`/general/booking/${coach.id}`}
                 >
                   Book Trial
                 </Button>
@@ -90,25 +69,28 @@ export default function Profile() {
               </Box>
               <Grid container spacing={2} className="py-4">
                 <Grid xs={12} md={6}>
-                  <StackBar />
-                  <p className="mb-2 mt-4 flex items-center text-sm font-semibold text-slate-500">
+                  <StackBar coachID={coach.id} />
+                  {/* <p className="mb-2 mt-4 flex items-center text-sm font-semibold text-slate-500">
                     <PersonPinCircleIcon
                       sx={{ color: "#facc15" }}
                       className="mr-1"
                     />{" "}
                     Location :
                   </p>
-                  <p className="pl-2 text-sm">74 Moricho, Kyoto City, Japan</p>
+                  <p className="pl-2 text-sm">74 Moricho, Kyoto City, Japan</p> */}
                 </Grid>
                 <Grid xs={12} md={6}>
-                  <VideoPlayer />
+                  <video
+                    src={coach.intro_video}
+                    className="rounded-lg w-full"
+                    controls
+                  ></video>
                 </Grid>
               </Grid>
-              <Tabs />
+              <Tabs coach={coach} />
             </div>
           </Paper>
-          <Availability />
-          <Review />
+          <Review coachID={coach.id} />
         </div>
       </InsideLayout>
     )

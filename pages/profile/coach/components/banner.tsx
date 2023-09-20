@@ -15,6 +15,7 @@ const Banner = ({ coach }: { coach: any }) => {
           fill
           style={{ objectFit: "cover" }}
           className="rounded-t-lg"
+          priority
         />
         <Badge
           className="absolute left-1/2 top-16 -translate-x-2/4 rounded-full border-4 border-white shadow-md md:top-24"
