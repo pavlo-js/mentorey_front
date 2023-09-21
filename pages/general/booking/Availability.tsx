@@ -1,19 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { enUS } from "date-fns/locale";
-import { format, parse, startOfWeek, getDay } from "date-fns";
+import React, { useEffect, useState } from 'react';
+import { enUS } from 'date-fns/locale';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
 
-import { useSelector } from "react-redux";
-import { selectAuthState } from "~/slices/authSlice";
-import {
-  Calendar as BigCalendar,
-  dateFnsLocalizer,
-  SlotInfo,
-  Views,
-} from "react-big-calendar";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import { Box } from "@mui/material";
+import { useSelector } from 'react-redux';
+import { selectAuthState } from '~/slices/authSlice';
+import { Calendar as BigCalendar, dateFnsLocalizer, SlotInfo, Views } from 'react-big-calendar';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { Box } from '@mui/material';
 const locales = {
-  "en-US": enUS,
+  'en-US': enUS,
 };
 
 interface PageProps {
@@ -42,78 +37,78 @@ const init: Event[] = [];
 
 const styles = {
   container: {
-    height: "60vh",
-    margin: "2em",
+    height: '60vh',
+    margin: '2em',
   },
 };
 
 const calendarStyle = {
-  "& .rbc-events-container": {
-    marginRight: "0px !important",
+  '& .rbc-events-container': {
+    marginRight: '0px !important',
   },
-  "& .rbc-event": {
-    backgroundColor: "#32b189 !important",
-    border: "1px solid #36c499 !important",
-    borderRadius: "0px !Important",
-    "&:focus": {
-      border: "2px solid black !important",
+  '& .rbc-event': {
+    backgroundColor: '#32b189 !important',
+    border: '1px solid #36c499 !important',
+    borderRadius: '0px !Important',
+    '&:focus': {
+      border: '2px solid black !important',
     },
-    "&:hover": {
-      border: "2px solid black !important",
+    '&:hover': {
+      border: '2px solid black !important',
     },
-    "&:focus-within": {
-      border: "2px solid black !important",
+    '&:focus-within': {
+      border: '2px solid black !important',
     },
-    "&:focus-visible": {
-      border: "2px solid black !important",
+    '&:focus-visible': {
+      border: '2px solid black !important',
     },
-    "&:active": {
-      border: "2px solid black !important",
+    '&:active': {
+      border: '2px solid black !important',
     },
-    "&:target": {
-      border: "2px solid black !important",
-    },
-  },
-  "& .rbc-allday-cell": {
-    display: "none !important",
-  },
-  "& .rbc-header": {
-    height: "50px",
-    justifyContent: "center",
-    display: "flex",
-    "& span": {
-      color: "#125a45 !important",
-      display: "flex",
-      alignItems: "center",
+    '&:target': {
+      border: '2px solid black !important',
     },
   },
-  "& .rbc-time-content": {
-    "& .rbc-time-column:nth-child(2),.rbc-time-column:nth-child(8)": {
-      background: "#fbf1f1 !important",
+  '& .rbc-allday-cell': {
+    display: 'none !important',
+  },
+  '& .rbc-header': {
+    height: '50px',
+    justifyContent: 'center',
+    display: 'flex',
+    '& span': {
+      color: '#125a45 !important',
+      display: 'flex',
+      alignItems: 'center',
     },
   },
-  "& .rbc-btn-group": {
+  '& .rbc-time-content': {
+    '& .rbc-time-column:nth-child(2),.rbc-time-column:nth-child(8)': {
+      background: '#fbf1f1 !important',
+    },
+  },
+  '& .rbc-btn-group': {
     mb: 1,
-    "& button": {
-      backgroundColor: "#059669 !important",
-      color: "white !important",
-      border: "0px !important",
-      "&:hover": {
-        backgroundColor: "#139e72 !important",
+    '& button': {
+      backgroundColor: '#059669 !important',
+      color: 'white !important',
+      border: '0px !important',
+      '&:hover': {
+        backgroundColor: '#139e72 !important',
       },
     },
-    "& .rbc-active": {
-      backgroundColor: "#23bb8b !important",
-      "&:hover": {
-        backgroundColor: "#23bb8b !important",
+    '& .rbc-active': {
+      backgroundColor: '#23bb8b !important',
+      '&:hover': {
+        backgroundColor: '#23bb8b !important',
       },
     },
   },
-  "& .rbc-agenda-table": {
-    "& .rbc-header": {
-      display: "table-cell !Important",
-      textAlign: "center",
-      color: "#125a45",
+  '& .rbc-agenda-table': {
+    '& .rbc-header': {
+      display: 'table-cell !Important',
+      textAlign: 'center',
+      color: '#125a45',
     },
   },
 };
@@ -139,7 +134,7 @@ export default function Availability({ coach }: PageProps) {
       for (let i = 0; i < times.weekly_avail.length; i++) {
         arr.push({
           id: arr.length,
-          title: "avail",
+          title: '',
           start: new Date(times.weekly_avail[i].from_time),
           end: new Date(times.weekly_avail[i].to_time),
         });
@@ -150,7 +145,7 @@ export default function Availability({ coach }: PageProps) {
       for (let i = 0; i < times.override_avail.length; i++) {
         arr.push({
           id: arr.length,
-          title: "override",
+          title: '',
           start: new Date(times.override_avail[i].from_time),
           end: new Date(times.override_avail[i].to_time),
         });
@@ -160,11 +155,11 @@ export default function Availability({ coach }: PageProps) {
   }, [times]);
 
   function getAvails() {
-    const api = "/api/coach/getAvailTimes";
+    const api = '/api/coach/getAvailTimes';
     const request = {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ coachID: coach.id }),
     };
@@ -177,7 +172,7 @@ export default function Availability({ coach }: PageProps) {
   }
 
   const [open, setOpen] = React.useState(false);
-  const [title, setTitle] = React.useState<string>("");
+  const [title, setTitle] = React.useState<string>('');
   const [current, setCurrent] = React.useState<any>({});
 
   const handleOpen = () => setOpen(true);
@@ -185,11 +180,11 @@ export default function Availability({ coach }: PageProps) {
   const setTitleName = (val: string) => setTitle(val);
 
   const handleSelectSlot = ({ start, end }: SlotInfo) => {
-    if (typeof start === "string") {
+    if (typeof start === 'string') {
       start = new Date(start);
     }
 
-    if (typeof end === "string") {
+    if (typeof end === 'string') {
       end = new Date(end);
     }
 
@@ -210,7 +205,7 @@ export default function Availability({ coach }: PageProps) {
         id: ulid(),
         start: new Date(start), //new Date(start.getDay(), start.getHours(), start.getMinutes()),
         end: new Date(end), //new Date(end.getDay(), end.getHours(), end.getMinutes()),
-        title: "",
+        title: '',
       },
     ]);
   };
@@ -235,15 +230,13 @@ export default function Availability({ coach }: PageProps) {
     setEvents((prevEvents) => {
       if (prevEvents.length === 0) return [];
       const updatedEvents = [...prevEvents];
-      title !== "none"
-        ? (updatedEvents[updatedEvents.length - 1].title = title)
-        : updatedEvents.pop();
+      title !== 'none' ? (updatedEvents[updatedEvents.length - 1].title = title) : updatedEvents.pop();
       return updatedEvents;
     });
   }, [title]);
 
   useEffect(() => {
-    open && setTitle("");
+    open && setTitle('');
   }, [open]);
 
   return (
@@ -261,7 +254,7 @@ export default function Availability({ coach }: PageProps) {
         //   console.log(e);
         // }}
         style={{
-          height: "100%",
+          height: '100%',
         }}
         timeslots={2} // number of per section
       />

@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import db from "~/database/db";
+import { NextApiRequest, NextApiResponse } from 'next';
+import db from '~/database/db';
 
 interface OverrideData {
   coach_id: number;
@@ -9,12 +9,13 @@ interface OverrideData {
 }
 
 const setOverrideTimes = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { overrideTimes } = req.body;
+  const { overrideTimes, coachID } = req.body;
 
-  const query =
-    "INSERT INTO override_avail (coach_id, date, from_time, to_time) VALUES (?, ?, ?, ?)";
+  const deleteQuery = `DELETE FROM override_avail WHERE coach_id = ${coachID}`;
+  const query = 'INSERT INTO override_avail (coach_id, date, from_time, to_time) VALUES (?, ?, ?, ?)';
 
   try {
+    await db.execute(deleteQuery);
     const promises = overrideTimes.map((item: OverrideData) => {
       const params = [item.coach_id, item.date, item.from, item.to];
       return db.execute(query, params);
@@ -22,7 +23,7 @@ const setOverrideTimes = async (req: NextApiRequest, res: NextApiResponse) => {
 
     await Promise.all(promises);
 
-    res.status(200).send({ message: "ok" });
+    res.status(200).send({ message: 'ok' });
   } catch (error) {
     res.status(500).json(error);
   }

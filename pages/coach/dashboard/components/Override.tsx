@@ -14,6 +14,7 @@ import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import { DateRange } from '@mui/x-date-pickers-pro/internals/models/range';
 import { formatDate } from '~/utils/utils';
+import axios from 'axios';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -45,6 +46,42 @@ export default function Override({ curUser, sendOverrideTimes }: PageProps) {
     },
   ]);
   const activeDayTimes = availTimes.find((item) => item.date.getDate() === activeDay?.getDate());
+
+  useEffect(() => {
+    (async () => {
+      const api = '/api/coach/getAvailTimes';
+      const { data: res } = await axios.post(api, { coachID: curUser.id });
+      const temp = res.override_avail;
+
+      const result: DayTime[] = Object.values(
+        temp.reduce((acc: { [date: string]: DayTime }, item: any) => {
+          if (!acc[item.date]) {
+            acc[item.date] = {
+              date: new Date(item.date),
+              times: [],
+            };
+          }
+          acc[item.date].times.push(convertToTimeSlot(item));
+          return acc;
+        }, {}),
+      ).map((group: any) => ({
+        date: group.date,
+        times: group.times.sort((a: any, b: any) => {
+          if (a.startTime.isBefore(b.startTime)) return -1;
+          if (a.startTime.isAfter(b.startTime)) return 1;
+          return 0;
+        }),
+      }));
+      setAvailTimes(result);
+    })();
+  }, []);
+
+  const convertToTimeSlot = (item: any): TimeSlot => {
+    return {
+      startTime: dayjs(item.from_time),
+      endTime: dayjs(item.to_time),
+    };
+  };
 
   const openDialog = () => {
     setActiveDay(undefined);
@@ -116,6 +153,12 @@ export default function Override({ curUser, sendOverrideTimes }: PageProps) {
     sendOverrideTimes(availTimes);
   }, [availTimes]);
 
+  const deleteDayTimes = (dateIndex: number) => {
+    const temp = [...availTimes];
+    temp.splice(dateIndex, 1);
+    setAvailTimes(temp);
+  };
+
   return (
     <>
       <Box className="m-2 rounded border border-slate-300 px-2 md:px-4 pt-2 md:pt-4">
@@ -142,7 +185,7 @@ export default function Override({ curUser, sendOverrideTimes }: PageProps) {
                 </Typography>
               ))}
             </Box>
-            <IconButton aria-label="delete" className="ml-4">
+            <IconButton aria-label="delete" className="ml-4" onClick={() => deleteDayTimes(dateIndex)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Box>

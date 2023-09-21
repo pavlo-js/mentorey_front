@@ -237,7 +237,7 @@ export default function Weekly({ curUser, sendWeeklyTimes, hasError }: PageProps
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           {availableTimes?.map((item: TimeSlot[], dayIndex) => (
             <>
-              <Box key={dayIndex} className="flex py-3 items-start">
+              <Box key={`day_${dayIndex}`} className="flex py-3 items-start">
                 {item.length > 0 ? (
                   <>
                     <FormControlLabel
@@ -253,7 +253,7 @@ export default function Weekly({ curUser, sendWeeklyTimes, hasError }: PageProps
                       }}
                     >
                       {item?.map(({ startTime, endTime }: TimeSlot, timesIndex: number) => (
-                        <Box className="flex justify-between" key={dayIndex + timesIndex}>
+                        <Box className="flex justify-between" key={`${dayIndex}_${timesIndex}`}>
                           <MultiInputTimeRangeField
                             onChange={(value) => updateTimes(dayIndex, timesIndex, value)}
                             value={[startTime, endTime]}

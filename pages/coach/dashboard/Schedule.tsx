@@ -69,7 +69,7 @@ export default function Schedule() {
         });
       }
 
-      const api = '/api/coach/setWeeklyAvailTimes';
+      const api = '/api/coach/save-weekly-times';
       const request = {
         method: 'POST',
         headers: {
@@ -98,13 +98,13 @@ export default function Schedule() {
         });
       });
     });
-    const api = '/api/coach/setOverrideTimes';
+    const api = '/api/coach/save-override-times';
     const request = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ overrideTimes: temp }),
+      body: JSON.stringify({ overrideTimes: temp, coachID: curUser.id }),
     };
     fetch(api, request)
       .then((res) => res.json())
