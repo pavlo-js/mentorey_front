@@ -1,27 +1,19 @@
-import { useCallback, useEffect, useState, ChangeEvent } from "react";
-import {
-  Box,
-  Divider,
-  Typography,
-  Menu,
-  MenuItem,
-  MenuList,
-  Button,
-} from "@mui/material";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { useCallback, useEffect, useState, ChangeEvent } from 'react';
+import { Box, Divider, Typography, Menu, MenuItem, MenuList, Button } from '@mui/material';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 // Timepicker
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { MultiInputTimeRangeField } from "@mui/x-date-pickers-pro/MultiInputTimeRangeField";
-import dayjs, { Dayjs } from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-import { DateRange } from "@mui/x-date-pickers-pro/internals/models/range";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { MultiInputTimeRangeField } from '@mui/x-date-pickers-pro/MultiInputTimeRangeField';
+import dayjs, { Dayjs } from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import { DateRange } from '@mui/x-date-pickers-pro/internals/models/range';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -41,16 +33,8 @@ interface InvalidState {
 
 type DayCheckboxValue = number;
 
-const DAY_LABELS = ["MON", "TUE", "WED", "THR", "FRI", "SAT", "SUN"];
-const FULL_DAY_LABELS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
+const DAY_LABELS = ['MON', 'TUE', 'WED', 'THR', 'FRI', 'SAT', 'SUN'];
+const FULL_DAY_LABELS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const defaultTimeSlot: TimeSlot = {
   startTime: dayjs().hour(9).minute(0),
@@ -90,11 +74,7 @@ interface PageProps {
   hasError: (data: boolean) => void;
 }
 
-export default function Weekly({
-  curUser,
-  sendWeeklyTimes,
-  hasError,
-}: PageProps) {
+export default function Weekly({ curUser, sendWeeklyTimes, hasError }: PageProps) {
   const [availableTimes, setAvailableTimes] = useState<DayTimes[]>([]);
   const [invalid, setInvalid] = useState<InvalidState[]>([]);
   const [originDay, setOriginDay] = useState<number | undefined>();
@@ -102,11 +82,11 @@ export default function Weekly({
   const open = Boolean(anchorEl);
 
   useEffect(() => {
-    const api = "/api/coach/getAvailTimes";
+    const api = '/api/coach/getAvailTimes';
     const request = {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         coachID: curUser?.id,
@@ -157,8 +137,8 @@ export default function Weekly({
           if (item.length > 0) {
             const lastSlot = item[item.length - 1];
             const newSlot: TimeSlot = {
-              startTime: lastSlot.endTime.add(1, "hour"),
-              endTime: lastSlot.endTime.add(2, "hour"),
+              startTime: lastSlot.endTime.add(1, 'hour'),
+              endTime: lastSlot.endTime.add(2, 'hour'),
             };
             return [...item, newSlot];
           } else {
@@ -170,8 +150,9 @@ export default function Weekly({
       });
       setAvailableTimes(newTimes);
     },
-    [availableTimes]
+    [availableTimes],
   );
+
   const handleDelete = (dayIndex: number, timesIndex: number) => {
     if (availableTimes) {
       const newTimes = [...availableTimes];
@@ -181,11 +162,7 @@ export default function Weekly({
     }
   };
 
-  const updateTimes = (
-    dayIndex: number,
-    timesIndex: number,
-    value: DateRange<Dayjs>
-  ) => {
+  const updateTimes = (dayIndex: number, timesIndex: number, value: DateRange<Dayjs>) => {
     const tempTimes = [...availableTimes];
     tempTimes[dayIndex][timesIndex].startTime = value[0]!;
     tempTimes[dayIndex][timesIndex].endTime = value[1]!;
@@ -193,19 +170,13 @@ export default function Weekly({
     setAvailableTimes(tempTimes);
   };
 
-  const handleCheckbox = (
-    event: ChangeEvent<HTMLInputElement>,
-    dayIndex: number
-  ) => {
+  const handleCheckbox = (event: ChangeEvent<HTMLInputElement>, dayIndex: number) => {
     const temp = [...availableTimes];
     temp[dayIndex] = event.target.checked ? [{ ...defaultTimeSlot }] : [];
     setAvailableTimes(temp);
   };
 
-  const handleCopy = (
-    event: React.MouseEvent<HTMLElement>,
-    dayIndex: number
-  ) => {
+  const handleCopy = (event: React.MouseEvent<HTMLElement>, dayIndex: number) => {
     setAnchorEl(event.currentTarget);
     setOriginDay(dayIndex);
   };
@@ -214,9 +185,7 @@ export default function Weekly({
     event.preventDefault();
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
-    const checkedValues: DayCheckboxValue[] = formData
-      .getAll("days")
-      .map((value) => Number(value) as DayCheckboxValue);
+    const checkedValues: DayCheckboxValue[] = formData.getAll('days').map((value) => Number(value) as DayCheckboxValue);
     if (originDay !== undefined) {
       const originTimes = availableTimes[originDay];
       const tempTimes = [...availableTimes];
@@ -250,7 +219,7 @@ export default function Weekly({
         }
 
         return issues;
-      })
+      }),
     );
 
     setInvalid(temp);
@@ -264,9 +233,7 @@ export default function Weekly({
   return (
     <>
       <Box className="m-2 rounded border border-slate-300 px-2 md:px-4 pt-2 md:pt-4">
-        <Typography className="my-3 font-semibold">
-          Set your weekly hours
-        </Typography>
+        <Typography className="my-3 font-semibold">Set your weekly hours</Typography>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           {availableTimes?.map((item: TimeSlot[], dayIndex) => (
             <>
@@ -274,99 +241,67 @@ export default function Weekly({
                 {item.length > 0 ? (
                   <>
                     <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={true}
-                          onChange={(event) => handleCheckbox(event, dayIndex)}
-                        />
-                      }
+                      control={<Checkbox checked={true} onChange={(event) => handleCheckbox(event, dayIndex)} />}
                       label={DAY_LABELS[dayIndex]}
                       sx={{ width: 80 }}
                     />
                     <Box
                       sx={{
-                        "& > *:not(:first-of-type)": {
-                          marginTop: "10px",
+                        '& > *:not(:first-of-type)': {
+                          marginTop: '10px',
                         },
                       }}
                     >
-                      {item?.map(
-                        (
-                          { startTime, endTime }: TimeSlot,
-                          timesIndex: number
-                        ) => (
-                          <Box
-                            className="flex justify-between"
-                            key={dayIndex + timesIndex}
+                      {item?.map(({ startTime, endTime }: TimeSlot, timesIndex: number) => (
+                        <Box className="flex justify-between" key={dayIndex + timesIndex}>
+                          <MultiInputTimeRangeField
+                            onChange={(value) => updateTimes(dayIndex, timesIndex, value)}
+                            value={[startTime, endTime]}
+                            timezone={curUser.timezone}
+                            ampm={false}
+                            slotProps={{
+                              textField: ({ position }) => ({
+                                label: position === 'start' ? 'From' : 'To',
+                                size: 'small',
+                                sx: { width: 80 },
+                                error: !!invalid.find(
+                                  (item) => item.dayIndex === dayIndex && item.timesIndex === timesIndex,
+                                ),
+                                inputProps: {
+                                  style: { textAlign: 'center' },
+                                },
+                              }),
+                            }}
+                          />
+                          <IconButton
+                            aria-label="delete"
+                            className="ml-4"
+                            onClick={() => handleDelete(dayIndex, timesIndex)}
                           >
-                            <MultiInputTimeRangeField
-                              onChange={(value) =>
-                                updateTimes(dayIndex, timesIndex, value)
-                              }
-                              value={[startTime, endTime]}
-                              timezone={curUser.timezone}
-                              ampm={false}
-                              slotProps={{
-                                textField: ({ position }) => ({
-                                  label: position === "start" ? "From" : "To",
-                                  size: "small",
-                                  sx: { width: 80 },
-                                  error: !!invalid.find(
-                                    (item) =>
-                                      item.dayIndex === dayIndex &&
-                                      item.timesIndex === timesIndex
-                                  ),
-                                  inputProps: {
-                                    style: { textAlign: "center" },
-                                  },
-                                }),
-                              }}
-                            />
-                            <IconButton
-                              aria-label="delete"
-                              className="ml-4"
-                              onClick={() => handleDelete(dayIndex, timesIndex)}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Box>
-                        )
-                      )}
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      ))}
                     </Box>
                   </>
                 ) : (
                   <>
                     <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={false}
-                          onChange={(event) => handleCheckbox(event, dayIndex)}
-                        />
-                      }
+                      control={<Checkbox checked={false} onChange={(event) => handleCheckbox(event, dayIndex)} />}
                       label={DAY_LABELS[dayIndex]}
                       sx={{ width: 80 }}
                     />
                     <Box className="flex justify-between pt-2">Unavailable</Box>
                   </>
                 )}
-                <IconButton
-                  aria-label="add"
-                  className="ml-auto"
-                  onClick={() => handleAdd(dayIndex)}
-                >
+                <IconButton aria-label="add" className="ml-auto" onClick={() => handleAdd(dayIndex)}>
                   <AddIcon fontSize="small" />
                 </IconButton>
-                <IconButton
-                  aria-label="add"
-                  className="ml-2"
-                  onClick={(event) => handleCopy(event, dayIndex)}
-                >
+                <IconButton aria-label="add" className="ml-2" onClick={(event) => handleCopy(event, dayIndex)}>
                   <ContentCopyIcon fontSize="small" />
                 </IconButton>
               </Box>
-              {dayIndex !== availableTimes.length - 1 && (
-                <Divider className="mx-4" />
-              )}
+              {dayIndex !== availableTimes.length - 1 && <Divider className="mx-4" />}
             </>
           ))}
         </LocalizationProvider>
@@ -376,19 +311,17 @@ export default function Weekly({
         open={open}
         onClose={handleClose}
         anchorOrigin={{
-          vertical: "top",
-          horizontal: "left",
+          vertical: 'top',
+          horizontal: 'left',
         }}
         transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
+          vertical: 'top',
+          horizontal: 'left',
         }}
       >
         <form action="#" onSubmit={handleCopyDates}>
-          <Typography className="text-slate-500 text-sm ml-4 mt-2">
-            Copy times to...
-          </Typography>
-          <MenuList sx={{ width: "150px" }}>
+          <Typography className="text-slate-500 text-sm ml-4 mt-2">Copy times to...</Typography>
+          <MenuList sx={{ width: '150px' }}>
             {FULL_DAY_LABELS.map((item, index) => (
               <MenuItem className="py-0">
                 <FormControlLabel
@@ -405,23 +338,17 @@ export default function Weekly({
                   label={item}
                   labelPlacement="start"
                   sx={{
-                    width: "100%",
+                    width: '100%',
                     marginLeft: 0,
-                    display: "flex",
-                    justifyContent: "space-between",
+                    display: 'flex',
+                    justifyContent: 'space-between',
                   }}
                 />
               </MenuItem>
             ))}
           </MenuList>
           <Box className="px-2">
-            <Button
-              type="submit"
-              variant="contained"
-              size="small"
-              fullWidth
-              className="rounded-3xl bg-primary-600"
-            >
+            <Button type="submit" variant="contained" size="small" fullWidth className="rounded-3xl bg-primary-600">
               Apply
             </Button>
           </Box>
