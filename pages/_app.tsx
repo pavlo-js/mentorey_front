@@ -35,6 +35,9 @@ let theme = createTheme({
       main: '#059669',
       light: '#10b981',
     },
+    secondary: {
+      main: '#FACC15',
+    },
   },
   typography: {
     fontFamily: 'inherit',

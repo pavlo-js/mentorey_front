@@ -1,7 +1,7 @@
-import React, { FC } from 'react'
-import Box from '@mui/material/Box'
-import { Link as ScrollLink } from 'react-scroll'
-import { navigations } from './navigation.data'
+import React, { FC } from 'react';
+import Box from '@mui/material/Box';
+import { Link as ScrollLink } from 'react-scroll';
+import { navigations } from './navigation.data';
 
 const Navigation: FC = () => {
   return (
@@ -25,7 +25,7 @@ const Navigation: FC = () => {
             justifyContent: 'center',
             px: { xs: 0, md: 3 },
             mb: { xs: 3, md: 0 },
-            fontSize: { xs: '1.2rem', md: 'inherit' },
+            fontSize: { xs: '1rem', md: 'inherit' },
             ...(destination === '/' && {
               color: 'primary.main',
             }),
@@ -42,22 +42,11 @@ const Navigation: FC = () => {
             },
           }}
         >
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 12,
-              transform: 'rotate(3deg)',
-              '& img': { width: 44, height: 'auto' },
-            }}
-          >
-            {/* eslint-disable-next-line */}
-            <img src="/images/headline-curve.svg" alt="Headline curve" />
-          </Box>
           {label}
         </Box>
       ))}
     </Box>
-  )
-}
+  );
+};
 
-export default Navigation
+export default Navigation;

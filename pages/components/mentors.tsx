@@ -8,7 +8,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme, styled } from '@mui/material/styles';
 import IconArrowBack from '@mui/icons-material/ArrowBack';
 import IconArrowForward from '@mui/icons-material/ArrowForward';
-import { MentorCardItem } from '~/components/mentor';
+import { MentorCardItem } from '~/components/homepage/mentor';
 import { data } from './mentors.data';
 
 interface SliderArrowArrow {

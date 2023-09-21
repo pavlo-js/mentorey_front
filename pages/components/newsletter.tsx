@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import InputBase from '@mui/material/InputBase';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import { StyledButton } from '~/components/styled-button';
+import { StyledButton } from '~/components/homepage/styled-button';
 
 const HomeNewsLetter: FC = () => {
   return (

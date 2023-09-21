@@ -1,16 +1,16 @@
-import React, { FC } from 'react'
-import Image from 'next/image'
-import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import { styled } from '@mui/material/styles'
-import Container from '@mui/material/Container'
-import Typography from '@mui/material/Typography'
-import CircularProgress from '@mui/material/CircularProgress'
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress'
-import { data } from './feature.data'
+import React, { FC } from 'react';
+import Image from 'next/image';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import { styled } from '@mui/material/styles';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
+import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
+import { data } from './feature.data';
 
 interface LinearProgressProps {
-  order: number
+  order: number;
 }
 
 const BorderLinearProgress = styled(LinearProgress, {
@@ -33,7 +33,7 @@ const BorderLinearProgress = styled(LinearProgress, {
       backgroundColor: '#0063ff',
     }),
   },
-}))
+}));
 
 const HomeFeature: FC = () => {
   return (
@@ -62,21 +62,21 @@ const HomeFeature: FC = () => {
                 </Typography>
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="subtitle1" color="text.secondary">
-                    UI/UI Design
+                    Accuracy
                   </Typography>
-                  <BorderLinearProgress variant="determinate" color="inherit" value={65} order={1} />
+                  <BorderLinearProgress variant="determinate" color="inherit" value={85} order={1} />
                 </Box>
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="subtitle1" color="text.secondary">
-                    Mobile Development
+                    Interaction
                   </Typography>
-                  <BorderLinearProgress variant="determinate" color="inherit" value={40} order={2} />
+                  <BorderLinearProgress variant="determinate" color="inherit" value={70} order={2} />
                 </Box>
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="subtitle1" color="text.secondary">
-                    Web Development
+                    Expertise
                   </Typography>
-                  <BorderLinearProgress variant="determinate" color="inherit" value={50} order={3} />
+                  <BorderLinearProgress variant="determinate" color="inherit" value={95} order={3} />
                 </Box>
               </Box>
 
@@ -224,7 +224,7 @@ const HomeFeature: FC = () => {
         </Grid>
       </Container>
     </Box>
-  )
-}
+  );
+};
 
-export default HomeFeature
+export default HomeFeature;

@@ -3,24 +3,24 @@ import Link from 'next/link';
 import Grid from '@mui/material/Grid';
 import MuiLink from '@mui/material/Link';
 import type { Navigation } from '~/interfaces/navigation';
-import { navigations as headerNavigations } from '~/components/navigation/navigation.data';
-import { FooterSectionTitle } from '~/components/footer';
+import { navigations as headerNavigations } from '~/components/homepage/navigation/navigation.data';
+import { FooterSectionTitle } from '~/components/homepage/footer';
 
 const courseMenu: Array<Navigation> = [
   {
-    label: 'UI/UX Design',
+    label: 'Business',
     path: '#',
   },
   {
-    label: 'Mobile Development',
+    label: 'Wellbeing',
     path: '#',
   },
   {
-    label: 'Machine Learning',
+    label: 'Cooking',
     path: '#',
   },
   {
-    label: 'Web Development',
+    label: 'Relationship',
     path: '#',
   },
 ];
@@ -28,7 +28,6 @@ const courseMenu: Array<Navigation> = [
 const pageMenu = headerNavigations;
 
 const companyMenu: Array<Navigation> = [
-  { label: 'Contact Us', path: '#' },
   { label: 'Privacy & Policy', path: '#' },
   { label: 'Term & Condition', path: '#' },
   { label: 'FAQ', path: '#' },
@@ -41,7 +40,7 @@ interface NavigationItemProps {
 
 const NavigationItem: FC<NavigationItemProps> = ({ label, path }) => {
   return (
-    <Link href={path} passHref>
+    <Link href={path} passHref className="block mb-1">
       {/* <MuiLink
         underline="hover"
         sx={{

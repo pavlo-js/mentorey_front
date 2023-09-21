@@ -61,7 +61,7 @@ const CourseCardItem: FC<Props> = ({ item }) => {
             <Typography variant="h5" color="primary.main">
               {'$' + item.price}
             </Typography>
-            <Typography variant="h6">/ course</Typography>
+            <Typography variant="h6">/ hr</Typography>
           </Box>
           <IconButton
             color="primary"
