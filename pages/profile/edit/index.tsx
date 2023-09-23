@@ -1,6 +1,6 @@
-import React from "react";
-import { useEffect, useState, useRef } from "react";
-import InsideLayout from "~/layouts/InsideLayout";
+import React from 'react';
+import { useEffect, useState, useRef } from 'react';
+import InsideLayout from '~/layouts/InsideLayout';
 import {
   Paper,
   TextField,
@@ -18,40 +18,40 @@ import {
   Chip,
   InputLabel,
   OutlinedInput,
-} from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
-import dayjs, { Dayjs } from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { CountryType } from "~/shared/types";
-import { countries } from "~/shared/data";
-import AvatarEditor from "react-avatar-editor";
-import ReactAvatarEditor from "react-avatar-editor";
-import EditIcon from "@mui/icons-material/Edit";
-import SaveIcon from "@mui/icons-material/Save";
-import { nanoid } from "nanoid";
-import { toast } from "react-toastify";
-import { useTimezoneSelect, allTimezones } from "react-timezone-select";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { validatePhoneNumber, getFileExtension } from "~/utils/utils";
-import { useRouter } from "next/navigation";
-import { CurrencyData } from "~/shared/CurrencyData";
+} from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
+import dayjs, { Dayjs } from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { CountryType } from '~/shared/types';
+import { countries } from '~/shared/data';
+import AvatarEditor from 'react-avatar-editor';
+import ReactAvatarEditor from 'react-avatar-editor';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import { nanoid } from 'nanoid';
+import { toast } from 'react-toastify';
+import { useTimezoneSelect, allTimezones } from 'react-timezone-select';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { validatePhoneNumber, getFileExtension } from '~/utils/utils';
+import { useRouter } from 'next/navigation';
+import { CurrencyData } from '~/shared/CurrencyData';
 // language Selector
-import { LanguageData } from "~/shared/data";
-import { SelectChangeEvent } from "@mui/material/Select";
-import CancelIcon from "@mui/icons-material/Cancel";
+import { LanguageData } from '~/shared/data';
+import { SelectChangeEvent } from '@mui/material/Select';
+import CancelIcon from '@mui/icons-material/Cancel';
 // Phone number input
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 // Redux
-import useSetAuthState from "~/hooks/useSetAuthState";
-import { selectAuthState } from "~/slices/authSlice";
-import { useSelector } from "react-redux";
+import useSetAuthState from '~/hooks/useSetAuthState';
+import { selectAuthState } from '~/slices/authSlice';
+import { useSelector } from 'react-redux';
 // Image Upload
-import AWS from "aws-sdk";
+import AWS from 'aws-sdk';
 AWS.config.update({
   accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
@@ -80,7 +80,7 @@ interface PictureState {
   croppedImg: string;
 }
 
-const labelStyle = "original";
+const labelStyle = 'original';
 const timezones = {
   ...allTimezones,
 };
@@ -91,16 +91,12 @@ const EditProfilePage = () => {
   const [firstName, setFirstName] = useState<string>(curUser.first_name);
   const [lastName, setLastName] = useState<string>(curUser.last_name);
   const [birthday, setBirthday] = useState<any>(dayjs(curUser.birthday));
-  const [gender, setGender] = useState<"MALE" | "FEMALE">(curUser.gender);
-  const initialCountry = countries.find(
-    (country) => country.code === curUser.country
-  );
-  const [country, setCountry] = useState<CountryType | undefined>(
-    initialCountry
-  );
+  const [gender, setGender] = useState<'MALE' | 'FEMALE'>(curUser.gender);
+  const initialCountry = countries.find((country) => country.code === curUser.country);
+  const [country, setCountry] = useState<CountryType | undefined>(initialCountry);
   const [title, setTitle] = useState(curUser.title);
   const [preEmail, setPreEmail] = useState<string>(curUser.email);
-  const [email, setEmail] = useState<string>("");
+  const [email, setEmail] = useState<string>('');
   const [phone, setPhone] = useState<string | undefined>(curUser.phone);
   const [skype, setSkype] = useState<string>(curUser.skype);
   const [zoom, setZoom] = useState<string>(curUser.zoom);
@@ -124,14 +120,12 @@ const EditProfilePage = () => {
   const [picture, setPicture] = useState<PictureState>({
     img: null,
     zoom: 1.2,
-    croppedImg: "",
+    croppedImg: '',
   });
   // Currency state
   const [currency, setCurrency] = useState<string>(curUser.currency);
   // lang select
-  const [languages, setLanguages] = React.useState<string[]>(
-    JSON.parse(curUser.language.replace(/'/g, '"'))
-  );
+  const [languages, setLanguages] = React.useState<string[]>(JSON.parse(curUser.language.replace(/'/g, '"')));
   const LangSelectBox = React.useRef<HTMLSelectElement>(null);
 
   const { options, parseTimezone } = useTimezoneSelect({
@@ -151,7 +145,7 @@ const EditProfilePage = () => {
     const {
       target: { value },
     } = event;
-    setLanguages(typeof value === "string" ? value.split(",") : value);
+    setLanguages(typeof value === 'string' ? value.split(',') : value);
   };
 
   const deSelect = (value: any) => {
@@ -166,11 +160,11 @@ const EditProfilePage = () => {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     setSaving(true);
-    const api = "/api/common/updateProfile";
+    const api = '/api/common/updateProfile';
     const request = {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         id: curUser?.id,
@@ -201,7 +195,7 @@ const EditProfilePage = () => {
       .then((res) => res.json())
       .then((data) => {
         setAuthState(data.user);
-        const url = curUser.is_teacher ? "/coach/dashboard" : "/pupil/learn";
+        const url = curUser.is_teacher ? '/coach/dashboard' : '/pupil/learn';
         router.push(url);
       })
       .catch((err) => console.error(err))
@@ -245,17 +239,17 @@ const EditProfilePage = () => {
   };
 
   function uploadAvatar(base64Data: string) {
-    const uploadToast = toast("Uploading avatar...", {
+    const uploadToast = toast('Uploading avatar...', {
       type: toast.TYPE.INFO,
       autoClose: false,
       closeButton: false,
     });
 
-    const api = "/api/aws/imageUpload";
+    const api = '/api/aws/imageUpload';
     const request = {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         filePath: `avatar/${nanoid()}.png`,
@@ -267,22 +261,21 @@ const EditProfilePage = () => {
       .then((res) => res.json())
       .then((data) => {
         toast.update(uploadToast, {
-          render:
-            "Avatar changed successfully! Please do not forget to click SAVE button.",
+          render: 'Avatar changed successfully! Please do not forget to click SAVE button.',
           type: toast.TYPE.SUCCESS,
           autoClose: 3000,
           closeButton: true,
-          className: "rotateY animated",
+          className: 'rotateY animated',
         });
         setAvatar(data.imagePath);
       })
       .catch((err) => {
         toast.update(uploadToast, {
-          render: "Network Error!",
+          render: 'Network Error!',
           type: toast.TYPE.ERROR,
           autoClose: 3000,
           closeButton: true,
-          className: "rotateY animated",
+          className: 'rotateY animated',
         });
       });
   }
@@ -322,7 +315,7 @@ const EditProfilePage = () => {
     currencyItems.push(
       <MenuItem key={currency.code} value={currency.code}>
         {currency.code}
-      </MenuItem>
+      </MenuItem>,
     );
   }
 
@@ -331,7 +324,7 @@ const EditProfilePage = () => {
       <input
         type="file"
         accept="image/*"
-        style={{ display: "none" }}
+        style={{ display: 'none' }}
         ref={fileInputRef}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           const file = e.target.files?.[0];
@@ -349,7 +342,7 @@ const EditProfilePage = () => {
         <Box className="absolute left-1/2 top-1/2 w-fit -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white p-4 shadow-lg">
           <AvatarEditor
             ref={(ref: any) => (editorRef.current = ref)}
-            image={picture.img || ""}
+            image={picture.img || ''}
             width={200}
             height={200}
             borderRadius={100}
@@ -367,18 +360,10 @@ const EditProfilePage = () => {
             className="mt-3"
           />
           <div className="mt-4 flex justify-between">
-            <Button
-              variant="outlined"
-              className="block"
-              onClick={handleAvatarCancel}
-            >
+            <Button variant="outlined" className="block" onClick={handleAvatarCancel}>
               Cancel
             </Button>
-            <Button
-              variant="contained"
-              className="block  bg-primary-600"
-              onClick={handleAvatarSave}
-            >
+            <Button variant="contained" className="block  bg-primary-600" onClick={handleAvatarSave}>
               Save
             </Button>
           </div>
@@ -389,7 +374,7 @@ const EditProfilePage = () => {
           <div className="flex justify-center">
             <Badge
               overlap="circular"
-              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
               badgeContent={
                 <IconButton
                   color="primary"
@@ -403,15 +388,13 @@ const EditProfilePage = () => {
             >
               <Avatar
                 alt={firstName + lastName}
-                src={avatar === "null" ? "" : avatar}
-                sx={{ width: "150px", height: "150px" }}
+                src={avatar === 'null' ? '' : avatar}
+                sx={{ width: '150px', height: '150px' }}
               />
             </Badge>
           </div>
           <div className="flex flex-wrap">
-            <p className="w-full px-2 text-lg font-semibold text-slate-600">
-              Basic Information
-            </p>
+            <p className="w-full px-2 text-lg font-semibold text-slate-600">Basic Information</p>
             <div className="w-full p-2 sm:w-1/2">
               <p>First Name*</p>
               <TextField
@@ -444,7 +427,7 @@ const EditProfilePage = () => {
                   }}
                   slotProps={{
                     textField: {
-                      size: "small",
+                      size: 'small',
                       // error: !birthValid && true,
                       // helperText: !birthValid && 'Set your birthday',
                     },
@@ -459,9 +442,7 @@ const EditProfilePage = () => {
                   labelId="demo-select-small-label"
                   value={gender}
                   required
-                  onChange={(e) =>
-                    setGender(e.target.value as "MALE" | "FEMALE")
-                  }
+                  onChange={(e) => setGender(e.target.value as 'MALE' | 'FEMALE')}
                 >
                   <MenuItem value="MALE">Male</MenuItem>
                   <MenuItem value="FEMALE">Female</MenuItem>
@@ -483,11 +464,7 @@ const EditProfilePage = () => {
                   }
                 }}
                 renderOption={(props, option) => (
-                  <Box
-                    component="li"
-                    sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                    {...props}
-                  >
+                  <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       loading="lazy"
@@ -505,7 +482,7 @@ const EditProfilePage = () => {
                     {...params}
                     inputProps={{
                       ...params.inputProps,
-                      autoComplete: "new-password", // disable autocomplete and autofill
+                      autoComplete: 'new-password', // disable autocomplete and autofill
                     }}
                   />
                 )}
@@ -515,8 +492,6 @@ const EditProfilePage = () => {
               <p>Timezone</p>
               <FormControl fullWidth size="small">
                 <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
                   value={timezone}
                   onChange={(e) => {
                     handleTimezone(parseTimezone(e.target.value));
@@ -534,12 +509,7 @@ const EditProfilePage = () => {
             <div className="w-full p-2 sm:w-1/2">
               <p>Currency</p>
               <FormControl fullWidth size="small">
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value)}
-                >
+                <Select value={currency} onChange={(e) => setCurrency(e.target.value)}>
                   {currencyItems}
                 </Select>
               </FormControl>
@@ -556,7 +526,7 @@ const EditProfilePage = () => {
                 />
               </div>
             )}
-            <div className={"w-full p-2 " + (!+isTeacher && "sm:w-1/2")}>
+            <div className={'w-full p-2 ' + (!+isTeacher && 'sm:w-1/2')}>
               <p>Language</p>
               <FormControl size="small" className="w-full">
                 <Select
@@ -567,7 +537,7 @@ const EditProfilePage = () => {
                   MenuProps={MenuProps}
                   input={<OutlinedInput />}
                   renderValue={(selected) => (
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {selected.map((value) => (
                         <Chip
                           key={value}
@@ -576,10 +546,7 @@ const EditProfilePage = () => {
                           onDelete={() => deSelect(value)}
                           size="small"
                           deleteIcon={
-                            <IconButton
-                              onMouseDown={stopPropagation}
-                              size="small"
-                            >
+                            <IconButton onMouseDown={stopPropagation} size="small">
                               <CancelIcon className="text-lg" />
                             </IconButton>
                           }
@@ -598,9 +565,7 @@ const EditProfilePage = () => {
             </div>
             {!!+isTeacher && (
               <Box className="my-4 w-full">
-                <p className="w-full px-2 text-lg font-semibold text-slate-600">
-                  Introduction Video
-                </p>
+                <p className="w-full px-2 text-lg font-semibold text-slate-600">Introduction Video</p>
                 <input
                   type="file"
                   accept="video/mp4, video/webm"
@@ -611,12 +576,7 @@ const EditProfilePage = () => {
                   }}
                 />
                 <div className="w-full px-4 py-4 md:px-8">
-                  <video
-                    key={videoKey}
-                    controls
-                    src={videoURL}
-                    className="w-full"
-                  ></video>
+                  <video key={videoKey} controls src={videoURL} className="w-full"></video>
                 </div>
                 <LoadingButton
                   className="mx-auto flex"
@@ -627,11 +587,7 @@ const EditProfilePage = () => {
                   variant="outlined"
                   size="large"
                 >
-                  {uploading ? (
-                    <span>Uploading Video</span>
-                  ) : (
-                    <span>Change Video</span>
-                  )}
+                  {uploading ? <span>Uploading Video</span> : <span>Change Video</span>}
                 </LoadingButton>
               </Box>
             )}
@@ -644,8 +600,8 @@ const EditProfilePage = () => {
                 onChange={(e) => setTitle(e.target.value)}
                 FormHelperTextProps={{
                   sx: {
-                    display: "block",
-                    marginLeft: "auto",
+                    display: 'block',
+                    marginLeft: 'auto',
                   },
                 }}
               />
@@ -662,8 +618,8 @@ const EditProfilePage = () => {
                 helperText="Less than 1500 characters"
                 FormHelperTextProps={{
                   sx: {
-                    display: "block",
-                    marginLeft: "auto",
+                    display: 'block',
+                    marginLeft: 'auto',
                   },
                 }}
               />
@@ -683,8 +639,8 @@ const EditProfilePage = () => {
                     helperText="Less than 700 characters"
                     FormHelperTextProps={{
                       sx: {
-                        display: "block",
-                        marginLeft: "auto",
+                        display: 'block',
+                        marginLeft: 'auto',
                       },
                     }}
                   />
@@ -701,8 +657,8 @@ const EditProfilePage = () => {
                     helperText="Less than 700 characters"
                     FormHelperTextProps={{
                       sx: {
-                        display: "block",
-                        marginLeft: "auto",
+                        display: 'block',
+                        marginLeft: 'auto',
                       },
                     }}
                   />
@@ -710,9 +666,7 @@ const EditProfilePage = () => {
               </>
             )}
 
-            <p className="mt-4 w-full px-2 text-lg font-semibold text-slate-600">
-              Contact Information
-            </p>
+            <p className="mt-4 w-full px-2 text-lg font-semibold text-slate-600">Contact Information</p>
             <div className="w-full p-2 sm:w-1/2">
               <p>Email Address*</p>
               <TextField
@@ -728,42 +682,22 @@ const EditProfilePage = () => {
               <p>Phone number(Optional)</p>
               <PhoneInput
                 value={phone}
-                inputStyle={{ height: "40px", width: "100%" }}
-                onChange={(value) => setPhone("+" + value)}
+                inputStyle={{ height: '40px', width: '100%' }}
+                onChange={(value) => setPhone('+' + value)}
               />
             </div>
-            <p className="mt-4 w-full px-2 text-lg font-semibold text-slate-600">
-              Communication Tools
-            </p>
+            <p className="mt-4 w-full px-2 text-lg font-semibold text-slate-600">Communication Tools</p>
             <div className="w-full p-2">
               <p>Skype</p>
-              <TextField
-                type="url"
-                size="small"
-                value={skype}
-                onChange={(e) => setSkype(e.target.value)}
-                fullWidth
-              />
+              <TextField type="url" size="small" value={skype} onChange={(e) => setSkype(e.target.value)} fullWidth />
             </div>
             <div className="w-full p-2">
               <p>Zoom</p>
-              <TextField
-                type="url"
-                size="small"
-                value={zoom}
-                onChange={(e) => setZoom(e.target.value)}
-                fullWidth
-              />
+              <TextField type="url" size="small" value={zoom} onChange={(e) => setZoom(e.target.value)} fullWidth />
             </div>
             <div className="w-full p-2">
               <p>Slack</p>
-              <TextField
-                type="url"
-                size="small"
-                value={slack}
-                onChange={(e) => setSlack(e.target.value)}
-                fullWidth
-              />
+              <TextField type="url" size="small" value={slack} onChange={(e) => setSlack(e.target.value)} fullWidth />
             </div>
             <div className="w-full p-2">
               <p>Google Hangouts</p>
@@ -787,11 +721,7 @@ const EditProfilePage = () => {
             </div>
           </div>
           <div className="mt-3 flex items-center justify-end">
-            <Button
-              variant="outlined"
-              className="mr-4"
-              onClick={() => router.back()}
-            >
+            <Button variant="outlined" className="mr-4" onClick={() => router.back()}>
               Cancel
             </Button>
             <LoadingButton

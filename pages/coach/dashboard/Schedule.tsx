@@ -4,20 +4,14 @@ import { useSelector } from 'react-redux';
 import { selectAuthState } from '~/slices/authSlice';
 import Weekly from './components/Weekly';
 import Override from './components/Override';
-// Date
-import dayjs, { Dayjs } from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-import { formatDate } from '~/utils/utils';
-// Toast
 import { toast } from 'react-toastify';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
+import { formatDate } from '~/utils/utils';
+import axios from 'axios';
+import { convertToUTC } from '~/utils/timezoneConverter';
 
 interface TimeSlot {
-  startTime: Dayjs;
-  endTime: Dayjs;
+  startTime: number;
+  endTime: number;
 }
 
 type DayTimes = TimeSlot[];
@@ -30,15 +24,15 @@ interface OverrideTimes {
 interface WeeklyData {
   coach_id: any;
   dayOfWeek: number;
-  from: string;
-  to: string;
+  from: number;
+  to: number;
 }
 
 interface OverrideData {
   coach_id: any;
   date: string;
-  from: string;
-  to: string;
+  from: number;
+  to: number;
 }
 
 export default function Schedule() {
@@ -62,8 +56,8 @@ export default function Schedule() {
             temp.push({
               coach_id: curUser.id,
               dayOfWeek: dayIndex,
-              from: time.startTime.toISOString(),
-              to: time.endTime.toISOString(),
+              from: convertToUTC(time.startTime, curUser.timezone),
+              to: convertToUTC(time.endTime, curUser.timezone),
             });
           });
         });
@@ -86,29 +80,20 @@ export default function Schedule() {
     }
   };
 
-  const saveOverrideTimes = () => {
+  const saveOverrideTimes = async () => {
     const temp: OverrideData[] = [];
     overrideTimes.forEach((item: OverrideTimes) => {
-      item.times.forEach((times) => {
+      item.times.forEach((time) => {
         temp.push({
           coach_id: curUser.id,
-          date: formatDate(item.date)!,
-          from: times.startTime.toISOString(),
-          to: times.endTime.toISOString(),
+          date: formatDate(item.date),
+          from: convertToUTC(time.startTime, curUser.timezone),
+          to: convertToUTC(time.endTime, curUser.timezone),
         });
       });
     });
     const api = '/api/coach/save-override-times';
-    const request = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ overrideTimes: temp, coachID: curUser.id }),
-    };
-    fetch(api, request)
-      .then((res) => res.json())
-      .then((data) => console.log(data));
+    await axios.post(api, { overrideTimes: temp, coachID: curUser.id });
   };
 
   const handleSave = () => {
