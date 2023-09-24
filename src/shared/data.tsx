@@ -2698,7 +2698,7 @@ export const LessonTypes = {
   MIN60: '60 mins',
 };
 
-export const DaysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THR', 'FRI', 'SAT'];
+export const DaysOfWeek = ['MON', 'TUE', 'WED', 'THR', 'FRI', 'SAT', 'SUN'];
 
 export const TimeCells = [
   '00:00',

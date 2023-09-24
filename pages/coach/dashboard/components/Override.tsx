@@ -23,7 +23,7 @@ import { formatDate } from '~/utils/utils';
 import axios from 'axios';
 import { TimeCells } from '~/shared/data';
 import { toast } from 'react-toastify';
-import { convertToLoaclTimezone, convertToUTC } from '~/utils/timezoneConverter';
+import { UtcToLocal } from '~/utils/timezoneConverter';
 
 const SelectMenuProps = {
   PaperProps: {
@@ -124,8 +124,8 @@ export default function Override({ curUser, sendOverrideTimes }: PageProps) {
 
   const convertToTimeSlot = (item: any): TimeSlot => {
     return {
-      startTime: convertToLoaclTimezone(item.from_time, curUser.timezone),
-      endTime: convertToLoaclTimezone(item.to_time, curUser.timezone),
+      startTime: UtcToLocal(item.from_time, curUser.timezone),
+      endTime: UtcToLocal(item.to_time, curUser.timezone),
     };
   };
 

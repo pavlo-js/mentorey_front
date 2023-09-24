@@ -18,14 +18,9 @@ import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-
 import { TimeCells, DaysOfWeek } from '~/shared/data';
 import axios from 'axios';
-
-import { allTimezones } from 'react-timezone-select';
-import { convertToLoaclTimezone } from '~/utils/timezoneConverter';
-
-console.log(allTimezones);
+import { UtcToLocal } from '~/utils/timezoneConverter';
 
 interface TimeSlot {
   startTime: number;
@@ -105,8 +100,8 @@ export default function Weekly({ curUser, sendWeeklyTimes, hasError }: PageProps
 
         res.weekly_avail.forEach((item: any, index: number) => {
           temp[item.day_of_week].push({
-            startTime: convertToLoaclTimezone(item.from_time, curUser.timezone),
-            endTime: convertToLoaclTimezone(item.to_time, curUser.timezone),
+            startTime: UtcToLocal(item.from_time, curUser.timezone),
+            endTime: UtcToLocal(item.to_time, curUser.timezone),
           });
         });
 

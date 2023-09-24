@@ -7,7 +7,7 @@ import Override from './components/Override';
 import { toast } from 'react-toastify';
 import { formatDate } from '~/utils/utils';
 import axios from 'axios';
-import { convertToUTC } from '~/utils/timezoneConverter';
+import { localToUtc } from '~/utils/timezoneConverter';
 
 interface TimeSlot {
   startTime: number;
@@ -47,7 +47,7 @@ export default function Schedule() {
     setTabValue(newValue);
   };
 
-  const saveWeeklyTimes = () => {
+  const saveWeeklyTimes = async () => {
     if (!weeklyError) {
       const temp: WeeklyData[] = [];
       if (weeklyTimes) {
@@ -56,25 +56,15 @@ export default function Schedule() {
             temp.push({
               coach_id: curUser.id,
               dayOfWeek: dayIndex,
-              from: convertToUTC(time.startTime, curUser.timezone),
-              to: convertToUTC(time.endTime, curUser.timezone),
+              from: localToUtc(time.startTime, curUser.timezone),
+              to: localToUtc(time.endTime, curUser.timezone),
             });
           });
         });
       }
 
       const api = '/api/coach/save-weekly-times';
-      const request = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ weeklyAvailTimes: temp }),
-      };
-
-      fetch(api, request)
-        .then((res) => res.json())
-        .then((data) => console.log(data));
+      await axios.post(api, { weeklyAvailTimes: temp });
     } else {
       toast.error('Please fix the override times');
     }
@@ -87,8 +77,8 @@ export default function Schedule() {
         temp.push({
           coach_id: curUser.id,
           date: formatDate(item.date),
-          from: convertToUTC(time.startTime, curUser.timezone),
-          to: convertToUTC(time.endTime, curUser.timezone),
+          from: localToUtc(time.startTime, curUser.timezone),
+          to: localToUtc(time.endTime, curUser.timezone),
         });
       });
     });
