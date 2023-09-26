@@ -7,7 +7,6 @@ import Override from './components/Override';
 import { toast } from 'react-toastify';
 import { formatDate } from '~/utils/utils';
 import axios from 'axios';
-import { localToUtc } from '~/utils/timezoneConverter';
 
 interface TimeSlot {
   startTime: number;
@@ -56,8 +55,8 @@ export default function Schedule() {
             temp.push({
               coach_id: curUser.id,
               dayOfWeek: dayIndex,
-              from: localToUtc(time.startTime, curUser.timezone),
-              to: localToUtc(time.endTime, curUser.timezone),
+              from: time.startTime,
+              to: time.endTime,
             });
           });
         });
@@ -77,8 +76,8 @@ export default function Schedule() {
         temp.push({
           coach_id: curUser.id,
           date: formatDate(item.date),
-          from: localToUtc(time.startTime, curUser.timezone),
-          to: localToUtc(time.endTime, curUser.timezone),
+          from: time.startTime,
+          to: time.endTime,
         });
       });
     });

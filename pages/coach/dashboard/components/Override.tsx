@@ -23,7 +23,6 @@ import { formatDate } from '~/utils/utils';
 import axios from 'axios';
 import { TimeCells } from '~/shared/data';
 import { toast } from 'react-toastify';
-import { UtcToLocal } from '~/utils/timezoneConverter';
 
 const SelectMenuProps = {
   PaperProps: {
@@ -95,7 +94,7 @@ export default function Override({ curUser, sendOverrideTimes }: PageProps) {
 
   useEffect(() => {
     (async () => {
-      const api = '/api/coach/getAvailTimes';
+      const api = '/api/coach/get-avail-times';
       const { data: res } = await axios.post(api, { coachID: curUser.id });
       const temp = res.override_avail;
 
@@ -124,8 +123,8 @@ export default function Override({ curUser, sendOverrideTimes }: PageProps) {
 
   const convertToTimeSlot = (item: any): TimeSlot => {
     return {
-      startTime: UtcToLocal(item.from_time, curUser.timezone),
-      endTime: UtcToLocal(item.to_time, curUser.timezone),
+      startTime: item.from_time,
+      endTime: item.to_time,
     };
   };
 

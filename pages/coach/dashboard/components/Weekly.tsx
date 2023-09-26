@@ -20,7 +20,6 @@ import AddIcon from '@mui/icons-material/Add';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { TimeCells, DaysOfWeek } from '~/shared/data';
 import axios from 'axios';
-import { UtcToLocal } from '~/utils/timezoneConverter';
 
 interface TimeSlot {
   startTime: number;
@@ -90,7 +89,7 @@ export default function Weekly({ curUser, sendWeeklyTimes, hasError }: PageProps
 
   useEffect(() => {
     (async () => {
-      const api = '/api/coach/getAvailTimes';
+      const api = '/api/coach/get-avail-times';
       const { data: res } = await axios.post(api, { coachID: curUser.id });
 
       if (res.weekly_avail.length > 0) {
@@ -100,8 +99,8 @@ export default function Weekly({ curUser, sendWeeklyTimes, hasError }: PageProps
 
         res.weekly_avail.forEach((item: any, index: number) => {
           temp[item.day_of_week].push({
-            startTime: UtcToLocal(item.from_time, curUser.timezone),
-            endTime: UtcToLocal(item.to_time, curUser.timezone),
+            startTime: item.from_time,
+            endTime: item.to_time,
           });
         });
 
