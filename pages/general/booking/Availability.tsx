@@ -58,13 +58,15 @@ export default function Availability({ coach }: { coach: any }) {
       <Box className="h-80 overflow-scroll border-t flex justify-between">
         <Box className="w-20 border-r select-none">
           {TimeCells.map((item, index) => (
-            <Box className="flex justify-center items-center h-8 border-b">
-              {index === TimeCells.length - 1 ? (
-                <Typography className="text-xs">{`${item}-24:00`}</Typography>
-              ) : (
-                <Typography className="text-xs">{`${item}-${TimeCells[index + 1]}`}</Typography>
-              )}
-            </Box>
+            <>
+              {index < 48 ? (
+                <Box className="flex justify-center items-center h-8 border-b">
+                  {TimeCells[index + 1] && (
+                    <Typography className="text-xs">{`${item}-${TimeCells[index + 1]}`}</Typography>
+                  )}
+                </Box>
+              ) : null}
+            </>
           ))}
         </Box>
         <Box className="flex justify-around flex-grow">

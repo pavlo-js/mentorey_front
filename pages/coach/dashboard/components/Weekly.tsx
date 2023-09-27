@@ -88,11 +88,6 @@ export default function Weekly({ curUser, sendWeeklyTimes, hasError }: PageProps
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const temp = {
-    day_of_week: 1,
-    from_time: '03:00',
-    to_time: '13:00',
-  };
   useEffect(() => {
     (async () => {
       const api = '/api/coach/get-avail-times';
@@ -253,63 +248,56 @@ export default function Weekly({ curUser, sendWeeklyTimes, hasError }: PageProps
                       },
                     }}
                   >
-                    {item?.map(
-                      ({ startTime, endTime }: TimeSlot, timesIndex: number) =>
-                        endTime < 48 && (
-                          <Box className="flex justify-between">
-                            <FormControl
-                              size="small"
-                              className="w-24"
-                              error={
-                                !!invalid.find((item) => item.dayIndex === dayIndex && item.timesIndex === timesIndex)
-                              }
-                            >
-                              <InputLabel>From</InputLabel>
-                              <Select
-                                value={startTime || defaultTimeSlot.startTime}
-                                label="From"
-                                onChange={(e) => updateStartTimes(dayIndex, timesIndex, e.target.value as number)}
-                                inputProps={{ className: 'text-center' }}
-                                MenuProps={SelectMenuProps as MenuProps}
-                                error={
-                                  !!invalid.find((item) => item.dayIndex === dayIndex && item.timesIndex === timesIndex)
-                                }
-                              >
-                                {TimeCells.map((item, index) => (
-                                  <MenuItem value={index}>{item}</MenuItem>
-                                ))}
-                              </Select>
-                            </FormControl>
-                            <FormControl
-                              size="small"
-                              className="w-24 ml-2"
-                              error={
-                                !!invalid.find((item) => item.dayIndex === dayIndex && item.timesIndex === timesIndex)
-                              }
-                            >
-                              <InputLabel>To</InputLabel>
-                              <Select
-                                value={endTime || defaultTimeSlot.endTime}
-                                label="To"
-                                onChange={(e) => updateEndTimes(dayIndex, timesIndex, e.target.value as number)}
-                                inputProps={{ className: 'text-center' }}
-                                MenuProps={SelectMenuProps as MenuProps}
-                              >
-                                {TimeCells.map((item, index) => (
-                                  <MenuItem value={index}>{item}</MenuItem>
-                                ))}
-                              </Select>
-                            </FormControl>
-                            <IconButton
-                              aria-label="delete"
-                              className="ml-4"
-                              onClick={() => handleDelete(dayIndex, timesIndex)}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Box>
-                        ),
-                    )}
+                    {item?.map(({ startTime, endTime }: TimeSlot, timesIndex: number) => (
+                      <Box className="flex justify-between">
+                        <FormControl
+                          size="small"
+                          className="w-24"
+                          error={!!invalid.find((item) => item.dayIndex === dayIndex && item.timesIndex === timesIndex)}
+                        >
+                          <InputLabel>From</InputLabel>
+                          <Select
+                            value={startTime}
+                            label="From"
+                            onChange={(e) => updateStartTimes(dayIndex, timesIndex, e.target.value as number)}
+                            inputProps={{ className: 'text-center' }}
+                            MenuProps={SelectMenuProps as MenuProps}
+                            error={
+                              !!invalid.find((item) => item.dayIndex === dayIndex && item.timesIndex === timesIndex)
+                            }
+                          >
+                            {TimeCells.map((item, index) => (
+                              <MenuItem value={index}>{item}</MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        <FormControl
+                          size="small"
+                          className="w-24 ml-2"
+                          error={!!invalid.find((item) => item.dayIndex === dayIndex && item.timesIndex === timesIndex)}
+                        >
+                          <InputLabel>To</InputLabel>
+                          <Select
+                            value={endTime}
+                            label="To"
+                            onChange={(e) => updateEndTimes(dayIndex, timesIndex, e.target.value as number)}
+                            inputProps={{ className: 'text-center' }}
+                            MenuProps={SelectMenuProps as MenuProps}
+                          >
+                            {TimeCells.map((item, index) => (
+                              <MenuItem value={index}>{item}</MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        <IconButton
+                          aria-label="delete"
+                          className="ml-4"
+                          onClick={() => handleDelete(dayIndex, timesIndex)}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    ))}
                   </Box>
                 </>
               ) : (

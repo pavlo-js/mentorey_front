@@ -174,7 +174,15 @@ function getOverStartEnd(date: string, coachZone: string, buyerZone: string) {
   const coachStartTime = DateTime.fromISO(date, { zone: coachZone }).startOf('day').setZone(buyerZone);
   const coachEndTime = DateTime.fromISO(date, { zone: coachZone }).endOf('day').setZone(buyerZone);
 
-  return [coachStartTime, coachEndTime];
+  const fromIndex = TimeCells.indexOf(coachStartTime.toFormat('HH:mm'));
+  const toIndex = TimeCells.indexOf(coachEndTime.toFormat('HH:m'));
+  return [
+    {
+      date: date,
+      from: fromIndex,
+      end: toIndex || 49,
+    },
+  ];
 }
 
 export default async function getSchedule(buyer: any, coach: any, weekDates: string[]) {
@@ -190,7 +198,7 @@ export default async function getSchedule(buyer: any, coach: any, weekDates: str
   weekDates.forEach((item) => {
     availMap.set(
       item,
-      Array.from({ length: 48 }, () => 'blank'),
+      Array.from({ length: 49 }, () => 'blank'),
     );
   });
 
