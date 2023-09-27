@@ -20,6 +20,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { TimeCells, DaysOfWeek } from '~/shared/data';
 import axios from 'axios';
+import { UtcToLocal } from '~/utils/timezoneConverter';
 
 interface TimeSlot {
   startTime: number;
@@ -87,6 +88,11 @@ export default function Weekly({ curUser, sendWeeklyTimes, hasError }: PageProps
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
+  const temp = {
+    day_of_week: 1,
+    from_time: '03:00',
+    to_time: '13:00',
+  };
   useEffect(() => {
     (async () => {
       const api = '/api/coach/get-avail-times';

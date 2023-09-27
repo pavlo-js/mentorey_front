@@ -23,7 +23,7 @@ export function localToUtc(time: number, timezone: string) {
 export function UtcToLocal(time: number, timezone: string) {
   const offset = getTimezoneOffset(timezone);
   const utcTime = TimeCells[time];
-  const temp = new Date(`1970-01-01T${utcTime}:00Z`);
+  const temp = new Date(`1980-01-01T${utcTime}:00Z`);
   temp.setHours(temp.getHours() + offset);
 
   const localTime = temp.toISOString().substr(11, 5);

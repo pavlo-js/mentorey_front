@@ -1,6 +1,16 @@
 import { DateTime } from 'luxon';
 import { TimeCells } from '~/shared/data';
 
+const TempWeeks: string[] = [
+  '1997-06-09', // Monday
+  '1997-06-10',
+  '1997-06-11',
+  '1997-06-12',
+  '1997-06-13',
+  '1997-06-14',
+  '1997-06-15',
+];
+
 export function getWeekDates(year: number, weekNumber: number): DateTime[] {
   // Create a DateTime object for January 1st of the specified year
   const firstDayOfYear = DateTime.fromObject({ year, month: 1, day: 1 });
@@ -129,4 +139,44 @@ export function overAvailConverter(sourceTz: string, targetTz: string, overTimeS
       to_time: TimeCells.indexOf(toTime.toFormat('HH:mm')),
     },
   ];
+}
+
+// This funnction works for only weekly avail timeslots.
+export function convertToUTCTimeSlot(timeslot: any, timezone: string) {
+  const tempDate = TempWeeks[timeslot.dayOfWeek];
+  const tempFromTime = DateTime.fromISO(`${tempDate}T${TimeCells[timeslot.from]}`, { zone: timezone }).toUTC();
+  const tempToTime = DateTime.fromISO(`${tempDate}T${TimeCells[timeslot.to]}`, { zone: timezone }).toUTC();
+
+  if (tempFromTime.day != tempToTime.day) {
+    return [
+      {
+        coach_id: timeslot.coach_id,
+        dayOfWeek: tempFromTime.weekday,
+        from: TimeCells.indexOf(tempFromTime.toFormat('HH:mm')),
+        to: 48,
+      },
+      {
+        coach_id: timeslot.coach_id,
+        dayOfWeek: tempToTime.weekday,
+        from: 0,
+        to: TimeCells.indexOf(tempToTime.toFormat('HH:mm')),
+      },
+    ];
+  }
+
+  return [
+    {
+      coach_id: timeslot.coach_id,
+      dayOfWeek: tempFromTime.weekday,
+      from: TimeCells.indexOf(tempFromTime.toFormat('HH:mm')),
+      to: TimeCells.indexOf(tempToTime.toFormat('HH:mm')),
+    },
+  ];
+}
+
+// This funnction works for only weekly avail timeslots.
+export function convertToLocalTimeSlots(timeslots: any[], timezone: string) {
+  const temp: any[] = Array(7)
+    .fill(null)
+    .map(() => []);
 }

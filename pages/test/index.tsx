@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { DateTime } from 'luxon';
 
-export default function MainPage() {
-  const [varOne, setVarOne] = useState();
-  const [varTwo, setVarTwo] = useState();
-  const varThree = !!varOne === varTwo;
+export default function TestPage() {
+  const localTime = DateTime.now();
+
+  console.log(DateTime.fromFormat('03:00', 'HH:mm', { zone: localTime.zoneName! }));
+
+  return <div>this is test page</div>;
 }

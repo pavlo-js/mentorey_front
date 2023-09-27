@@ -48,13 +48,13 @@ export default function Schedule() {
 
   const saveWeeklyTimes = async () => {
     if (!weeklyError) {
-      const temp: WeeklyData[] = [];
+      const temp: any[] = [];
       if (weeklyTimes) {
-        weeklyTimes.forEach((item: DayTimes, dayIndex: number) => {
+        weeklyTimes.forEach((item: DayTimes, wdIndex: number) => {
           item.forEach((time: TimeSlot) => {
             temp.push({
               coach_id: curUser.id,
-              dayOfWeek: dayIndex,
+              dayOfWeek: wdIndex,
               from: time.startTime,
               to: time.endTime,
             });
@@ -64,6 +64,7 @@ export default function Schedule() {
 
       const api = '/api/coach/save-weekly-times';
       await axios.post(api, { weeklyAvailTimes: temp });
+      toast.success('Okay');
     } else {
       toast.error('Please fix the override times');
     }
