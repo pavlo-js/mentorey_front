@@ -1,48 +1,49 @@
-import * as React from "react";
-import { useRouter } from "next/router";
-import Link from "next/link";
+import * as React from 'react';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 // Mui Components
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
-import MenuItem from "@mui/material/MenuItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import Divider from "@mui/material/Divider";
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import Menu from '@mui/material/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
+import Container from '@mui/material/Container';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Divider from '@mui/material/Divider';
 // Icons
-import Settings from "@mui/icons-material/Settings";
-import Logout from "@mui/icons-material/Logout";
-import BorderColorIcon from "@mui/icons-material/BorderColor";
-import AddToPhotosIcon from "@mui/icons-material/AddToPhotos";
-import CastForEducationIcon from "@mui/icons-material/CastForEducation";
-import PageviewIcon from "@mui/icons-material/Pageview";
-import Diversity1Icon from "@mui/icons-material/Diversity1";
-import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
-import ForumIcon from "@mui/icons-material/Forum";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import CoPresentIcon from "@mui/icons-material/CoPresent";
-import SchoolIcon from "@mui/icons-material/School";
+import Settings from '@mui/icons-material/Settings';
+import Logout from '@mui/icons-material/Logout';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
+import AddToPhotosIcon from '@mui/icons-material/AddToPhotos';
+import CastForEducationIcon from '@mui/icons-material/CastForEducation';
+import PageviewIcon from '@mui/icons-material/Pageview';
+import Diversity1Icon from '@mui/icons-material/Diversity1';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import ForumIcon from '@mui/icons-material/Forum';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import CoPresentIcon from '@mui/icons-material/CoPresent';
+import SchoolIcon from '@mui/icons-material/School';
+import Diversity2Icon from '@mui/icons-material/Diversity2';
 // Redux
-import { selectAuthState } from "~/slices/authSlice";
-import { useSelector } from "react-redux";
+import { selectAuthState } from '~/slices/authSlice';
+import { useSelector } from 'react-redux';
 
-import Image from "next/image";
+import Image from 'next/image';
 
 const LinkStyle = {
   my: 2,
-  display: "block",
-  color: "#059669",
+  display: 'block',
+  color: '#059669',
   fontSize: 14,
   fontWeight: 600,
-  margin: "0px 16px",
+  margin: '0px 16px',
 };
 
 function InsideHeader() {
@@ -51,15 +52,11 @@ function InsideHeader() {
   const isTeacher = curUser?.is_teacher;
 
   React.useEffect(() => {
-    console.log("Current User: ", curUser);
+    console.log('Current User: ', curUser);
   }, []);
 
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-    null
-  );
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
-    null
-  );
+  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
+  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -78,28 +75,28 @@ function InsideHeader() {
 
   function logOut() {
     localStorage.clear();
-    router.push("/");
+    router.push('/');
   }
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: "white" }}>
+    <AppBar position="sticky" sx={{ backgroundColor: 'white' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           {/* Desktop Logo */}
           <Box
             sx={{
               width: 180,
-              height: "50px",
+              height: '50px',
 
-              display: { xs: "none", md: "flex" },
-              marginRight: "auto",
-              position: "relative",
+              display: { xs: 'none', md: 'flex' },
+              marginRight: 'auto',
+              position: 'relative',
             }}
           >
             <Image src="/logo.svg" alt="logo" fill priority={false} />
           </Box>
           {/* Mobile Link Menu */}
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
+          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
               aria-label="account of current user"
@@ -114,18 +111,18 @@ function InsideHeader() {
               id="menu-appbar-mobile"
               anchorEl={anchorElNav}
               anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
+                vertical: 'bottom',
+                horizontal: 'left',
               }}
               keepMounted
               transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
+                vertical: 'top',
+                horizontal: 'left',
               }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
               sx={{
-                display: { xs: "block", md: "none" },
+                display: { xs: 'block', md: 'none' },
               }}
             >
               <MenuItem>
@@ -159,9 +156,9 @@ function InsideHeader() {
             sx={{
               width: 180,
               height: 50,
-              display: { xs: "flex", md: "none" },
-              marginRight: "auto",
-              position: "relative",
+              display: { xs: 'flex', md: 'none' },
+              marginRight: 'auto',
+              position: 'relative',
             }}
           >
             <Image src="/logo.svg" alt="logo" fill priority={false} />
@@ -170,8 +167,8 @@ function InsideHeader() {
           <Box
             sx={{
               flexGrow: 1,
-              display: { xs: "none", md: "flex" },
-              justifyContent: "center",
+              display: { xs: 'none', md: 'flex' },
+              justifyContent: 'center',
             }}
           >
             <Button sx={LinkStyle} href="/general/learn">
@@ -192,31 +189,29 @@ function InsideHeader() {
             </Button>
           </Box>
           {/* Avatar Button */}
-          <Box sx={{ marginLeft: "auto" }}>
+          <Box sx={{ marginLeft: 'auto' }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar
-                  src={curUser?.avatar != "null" ? curUser.avatar : undefined}
-                />
+                <Avatar src={curUser?.avatar != 'null' ? curUser.avatar : undefined} />
               </IconButton>
             </Tooltip>
             <Menu
-              sx={{ mt: "45px" }}
+              sx={{ mt: '45px' }}
               id="menu-appbar"
               anchorEl={anchorElUser}
               anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
+                vertical: 'top',
+                horizontal: 'right',
               }}
               keepMounted
               transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
+                vertical: 'top',
+                horizontal: 'right',
               }}
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <MenuItem onClick={() => router.push(`/uprof/${curUser["sub"]}`)}>
+              <MenuItem onClick={() => router.push(`/uprof/${curUser['sub']}`)}>
                 <ListItemIcon>
                   <AccountCircleIcon fontSize="small" />
                 </ListItemIcon>
@@ -227,9 +222,7 @@ function InsideHeader() {
                   <ListItemIcon>
                     <CoPresentIcon fontSize="small" />
                   </ListItemIcon>
-                  <Link href={`/profile/coach/${curUser.id}`}>
-                    My Coach Profile
-                  </Link>
+                  <Link href={`/profile/coach/${curUser.id}`}>My Coach Profile</Link>
                 </MenuItem>
               ) : null}
               <Divider />
@@ -261,6 +254,14 @@ function InsideHeader() {
                     <AddToPhotosIcon fontSize="small" />
                   </ListItemIcon>
                   <Link href="/coach/new_lesson">Create a new Lesson</Link>
+                </MenuItem>
+              ) : null}
+              {curUser && isTeacher ? (
+                <MenuItem>
+                  <ListItemIcon>
+                    <Diversity2Icon fontSize="small" />
+                  </ListItemIcon>
+                  <Link href="/coach/new-seminar">Create a new Seminar</Link>
                 </MenuItem>
               ) : null}
               {curUser && isTeacher ? (

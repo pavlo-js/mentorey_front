@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Paper } from "@mui/material";
+import React, { useState, useEffect } from 'react';
+import { Paper } from '@mui/material';
 // Data grid imports
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Close";
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Close';
 import {
   GridRowsProp,
   GridRowModesModel,
@@ -20,26 +20,24 @@ import {
   GridRowId,
   GridRowModel,
   GridRowEditStopReasons,
-} from "@mui/x-data-grid";
-import CircularProgress from "@mui/material/CircularProgress";
+} from '@mui/x-data-grid';
+import CircularProgress from '@mui/material/CircularProgress';
 // Redux imports
-import { useSelector } from "react-redux";
-import { selectAuthState } from "~/slices/authSlice";
+import { useSelector } from 'react-redux';
+import { selectAuthState } from '~/slices/authSlice';
 // Currency Imports
-import { CurrencyData } from "~/shared/CurrencyData";
-import Link from "next/link";
+import { CurrencyData } from '~/shared/CurrencyData';
+import Link from 'next/link';
 
 const LessonType: any = {
-  MIN30: "30min",
-  MIN60: "60min",
-  MIXED: "Mixed",
+  MIN30: '30min',
+  MIN60: '60min',
+  MIXED: 'Mixed',
 };
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-  setRowModesModel: (
-    newModel: (oldModel: GridRowModesModel) => GridRowModesModel
-  ) => void;
+  setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
 }
 function EditToolbar() {
   return (
@@ -53,9 +51,7 @@ function EditToolbar() {
 
 export default function MyLessons() {
   const [rows, setRows] = React.useState<any[]>([]);
-  const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
-    {}
-  );
+  const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [categories, setCategories] = useState<any[]>([]);
   const curUser = useSelector(selectAuthState);
@@ -69,7 +65,7 @@ export default function MyLessons() {
   }, []);
 
   function getAllCategories() {
-    const url = "/api/common/getAllCategories";
+    const url = '/api/common/get-all-categories';
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
@@ -81,15 +77,15 @@ export default function MyLessons() {
   useEffect(() => {
     if (categories?.length) {
       const request = {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userID: curUser?.id,
         }),
       };
-      const url = "/api/coach/my_lessons";
+      const url = '/api/coach/my_lessons';
       fetch(url, request)
         .then((res) => res.json())
         .then((data) => generateRows(data.lessons))
@@ -100,18 +96,7 @@ export default function MyLessons() {
   function generateRows(data: any) {
     const rows: any[] = [];
     data.map((item: any, key: number) => {
-      const {
-        id,
-        title,
-        price,
-        pack,
-        disRate,
-        categoryID,
-        description,
-        purpose,
-        created_at,
-        updated_at,
-      } = item;
+      const { id, title, price, pack, disRate, categoryID, description, purpose, created_at, updated_at } = item;
       const category = categories.find((item) => item.id === categoryID);
       rows.push({
         id,
@@ -151,61 +136,61 @@ export default function MyLessons() {
 
   const myColumns: GridColDef[] = [
     {
-      field: "index",
-      headerName: "No",
-      type: "number",
+      field: 'index',
+      headerName: 'No',
+      type: 'number',
       width: 50,
-      headerAlign: "left",
-      align: "left",
+      headerAlign: 'left',
+      align: 'left',
     },
     {
-      field: "title",
-      type: "string",
-      headerName: "Title",
+      field: 'title',
+      type: 'string',
+      headerName: 'Title',
       width: 200,
-      headerAlign: "left",
-      align: "left",
+      headerAlign: 'left',
+      align: 'left',
     },
     {
-      field: "category",
-      type: "string",
-      headerName: "Category",
+      field: 'category',
+      type: 'string',
+      headerName: 'Category',
       width: 150,
     },
     {
-      field: "price",
-      type: "number",
+      field: 'price',
+      type: 'number',
       headerName: `Price (${currencySymbol})`,
       width: 100,
     },
     {
-      field: "pack",
-      type: "number",
-      headerName: "Pack count",
+      field: 'pack',
+      type: 'number',
+      headerName: 'Pack count',
       width: 100,
     },
     {
-      field: "disRate",
-      type: "number",
-      headerName: "Discount Rate",
+      field: 'disRate',
+      type: 'number',
+      headerName: 'Discount Rate',
       width: 100,
     },
     {
-      field: "created_at",
-      type: "date",
-      headerName: "Created At",
+      field: 'created_at',
+      type: 'date',
+      headerName: 'Created At',
     },
     {
-      field: "updated_at",
-      type: "date",
-      headerName: "Updated At",
+      field: 'updated_at',
+      type: 'date',
+      headerName: 'Updated At',
     },
     {
-      field: "actions",
-      type: "actions",
-      headerName: "Actions",
+      field: 'actions',
+      type: 'actions',
+      headerName: 'Actions',
       width: 100,
-      cellClassName: "actions",
+      cellClassName: 'actions',
       getActions: ({ id }) => {
         return [
           <GridActionsCellItem

@@ -28,7 +28,7 @@ export default function Availability({ coach }: { coach: any }) {
   useEffect(() => {
     (async () => {
       const schedule = await getSchedule(curUser, coach, curWeekDates);
-      // setSchedule(schedule);
+      setSchedule(schedule);
     })();
   }, []);
 

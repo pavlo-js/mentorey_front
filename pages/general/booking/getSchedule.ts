@@ -171,16 +171,34 @@ function convertAvail(avail: Map<string, any[]>) {
 }
 
 function getOverStartEnd(date: string, coachZone: string, buyerZone: string) {
-  const coachStartTime = DateTime.fromISO(date, { zone: coachZone }).startOf('day').setZone(buyerZone);
-  const coachEndTime = DateTime.fromISO(date, { zone: coachZone }).endOf('day').setZone(buyerZone);
+  const startTime = DateTime.fromISO(date, { zone: coachZone }).startOf('day').setZone(buyerZone);
+  const endTime = DateTime.fromISO(`${date}T23:30`, { zone: coachZone }).setZone(buyerZone);
 
-  const fromIndex = TimeCells.indexOf(coachStartTime.toFormat('HH:mm'));
-  const toIndex = TimeCells.indexOf(coachEndTime.toFormat('HH:m'));
+  const fromIndex = TimeCells.indexOf(startTime.toFormat('HH:mm'));
+  const toIndex = TimeCells.indexOf(endTime.toFormat('HH:m')) + 1;
+
+  if (startTime.day != endTime.day) {
+    return [
+      {
+        date: startTime.toFormat('yyyy-MM-dd'),
+        from: fromIndex,
+        to: 49,
+        status: 'blank',
+      },
+      {
+        date: endTime.toFormat('yyyy-MM-dd'),
+        from: 0,
+        to: toIndex,
+        status: 'blank',
+      },
+    ];
+  }
   return [
     {
-      date: date,
+      date: startTime.toFormat('yyyy-MM-dd'),
       from: fromIndex,
-      end: toIndex || 49,
+      to: toIndex || 49,
+      status: 'blank',
     },
   ];
 }
@@ -196,9 +214,10 @@ export default async function getSchedule(buyer: any, coach: any, weekDates: str
   const availMap = new Map<string, any[]>();
 
   weekDates.forEach((item) => {
+    console.log(item);
     availMap.set(
       item,
-      Array.from({ length: 49 }, () => 'blank'),
+      Array.from({ length: 48 }, () => 'blank'),
     );
   });
 
@@ -210,7 +229,7 @@ export default async function getSchedule(buyer: any, coach: any, weekDates: str
   //     status: 'avail',
   //   });
   // });
-
+  // ////////////////////////////////////////////////////
   // convert weekly avail times from coach's timezone to buyer's timezone
   const convertedWeeklyAvail = convertWeeklyAvail(weeklyAvail, coach.timezone, buyer.timezone, weekDates);
 
@@ -218,28 +237,41 @@ export default async function getSchedule(buyer: any, coach: any, weekDates: str
     availMap.get(slot.date)?.fill(slot.status, slot.from, slot.to);
   });
 
-  console.log(getOverStartEnd('2023-06-13', coach.timezone, buyer.timezone));
+  const overMap = new Map<string, any[]>();
+  overAvail.forEach((slot: any) => {
+    if (!overMap.has(slot.date)) {
+      overMap.set(slot.date, []);
+    }
+    overMap.get(slot.date)?.push({ from: slot.from_time, to: slot.to_time, status: 'avail' });
+  });
+  const overDates = Array.from(overMap.keys());
 
-  // const overMap = new Map<string, any[]>();
-  // overAvail.forEach((slot: any) => {
-  //   if (!overMap.has(slot.date)) {
-  //     overMap.set(slot.date, []);
-  //   }
-  //   overMap.get(slot.date)?.push({ from: slot.from_time, to: slot.to_time, status: 'avail' });
-  // });
+  console.log(overDates);
+
+  // // determine the start time and end time based on buyer's timezone
+  const overStartEnds = overDates.map((date) => getOverStartEnd(date, coach.timezone, buyer.timezone)).flat();
+  overStartEnds.forEach((slot) => {
+    availMap.get(slot.date)?.fill(slot.status, slot.from, slot.to);
+  });
+
   // // Update avail
-  // overMap.forEach((value, key) => {
-  //   if (avail.has(key)) {
-  //     avail.set(key, value);
-  //   }
-  // });
+  overMap.forEach((value, key) => {
+    if (availMap.has(key)) {
+      value.map((slot) => {
+        availMap.get(key)?.fill(slot.status, slot.from, slot.to);
+      });
+    }
+  });
 
+  const schedule: any[] = [];
+  availMap.forEach((value, key) => {
+    schedule.push({ date: key, timeSlots: value });
+  });
+
+  return schedule;
+  ///////////////////////////////////////////////////////
   // // Convert avail into buyer's timezone
   // const convertedAvail = convertAvail(avail);
-
-  console.log(DateTime.fromISO('2023-09-15T24:00:00'));
-
-  ('2023-09-16T00:00:00.000+09:00');
 
   // coachBookings.map((booking: any) => {
   //   const fromTime = DateTime.fromISO(booking.start_time).toUTC().setZone(buyer.timezone);

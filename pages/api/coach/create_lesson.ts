@@ -1,33 +1,14 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import db from "~/database/db";
-import { RowDataPacket } from "mysql2/promise";
+import { NextApiRequest, NextApiResponse } from 'next';
+import db from '~/database/db';
 
 const createLesson = async (req: NextApiRequest, res: NextApiResponse) => {
-  const {
-    userID,
-    lessonPack,
-    disRate,
-    lessonTitle,
-    lessonCategory,
-    price,
-    description,
-    purpose,
-  } = req.body;
+  const { userID, lessonPack, disRate, lessonTitle, lessonCategory, price, description, purpose } = req.body;
   try {
     const query =
-      "INSERT INTO lessons (ownerID, title, price, pack, disRate, categoryID, description, purpose) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    const params = [
-      userID,
-      lessonTitle,
-      price,
-      lessonPack,
-      disRate,
-      lessonCategory,
-      description,
-      purpose,
-    ];
+      'INSERT INTO lessons (ownerID, title, price, pack, disRate, categoryID, description, purpose) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+    const params = [userID, lessonTitle, price, lessonPack, disRate, lessonCategory, description, purpose];
     await db.execute(query, params);
-    res.status(200).send("success");
+    res.status(200).send('success');
   } catch (error) {
     res.status(500).json(error);
   }
