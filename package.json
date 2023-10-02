@@ -22,7 +22,6 @@
     "@mui/x-data-grid": "^6.11.2",
     "@mui/x-date-pickers": "^6.11.1",
     "@mui/x-date-pickers-pro": "^6.11.2",
-    "@next/swc-win32-x64-msvc": "^13.4.19",
     "@pubnub/react-chat-components": "^0.30.0",
     "@reduxjs/toolkit": "^1.9.5",
     "@stripe/react-stripe-js": "^2.3.0",
