@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { Box, Paper, Typography, Tooltip, Badge, Avatar, Button } from '@mui/material';
-import { BannerContainer, CategoryLabel, SeminarTitleContainer } from './components';
+import { BannerContainer, CategoryLabel, SeminarTitleContainer } from '../../../src/components/common/SeminarComponent';
 import ReactCountryFlag from 'react-country-flag';
 import { countries } from '~/shared/data';
 import { CurrencyData } from '~/shared/CurrencyData';

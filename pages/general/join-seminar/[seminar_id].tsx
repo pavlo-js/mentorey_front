@@ -7,7 +7,6 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useQuery } from 'react-query';
 import InsideLayout from '~/layouts/InsideLayout';
-import { BannerContainer } from './components';
 import Image from 'next/image';
 import ReactCountryFlag from 'react-country-flag';
 import { countries } from '~/shared/data';
@@ -15,6 +14,16 @@ import LanguageIcon from '@mui/icons-material/Language';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import GroupIcon from '@mui/icons-material/Group';
 import TopicIcon from '@mui/icons-material/Topic';
+import styled from '@emotion/styled';
+
+const BannerContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+`;
 
 const defaultBanner = '/img/default-seminar.jpg';
 
