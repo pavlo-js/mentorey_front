@@ -1,4 +1,4 @@
-import { Box, Button, Container, Paper, Typography, InputAdornment } from '@mui/material';
+import { Box, Button, Container, Paper, Typography, InputAdornment, Chip, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import axios from 'axios';
 import { TextFieldElement, SelectElement, useForm } from 'react-hook-form-mui';
@@ -51,6 +51,20 @@ export default function NewSeminar() {
 
   const curUser = useSelector(selectAuthState);
   const currencySymbol = CurrencyData[curUser?.currency]?.symbol;
+
+  const languages = JSON.parse(curUser.language);
+
+  const languageOptions = languages.map((item: any) => {
+    return { id: item, label: item };
+  });
+
+  const commuicationTools = [];
+
+  if (curUser.skype) commuicationTools.push({ id: 'skype', label: 'Skype' });
+  if (curUser.zoom) commuicationTools.push({ id: 'zoom', label: 'Zoom' });
+  if (curUser.discord) commuicationTools.push({ id: 'discord', label: 'Discord' });
+  if (curUser.slack) commuicationTools.push({ id: 'slack', label: 'Slack' });
+  if (curUser.hangouts) commuicationTools.push({ id: 'hangouts', label: 'Hangouts' });
 
   const onSubmit = handleSubmit(async (data) => {
     const banner = bannerURL != defaultPlaceholder ? bannerURL : 'default';
@@ -165,6 +179,26 @@ export default function NewSeminar() {
                   label="Seminar Type"
                   name={'duration'}
                   options={SeminarTypes}
+                  control={control}
+                  size="small"
+                  className="w-1/2 my-2 pl-1"
+                  required
+                />
+
+                <SelectElement
+                  label="Language"
+                  name={'language'}
+                  options={languageOptions}
+                  control={control}
+                  size="small"
+                  className="w-1/2 my-2 pr-1"
+                  required
+                />
+
+                <SelectElement
+                  label="Communication Tool"
+                  name={'communication'}
+                  options={commuicationTools}
                   control={control}
                   size="small"
                   className="w-1/2 my-2 pl-1"
