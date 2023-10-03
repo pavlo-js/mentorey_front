@@ -1,0 +1,11 @@
+{
+  "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
+  "/_document": "pages/_document.js",
+  "/general/join-seminar/[seminar_id]": "pages/general/join-seminar/[seminar_id].js",
+  "/api/common/get-all-categories": "pages/api/common/get-all-categories.js",
+  "/api/common/get-seminar": "pages/api/common/get-seminar.js",
+  "/api/common/get-user-by-id": "pages/api/common/get-user-by-id.js",
+  "/api/common/getCurrencyRates": "pages/api/common/getCurrencyRates.js",
+  "/api/payment/create-payment-intent": "pages/api/payment/create-payment-intent.js"
+}
