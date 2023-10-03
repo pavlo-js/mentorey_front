@@ -1,4 +1,4 @@
-import { Avatar, Box, Container, Paper, Typography, Tooltip, Badge, Stack, Chip } from '@mui/material';
+import { Avatar, Box, Container, Paper, Typography, Tooltip, Badge, Stack, Chip, Button } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -15,6 +15,11 @@ import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import GroupIcon from '@mui/icons-material/Group';
 import TopicIcon from '@mui/icons-material/Topic';
 import styled from '@emotion/styled';
+import { DateTime } from 'luxon';
+import { useSelector } from 'react-redux';
+import { selectAuthState } from '~/slices/authSlice';
+import { useEffect, useState } from 'react';
+import SeminarCheckOut from './CheckOut';
 
 const BannerContainer = styled.div`
   position: relative;
@@ -42,8 +47,10 @@ const CommunicationToolLogos: any = {
 };
 
 export default function JoinSeminarPage() {
+  const [instace, setInstance] = useState<number>();
   const router = useRouter();
   const seminarBasicID = router.query.seminar_id;
+  const curUser = useSelector(selectAuthState);
 
   const { data: seminar } = useQuery({
     queryKey: ['getSeminar', seminarBasicID],
@@ -66,17 +73,33 @@ export default function JoinSeminarPage() {
   const seminarBasic = seminar?.seminarBasic[0];
   const seminarInstances = seminar?.seminarInstances;
   const seminarBookings = seminar?.seminarBookings;
+  const seminarBookingsMap = new Map<number, any[]>();
 
-  const category = categories?.find((item: any) => (item.id = seminarBasic?.category_id));
+  useEffect(() => {
+    if (seminarInstances && seminarInstances.length > 0) {
+      setInstance(seminarInstances[0].id);
+    }
+  }, [seminarInstances]);
+
+  seminarBookings?.map((booking: any) => {
+    if (!seminarBookingsMap.has(booking.seminar_id)) {
+      seminarBookingsMap.set(booking.seminar_id, []);
+    }
+    seminarBookingsMap.get(booking.seminar_id)?.push(booking);
+  });
+
+  const category = categories?.find((category: any) => (category.id = seminarBasic?.category_id));
 
   const country = countries.find((country) => country.code === seminarBasic?.country)?.code;
+
+  const test = seminarBookingsMap.get(1)?.filter((booking) => booking.seminar_id === 1);
 
   return (
     seminar &&
     category && (
       <InsideLayout>
         <Container className="flex flex-wrap max-w-4xl mx-auto">
-          <Paper className="w-full md:w-3/5 p-2 md:p-4">
+          <Paper className="w-full md:w-3/5 p-2 md:p-4 order-2 md:order-1">
             <BannerContainer>
               <Image
                 src={seminarBasic.banner === 'default' ? defaultBanner : seminar.banner}
@@ -88,36 +111,36 @@ export default function JoinSeminarPage() {
             <Typography component={'h3'} className="first-letter:capitalize text-lg font-semibold my-3">
               {seminarBasic.seminar_title}
             </Typography>
-            <Stack direction="row" spacing={1} className="my-2">
+            <Box className="my-2 flex flex-wrap">
               <Chip
                 icon={<LanguageIcon />}
                 label={seminarBasic.seminar_language}
                 variant="outlined"
                 size="small"
-                className="px-1 select-none"
+                className="px-1 select-none m-1"
               />
               <Chip
                 icon={<WatchLaterIcon />}
                 label={SeminarTypes[seminarBasic.duration].label}
                 variant="outlined"
                 size="small"
-                className="px-1 select-none"
+                className="px-1 select-none m-1"
               />
               <Chip
                 icon={<GroupIcon />}
                 label={`${seminarBasic.max_pupil_num}spots/seminar`}
                 variant="outlined"
                 size="small"
-                className="px-1 select-none"
+                className="px-1 select-none m-1"
               />
               <Chip
                 icon={<TopicIcon />}
                 label={`${category.label}`}
                 variant="outlined"
                 size="small"
-                className="px-1 select-none"
+                className="px-1 select-none m-1"
               />
-            </Stack>
+            </Box>
             {/* <Box className="flex items-center">
               <Tooltip title={country}>
                 <Badge
@@ -155,7 +178,7 @@ export default function JoinSeminarPage() {
               <Typography className="text-sm text-gray-400">{seminarBasic.purpose}</Typography>
             </Box>
           </Paper>
-          <Paper className="w-full md:flex-1 ml-2 p-2 md:p-4">
+          <Paper className="w-full mb-2 md:mb-0 md:flex-1 md:ml-2 p-2 md:p-4 order-1 md:order-2">
             <Box className="flex items-center">
               <Typography>Communication Tool: </Typography>
               <Image
@@ -165,6 +188,25 @@ export default function JoinSeminarPage() {
                 alt="communicationTool"
               />
             </Box>
+            <Typography className="mt-2 text-base font-semibold text-gray-500">
+              Select the best start time for you{' '}
+            </Typography>
+            {seminarInstances.map((instance: any) => (
+              <>
+                {instance.id === instace ? (
+                  <Button fullWidth variant="contained" className="bg-primary-600 my-1">
+                    {DateTime.fromISO(instance.start_time).setZone(curUser.timezone).toFormat('yyyy-MM-dd hh:mm')}{' '}
+                    {seminarBookingsMap.get(instance.id)?.length}/{seminarBasic.max_pupil_num} spots
+                  </Button>
+                ) : (
+                  <Button fullWidth variant="outlined" className="my-1" onClick={() => setInstance(instance.id)}>
+                    {DateTime.fromISO(instance.start_time).setZone(curUser.timezone).toFormat('yyyy-MM-dd hh:mm')}{' '}
+                    {seminarBookingsMap.get(instance.id)?.length}/{seminarBasic.max_pupil_num} spots
+                  </Button>
+                )}
+              </>
+            ))}
+            <SeminarCheckOut seminar={seminarBasic} />
           </Paper>
         </Container>
       </InsideLayout>

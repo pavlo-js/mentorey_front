@@ -25,7 +25,7 @@ export default function Profile() {
     queryKey: ['getCoach', coachID],
     queryFn: () => {
       if (coachID) {
-        const api = '/api/common/getUser';
+        const api = '/api/common/get-user-by-id';
         const request = {
           method: 'POST',
           headers: {
